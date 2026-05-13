@@ -1,0 +1,58 @@
+<div class="form-group">
+    <label for="txt_subject" class="col-lg-3 control-label">Subject</label>
+    <div class="col-lg-9">
+        <input type="text" id="txt_subject" placeholder="Enter subject" name="txt_subject"  class="form-control" ng-class="emailcontent.txt_subject.$invalid && !emailcontent.txt_subject.$pristine" ng-model="form.txt_subject" required/>
+    </div>
+</div>
+
+<!--<div class="form-group">
+    <label for="opt_mx_institution_id" class="col-lg-3 control-label">Institution</label>
+    <div class="col-lg-9">
+        <select name="opt_mx_institution_id" id="opt_mx_institution_id" class="form-control" ng-model="form.opt_mx_institution_id"
+                ng-options="value.id as value.name for (key, value) in dropdowns.opt_mx_institution_ids" required>
+            <option value=""> Select  Institution</option>
+        </select>
+    </div>
+</div>-->
+
+<div class="form-group">
+    <label for="tar_email_body" class="col-lg-3 control-label">Email Body</label>
+    <div class="col-lg-9">
+        <textarea class="form-control" cols="50" id="tar_email_body" placeholder="Write email body" name="tar_email_body" ng-model="form.tar_email_body" required></textarea>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="txt_email_signature" class="col-lg-3 control-label">Email Signature</label>
+    <div class="col-lg-9">
+        <input type="text" id="txt_email_signature" placeholder="Enter signature" name="txt_email_signature"  class="form-control" ng-class="emailcontent.txt_email_signature.$invalid && !emailcontent.txt_email_signature.$pristine" ng-model="form.txt_email_signature" required/>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="txt_bcc" class="col-lg-3 control-label">Bcc</label>
+    <div class="col-lg-9">
+        <input type="text" id="txt_bcc" placeholder="Enter bcc" name="txt_bcc"  class="form-control" ng-class="emailcontent.txt_bcc.$invalid && !emailcontent.txt_bcc.$pristine" ng-model="form.txt_bcc" required/>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="opt_mx_source_id" class="col-lg-3 control-label">Reason</label>
+    <div class="col-lg-9">
+        <select name="opt_mx_source_id" id="opt_mx_source_id" class="form-control" ng-model="form.opt_mx_source_id" required 
+                ng-options="value.id as value.name for (key, value) in dropdowns.opt_mx_source_ids">
+            <option value="">Select Reason</option>
+        </select>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="opt_mx_email_language_id" class="col-lg-3 control-label">Email Language</label>
+    <div class="col-lg-9">
+        <select name="opt_mx_email_language_id" id="opt_mx_email_language_id" class="form-control" ng-model="form.opt_mx_email_language_id"
+                ng-options="value.id as value.name for (key, value) in dropdowns.opt_mx_email_language_ids" required>
+            <option value=""> Select  Language</option>
+        </select>
+    </div>
+</div>
+

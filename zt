@@ -1,0 +1,43 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+// Load framework configuration (handles .env)
+require_once __DIR__ . '/configuration/config.php';
+
+use Library\Console\ModuleGenerator;
+use Database\Schema\DatabaseInitializer;
+use Database\Database;
+
+$command = $argv[1] ?? null;
+
+if ($command === 'make:module') {
+    $name = $argv[2] ?? null;
+    if (!$name) {
+        echo "Usage: php zt make:module <ModuleName>\n";
+        exit(1);
+    }
+    (new ModuleGenerator())->generate($name);
+} elseif ($command === 'db:init') {
+    $sqlPath = __DIR__ . '/Database/Schema/init.sql';
+    $initializer = new DatabaseInitializer(new Database());
+    $result = $initializer->initialize($sqlPath);
+
+    echo $result['message'] . "\n";
+    if ($result['status'] === 'error') exit(1);
+} elseif ($command === 'db:seed') {
+    $sqlPath = __DIR__ . '/Database/Schema/seed.sql';
+    $initializer = new DatabaseInitializer(new Database());
+    $result = $initializer->initialize($sqlPath);
+
+    echo $result['message'] . "\n";
+    if ($result['status'] === 'error') exit(1);
+} else {
+    echo "Zantech CLI Utility\n";
+    echo "--------------------\n";
+    echo "Available commands:\n";
+    echo "  make:module <Name>    Scaffold a new module\n";
+    echo "  db:init               Initialize database with core schema\n";
+    echo "  db:seed               Seed database with initial data\n";
+}

@@ -1,0 +1,52 @@
+{
+  "require": {
+    "php": "^8.2",
+    "phpmailer/phpmailer": "*",
+    "twbs/bootstrap": "3.3.*",
+    "ext-pdo": "*",
+    "ext-json": "*",
+    "ext-fileinfo": "*",
+    "ext-curl": "*",
+    "phpoffice/phpspreadsheet": "*",
+    "mailgun/mailgun-php": "*",
+    "kriswallsmith/buzz": "*",
+    "nyholm/psr7": "*",
+    "fpdf/fpdf": "^1.84",
+    "vlucas/phpdotenv": "*",
+    "ext-simplexml": "*",
+    "dompdf/dompdf": "*",
+    "endroid/qr-code": "*",
+    "alphaolomi/mrz": "^1.0",
+    "chillerlan/php-qrcode": "^5.0",
+    "aferrandini/phpqrcode": "^1.0",
+    "ext-gd": "*",
+    "ext-openssl": "*",
+    "mpdf/mpdf": "^8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Loggers\\": "Loggers/",
+      "Exceptions\\": "Exceptions/",
+      "Library\\": "Library/",
+      "Foundation\\": "Foundation/",
+      "Authentication\\": "Authentication/",
+      "Database\\": "Database/",
+      "Services\\": "Services/",
+      "Notification\\": "Notification/",
+      "Modules\\": "Modules/",
+      "Libs\\": "Libs/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "php-http/discovery": true
+    }
+  },
+  "style": "default",
+  "tailwind": {},
+  "rsc": false,
+  "aliases": {},
+  "require-dev": {
+    "phpunit/phpunit": "^11.5"
+  }
+}

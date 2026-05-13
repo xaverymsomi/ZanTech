@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+        bootstrap="tests/bootstrap.php"
+        colors="true"
+        cacheDirectory=".phpunit.cache"
+        failOnRisky="true"
+        failOnWarning="true"
+>
+    <testsuites>
+        <testsuite name="Zantech Test Suite">
+            <directory suffix="Test.php">tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <!-- Ensure consistent env for tests -->
+        <env name="ENV" value="testing"/>
+        <env name="APP_DEBUG" value="true"/>
+        <env name="TRUSTED_PROXIES" value="127.0.0.1"/>
+    </php>
+</phpunit>

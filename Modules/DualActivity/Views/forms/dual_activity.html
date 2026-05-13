@@ -1,0 +1,11 @@
+<div class="form-group">
+    <label for="int_require_dual_activity" class="col-lg-3 control-label">Require Dual Activity</label>
+    <div class="col-lg-9">
+        <select name="int_require_dual_activity" id="int_require_dual_activity" class="form-control" ng-model="form.int_require_dual_activity" required 
+                ng-options="value.id as value.name for (key, value) in dropdowns.opt_require_dual_activity">
+            <option value="">Select One</option>
+        </select>
+    </div>
+
+</div>
+

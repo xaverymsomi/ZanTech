@@ -1,0 +1,98 @@
+<!--Activate User Form-->
+<!--author: Fatma Azad-->
+<div id="page-content">
+  <form name="activate" ng-submit="Activate()" novalidate>
+    <div
+      class="modal-header"
+      style="
+        background: linear-gradient(
+          to right,
+          #030000,
+          rgba(3, 3, 3, 0.95),
+          #00aeef
+        );
+        color: white;
+      "
+    >
+      <button
+        type="button"
+        ng-click="cancel()"
+        class="close"
+        data-dismiss="modal"
+        style="color: white; font-size: 35px"
+      >
+        &times;
+      </button>
+      <h4 class="modal-title ocean">
+        <i class="pe pe-7s-unlock pe-fw pe-va pe-2x"></i>{{title}}
+      </h4>
+    </div>
+    <div class="modal-body">
+      <div class="form-horizontal">
+        <input type="hidden" id="id" name="id" value="" ng-model="form.id" />
+        <div class="form-group">
+          <label for="checkme" class="col-lg-2 control-label"></label>
+          <div class="col-lg-8">
+            <h2 class="text-success">
+              <i class="pe pe-7s-unlock pe-fw pe-va pe-2x"></i>User Account
+              Activation
+            </h2>
+            <span
+              >In order to activate user account, you must click the “I have
+              read and agreed to Account Activation Policy” and then click the
+              “Submit” button.</span
+            ><br />
+            <br />
+            <input
+              type="checkbox"
+              id="checkme"
+              name="checkme"
+              ng-model="checkme"
+              required
+            />
+
+            <b
+              >I have read and agreed to the
+              <span class="text-success">Account Activation Policy</span></b
+            >
+          </div>
+        </div>
+
+        <input
+          type="hidden"
+          id="dat_date"
+          name="dat_date"
+          value=""
+          ng-model="form.dat_date"
+        />
+
+        <input
+          type="hidden"
+          id="txt_mx_user_id"
+          name="txt_mx_user_id"
+          value=""
+          ng-model="form.txt_mx_user_id"
+        />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        type="submit"
+        ng-disabled="!checkme"
+        class="btn btn-info"
+        name="submit"
+      >
+        Submit
+      </button>
+      <button
+        ng-click="cancel()"
+        type="button"
+        class="btn btn-danger"
+        data-dismiss="modal"
+      >
+        Close
+      </button>
+    </div>
+  </form>
+</div>

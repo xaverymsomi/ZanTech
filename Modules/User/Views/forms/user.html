@@ -1,0 +1,89 @@
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h5 class="text-center" style="text-transform: uppercase; font-size: 1.3em; opacity: 0.7;">Fill the form to create new system user</h5>
+                <hr/>
+                <div class="row">
+                    <div class="col-md-2 col-lg-2"></div>
+                    <div class="col-md-8 col-lg-8">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-6 col-lg-6">
+                                        <div class="form-group">
+                                            <label for="txt_name" class="col-md-12 col-lg-12">Name</label>
+                                            <div class="col-md-12 col-lg-12">
+                                                <input type="text" id="txt_name" placeholder="Enter name" name="txt_name"  class="form-control"
+                                                       ng-class="user.txt_name.$invalid && !user.txt_name.$pristine" ng-model="form.txt_name" required/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-6">
+                                        <div class="form-group">
+                                            <label for="email" class="col-md-12 col-lg-12">Email</label>
+                                            <div class="col-md-12 col-lg-12">
+                                                <input type="email" id="email" placeholder="Enter email" name="email"  class="form-control"
+                                                       ng-class="user.email.$invalid && !user.email.$pristine" ng-model="form.email" required/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 col-lg-6">
+                                        <div class = "form-group">
+                                            <label for = "txt_mobile" class = "col-md-12 col-lg-12">Mobile</label>
+                                            <div class = "col-md-12 col-lg-12">
+                                                <input type = "text" id = "txt_mobile" pattern="[0]{1}[0-9]{3}[0-9]{6}" placeholder = "Enter mobile" name = "txt_mobile" title="Please Use 0********* format" class = "form-control"
+                                                       ng-class = "user.txt_mobile.$invalid && !user.txt_mobile.$pristine" ng-model = "form.txt_mobile" />
+                                                <div class="mobile_error"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-lg-6">
+                                        <div class = "form-group" ng-if ="dropdowns.opt_mx_groups_ids.length > 0">
+                                            <label for = "group_id" class = "col-md-12 col-lg-12">User Group</label>
+                                            <div class = "col-md-12 col-lg-12">
+                                                <select name = "group_id" id = "group_id" class = "form-control" ng-model = "form.group_id"
+                                                        ng-options = "value.id as value.name for (key, value) in dropdowns.opt_mx_groups_ids">
+                                                    <option value = "">Select Group</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 col-lg-6">
+                                        <div class = "form-group" ng-if = "dropdowns.opt_mx_groups_ids.length === 0">
+                                            <label for = "group_id" class = "col-md-12 col-lg-12">User Group</label>
+                                            <div class = "col-md-12 col-lg-12">
+                                                <p>No Group Added please add Groups before trying to add new user</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class = "col-md-6 col-lg-6" >
+                                        <div class="form-group" ng-if = "form.group_id === 4">
+                                            <label for = "opt_mx_test_center_id" class = "col-md-12 col-lg-12">User Center</label>
+                                            <div class = "col-md-12 col-lg-12">
+                                                <select name = "opt_mx_test_center_id" id = "opt_mx_test_center_id" class = "form-control" ng-model = "form.opt_mx_test_center_id" 
+                                                        ng-options = "value.id as value.name for (key, value) in dropdowns.opt_mx_test_center_ids">
+                                                    <option value = "">Select Center</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+

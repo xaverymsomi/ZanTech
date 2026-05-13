@@ -1,0 +1,148 @@
+<div class="row g-3">
+    <!-- Host Field -->
+    <div class="col-12">
+        <label for="txt_host" class="form-label fw-medium">
+            <i class="fa fa-server text-primary me-2"></i>Host
+        </label>
+        <input type="text" 
+               id="txt_host" 
+               placeholder="Enter SMS gateway host" 
+               name="txt_host" 
+               class="form-control" 
+               ng-class="{'is-invalid': smssetup.txt_host.$invalid && !smssetup.txt_host.$pristine}" 
+               ng-model="form.txt_host" 
+               autocomplete="off"
+               required />
+        <div class="invalid-feedback" ng-show="smssetup.txt_host.$invalid && !smssetup.txt_host.$pristine">
+            Host is required
+        </div>
+    </div>
+
+    <!-- Port Field -->
+    <div class="col-12">
+        <label for="int_port" class="form-label fw-medium">
+            <i class="fa fa-plug text-primary me-2"></i>Port
+        </label>
+        <input type="number" 
+               id="int_port" 
+               placeholder="Enter port number" 
+               name="int_port" 
+               class="form-control" 
+               ng-class="{'is-invalid': smssetup.int_port.$invalid && !smssetup.int_port.$pristine}" 
+               ng-model="form.int_port" 
+               autocomplete="off"
+               required />
+        <div class="invalid-feedback" ng-show="smssetup.int_port.$invalid && !smssetup.int_port.$pristine">
+            Port is required
+        </div>
+    </div>
+
+    <!-- Username Field -->
+    <div class="col-12">
+        <label for="txt_username" class="form-label fw-medium">
+            <i class="fa fa-user text-primary me-2"></i>Username
+        </label>
+        <input type="text" 
+               id="txt_username" 
+               placeholder="Enter SMS gateway username" 
+               name="txt_username" 
+               class="form-control" 
+               ng-class="{'is-invalid': smssetup.txt_username.$invalid && !smssetup.txt_username.$pristine}" 
+               ng-model="form.txt_username" 
+               autocomplete="username"
+               required />
+        <div class="invalid-feedback" ng-show="smssetup.txt_username.$invalid && !smssetup.txt_username.$pristine">
+            Username is required
+        </div>
+    </div>
+
+    <!-- Password Field -->
+    <div class="col-12">
+        <label for="password" class="form-label fw-medium">
+            <i class="fa fa-lock text-primary me-2"></i>Password
+        </label>
+        <input type="password" 
+               id="password" 
+               placeholder="Enter SMS gateway password" 
+               name="password" 
+               class="form-control" 
+               ng-class="{'is-invalid': smssetup.password.$invalid && !smssetup.password.$pristine}" 
+               ng-model="form.password" 
+               autocomplete="current-password"
+               required />
+        <div class="invalid-feedback" ng-show="smssetup.password.$invalid && !smssetup.password.$pristine">
+            Password is required
+        </div>
+    </div>
+
+    <!-- Message Type Field -->
+    <div class="col-12">
+        <label for="txt_msg_type" class="form-label fw-medium">
+            <i class="fa fa-envelope text-primary me-2"></i>Message Type
+        </label>
+        <input type="text" 
+               id="txt_msg_type" 
+               placeholder="Enter message type (e.g., text, flash)" 
+               name="txt_msg_type" 
+               class="form-control" 
+               ng-class="{'is-invalid': smssetup.txt_msg_type.$invalid && !smssetup.txt_msg_type.$pristine}" 
+               ng-model="form.txt_msg_type" 
+               autocomplete="off"
+               required />
+        <div class="invalid-feedback" ng-show="smssetup.txt_msg_type.$invalid && !smssetup.txt_msg_type.$pristine">
+            Message type is required
+        </div>
+    </div>
+
+    <!-- Delivery Field -->
+    <div class="col-12">
+        <label for="txt_delivery" class="form-label fw-medium">
+            <i class="fa fa-paper-plane text-primary me-2"></i>Delivery Method
+        </label>
+        <input type="text" 
+               id="txt_delivery" 
+               placeholder="Enter delivery method" 
+               name="txt_delivery" 
+               class="form-control" 
+               ng-class="{'is-invalid': smssetup.txt_delivery.$invalid && !smssetup.txt_delivery.$pristine}" 
+               ng-model="form.txt_delivery" 
+               autocomplete="off"
+               required />
+        <div class="invalid-feedback" ng-show="smssetup.txt_delivery.$invalid && !smssetup.txt_delivery.$pristine">
+            Delivery method is required
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-label {
+        margin-bottom: 0.5rem;
+        color: #495057;
+    }
+
+    .form-label i {
+        font-size: 0.875rem;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1.5px solid #dee2e6;
+        padding: 0.625rem 0.875rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+
+    .invalid-feedback {
+        display: block;
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+    }
+</style>

@@ -1,0 +1,46 @@
+<input type="hidden" id="id" name="id" value="" ng-model="form.id" />
+
+<!--<div class="form-group">
+    <label for="opt_mx_institution_id" class="col-lg-3 control-label">Institution</label>
+    <div class="col-lg-9">
+        <select name="opt_mx_institution_id" id="opt_mx_institution_id" class="form-control" ng-model="form.opt_mx_institution_id"
+                ng-options="value.id as value.name for (key, value) in dropdowns.opt_mx_institution_ids" required>
+            <option value=""> Select  Institution</option>
+        </select>
+    </div>
+</div>-->
+<div class="form-group">
+    <label for="txt_sender" class="col-lg-3 control-label">SMS Sender</label>
+    <div class="col-lg-9">
+        <input type="text" id="txt_sender" placeholder="Enter Sender" name="txt_sender"  class="form-control" ng-class="emailcontent.txt_sender.$invalid && !emailcontent.txt_sender.$pristine" ng-model="form.txt_sender" required/>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="opt_mx_source_id" class="col-lg-3 control-label">Reason</label>
+    <div class="col-lg-9">
+        <select name="opt_mx_source_id" id="opt_mx_source_id" class="form-control" ng-model="form.opt_mx_source_id"
+                ng-options="value.id as value.name for (key, value) in dropdowns.opt_mx_source_ids" required>
+            <option value=""> Select  Reason</option>
+        </select>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="tar_sms_content" class="col-lg-3 control-label">SMS Template</label>
+    <div class="col-lg-9">
+        <textarea class="form-control" cols="50" id="tar_sms_content" placeholder="Write sms content" name="tar_sms_content" ng-class="smscontent.tar_sms_content.$invalid && !smscontent.tar_sms_content.$pristine" ng-model="form.tar_sms_content" required></textarea>
+        <p><small><i><span class="tar_sms_content-smsLength"></span> character(s) remaining, <span class="tar_sms_content-smsCount"></span> message(s)</i></small></p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="opt_mx_sms_language_id" class="col-lg-3 control-label">SMS Language</label>
+    <div class="col-lg-9">
+        <select name="opt_mx_sms_language_id" id="opt_mx_sms_language_id" class="form-control" ng-model="form.opt_mx_sms_language_id"
+                ng-options="value.id as value.name for (key, value) in dropdowns.opt_mx_sms_language_ids" required>
+            <option value=""> Select  Language</option>
+        </select>
+    </div>
+</div>
+
