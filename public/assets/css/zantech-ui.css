@@ -902,6 +902,53 @@ body {
     color: inherit !important;
 }
 
+.zt-menu__item--parent.zt-menu__item--open {
+    color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.zt-menu__item--parent.expanded {
+    color: #fff !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.zt-menu__submenu {
+    margin: 0 0 0.35rem 0;
+    padding: 0.15rem 0 0.35rem 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    margin-left: 2.5rem;
+    padding-left: 0.75rem;
+}
+
+.zt-menu__submenu .zt-menu__subitem {
+    display: block;
+    padding: 0.45rem 0.5rem 0.45rem 0.25rem;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.55) !important;
+    text-decoration: none !important;
+    border-radius: 6px;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.zt-menu__subitem:hover {
+    color: rgba(255, 255, 255, 0.9) !important;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.zt-menu__subitem.active {
+    color: #fff !important;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.zt-menu__item--no-chev .zt-menu__chev {
+    display: none !important;
+}
+
+.zt-menu__item--parent .zt-menu__chev {
+    font-size: 0.65rem !important;
+    opacity: 0.75 !important;
+}
+
 .zt-menu__item:hover:not(.active) {
     background: rgba(255, 255, 255, 0.06) !important;
     color: #eee !important;
@@ -1192,7 +1239,7 @@ body {
     top: 50%;
     transform: translateY(-50%) rotate(180deg);
     writing-mode: vertical-rl;
-    background: #0d47a1;
+    background: var(--zt-sidebar-header-bg) !important;
     color: #fff;
     padding: 1.5rem 0.5rem;
     border-radius: 0 4px 4px 0;

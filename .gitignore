@@ -1,1 +1,6 @@
 /vendor/
+.idea/
+logs/
+*.log
+.env
+.env.*

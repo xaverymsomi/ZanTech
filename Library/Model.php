@@ -347,6 +347,14 @@ abstract class Model
         return $this->db->update($table, $data, $id, $key);
     }
 
+    /**
+     * @deprecated Prefer updateRecord(); kept for module controllers that call update().
+     */
+    public function update(array $data, string $table, $id, string $key = 'id'): bool
+    {
+        return $this->updateRecord($data, $table, $id, $key);
+    }
+
     public function deleteRecord(string $table, $id, string $key = 'id'): bool
     {
         $tableQ = $this->db->quoteTable($table);

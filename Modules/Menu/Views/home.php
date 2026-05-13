@@ -2,7 +2,7 @@
     <div ng-controller="menuManageCtrl">
 
         <div class="row g-4"
-             ng-init='getMenuDropdowns(<?php echo htmlspecialchars(json_encode($this->dropdowns, JSON_NUMERIC_CHECK), ENT_COMPAT, "UTF-8") ?>)'>
+             ng-init='getMenuDropdowns(<?php echo htmlspecialchars(json_encode($this->dropdowns, JSON_NUMERIC_CHECK), ENT_COMPAT, "UTF-8") ?>); getAllMenus();'>
 
             <!-- Left: Add / Update Menu -->
             <div class="col-lg-5">
@@ -66,11 +66,7 @@
 
                                 <div class="input-group">
                                     <span class="input-group-text bg-white">
-                                        <!-- supports tools OR fa-tools -->
-                                        <i class="fa fa-fw"
-                                           ng-class="(new_menu_form.txt_icon || '').startsWith('fa-')
-                                                ? (new_menu_form.txt_icon)
-                                                : ('fa-' + (new_menu_form.txt_icon || 'circle'))"></i>
+                                        <i ng-class="iconPreviewClasses(new_menu_form.txt_icon)"></i>
                                     </span>
 
                                     <input type="text"
@@ -81,7 +77,19 @@
                                 </div>
 
                                 <div class="form-text text-muted">
-                                    Use FontAwesome name like <code>tools</code>, <code>list-alt</code> (or <code>fa-tools</code>).
+                                    Short name (<code>tools</code>), legacy (<code>fa-tools</code>), or full FA6 classes (<code>fa-solid fa-user</code>).
+                                </div>
+                            </div>
+
+                            <div class="mb-3" ng-if="new_menu_form.relation == 0">
+                                <label class="form-label fw-bold">Sidebar group</label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="txt_sidebar_group"
+                                       placeholder="Optional — e.g. main, settings"
+                                       ng-model="new_menu_form.txt_sidebar_group" />
+                                <div class="form-text text-muted">
+                                    Optional label for grouping items in the sidebar (main menus only).
                                 </div>
                             </div>
 
@@ -177,6 +185,9 @@
                                 <thead class="table-light sticky-top">
                                 <tr>
                                     <th>Menu</th>
+                                    <th class="d-none d-md-table-cell" style="min-width:120px;">Group</th>
+                                    <th class="d-none d-lg-table-cell">Link</th>
+                                    <th class="text-center" style="width:90px;">Order</th>
                                     <th class="text-center" style="width:110px;">Action</th>
                                 </tr>
                                 </thead>
@@ -187,16 +198,25 @@
                                 <tr class="table-secondary">
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <span class="badge bg-dark me-2">{{parent.int_position}}</span>
-
-                                            <i class="fa fa-fw me-2 text-primary"
-                                               ng-class="parent.txt_icon ? ('fa-' + parent.txt_icon) : 'fa-circle'"></i>
+                                            <i class="me-2 text-primary" ng-class="iconPreviewClasses(parent.txt_icon)"></i>
 
                                             <div class="d-flex flex-column">
                                                 <span class="fw-bold">{{parent.txt_name}}</span>
-                                                <small class="text-muted">{{parent.txt_title}} • {{parent.txt_link}}</small>
+                                                <small class="text-muted">{{parent.txt_title}} · {{parent.txt_link}}</small>
                                             </div>
                                         </div>
+                                    </td>
+
+                                    <td class="d-none d-md-table-cell text-muted small">
+                                        {{ parent.txt_sidebar_group || '—' }}
+                                    </td>
+
+                                    <td class="d-none d-lg-table-cell small text-break text-muted">
+                                        {{ parent.txt_link || '#' }}
+                                    </td>
+
+                                    <td class="text-center">
+                                        <span class="badge bg-dark">{{parent.int_position}}</span>
                                     </td>
 
                                     <td class="text-center">
@@ -217,9 +237,19 @@
 
                                             <div class="d-flex flex-column">
                                                 <span class="fw-semibold text-dark">{{child.txt_name}}</span>
-                                                <small class="text-muted">{{child.txt_title}} • {{child.txt_link}}</small>
+                                                <small class="text-muted">{{child.txt_title}} · {{child.txt_link}}</small>
                                             </div>
                                         </div>
+                                    </td>
+
+                                    <td class="d-none d-md-table-cell text-muted small">—</td>
+
+                                    <td class="d-none d-lg-table-cell small text-break text-muted">
+                                        {{ child.txt_link || '#' }}
+                                    </td>
+
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">{{child.int_position}}</span>
                                     </td>
 
                                     <td class="text-center">

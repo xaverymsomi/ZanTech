@@ -22,8 +22,8 @@
 
             <form name="menu" novalidate>
 
-                <!-- ✅ IMPORTANT: send row_value for post_edit -->
-                <input type="hidden" ng-model="form.id">
+                <!-- row_value for post_edit -->
+                <input type="hidden" name="id" ng-model="form.id">
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Name</label>
@@ -56,11 +56,19 @@
                     <label class="form-label fw-semibold">Icon</label>
                     <div class="input-group">
                         <span class="input-group-text">
-                            <i class="fa fa-fw" ng-class="form.txt_icon ? ('fa-' + form.txt_icon) : 'fa-circle'"></i>
+                            <i ng-class="iconPreviewClasses(form.txt_icon)"></i>
                         </span>
                         <input type="text" class="form-control" ng-model="form.txt_icon"
-                               placeholder="Example: cog, users, tools">
+                               placeholder="e.g. tools, fa-tools, fa-solid fa-user">
                     </div>
+                </div>
+
+                <div class="mb-3" ng-if="form.relation == 0">
+                    <label class="form-label fw-semibold">Sidebar group</label>
+                    <input type="text" class="form-control" name="txt_sidebar_group"
+                           ng-model="form.txt_sidebar_group"
+                           placeholder="Optional — e.g. main, settings">
+                    <div class="form-text text-muted">Optional grouping label for the sidebar (main menus only).</div>
                 </div>
 
                 <div class="mb-3" ng-if="form.relation == 1">
@@ -68,7 +76,7 @@
                     <select class="form-select"
                             name="int_parent"
                             ng-model="form.int_parent"
-                            ng-options="p.id as p.name for p in dropdowns.int_parent_ids track by p.id"
+                            ng-options="p.id as p.name for p in dropdowns.int_parent_ids | filter:menuParentRowFilter track by p.id"
                             ng-class="{'is-invalid': menu.int_parent.$invalid && menu.$submitted}"
                             required>
                         <option value="">-- Select Main Menu --</option>
@@ -96,17 +104,6 @@
                            name="txt_title"
                            required>
                     <div class="invalid-feedback">Title is required.</div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Permission</label>
-                    <select class="form-select"
-                            name="txt_name_permission"
-                            ng-model="form.permission_slug"
-                            ng-options="p.name as p.name for p in dropdowns.opt_mx_permission_ids">
-                        <option value="">-- No Permission (Public) --</option>
-                    </select>
-                    <div class="form-text text-muted">Select the permission required to view this menu.</div>
                 </div>
 
             </form>

@@ -33,6 +33,48 @@ if ($command === 'make:module') {
 
     echo $result['message'] . "\n";
     if ($result['status'] === 'error') exit(1);
+} elseif ($command === 'db:migrate') {
+    // With no second arg: run RBAC-related migrations in order (section → menu).
+    // With arg: run that single SQL file relative to project root.
+    $arg = $argv[2] ?? null;
+    $files = $arg === null
+        ? [
+            'database/migrations/20260213_create_mx_section_table.sql',
+            'database/migrations/20260212_create_mx_menu_table.sql',
+            'database/migrations/20260214_seed_sidebar_menus.sql',
+            'database/migrations/20260215_cleanup_utility_menu_children.sql',
+            'database/migrations/20260216_sidebar_menu_restructure.sql',
+            'database/migrations/20260217_mu_arms_sidebar_layout.sql',
+        ]
+        : [ltrim($arg, '/\\')];
+
+    $initializer = new DatabaseInitializer(new Database());
+    $exitCode = 0;
+
+    foreach ($files as $relative) {
+        $sqlPath = __DIR__ . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relative);
+
+        if (!is_file($sqlPath)) {
+            echo "SQL file not found: {$sqlPath}\n";
+            echo "Usage: php zt db:migrate [relative/path/to/file.sql]\n";
+            exit(1);
+        }
+
+        $result = $initializer->initialize($sqlPath);
+        echo $result['message'] . "\n";
+        if ($result['status'] === 'error') {
+            $exitCode = 1;
+            break;
+        }
+    }
+
+    if ($exitCode === 0 && $arg === null) {
+        echo "Note: Top-level mx_menu.txt_name must match mx_section.txt_name for sidebar visibility (RBAC).\n";
+    }
+
+    if ($exitCode !== 0) {
+        exit($exitCode);
+    }
 } else {
     echo "Zantech CLI Utility\n";
     echo "--------------------\n";
@@ -40,4 +82,5 @@ if ($command === 'make:module') {
     echo "  make:module <Name>    Scaffold a new module\n";
     echo "  db:init               Initialize database with core schema\n";
     echo "  db:seed               Seed database with initial data\n";
+    echo "  db:migrate [file]     Run SQL migration(s); default = section, mx_menu, sidebar seed\n";
 }

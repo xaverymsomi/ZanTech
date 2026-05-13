@@ -83,18 +83,22 @@ class Controller
     protected function jsonSuccess(int $status, string $msg, array $extra = []): void
     {
         $this->json(array_merge([
-            'status' => $status,
-            'ok'     => true,
-            'title'  => $msg,
+            'status'  => $status,
+            'ok'      => true,
+            'title'   => $msg,
+            'code'    => $status,
+            'message' => $msg,
         ], $extra), $status);
     }
 
     protected function jsonError(string $msg, int $status = 500, array $extra = []): void
     {
         $this->json(array_merge([
-            'status' => $status,
-            'ok'     => false,
-            'title'  => $msg,
+            'status'  => $status,
+            'ok'      => false,
+            'title'   => $msg,
+            'code'    => $status,
+            'message' => $msg,
         ], $extra), $status);
     }
 

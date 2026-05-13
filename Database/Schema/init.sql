@@ -80,15 +80,18 @@ CREATE TABLE mx_login_credential (
     CONSTRAINT fk_login_user FOREIGN KEY (user_id) REFERENCES mx_user(id)
 );
 
--- 6. Permission Sections
+-- 6. Permission sections (RBAC: permissions link here; menu top-level txt_name matches txt_name for sidebar)
 CREATE TABLE mx_section (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    txt_name VARCHAR(100) NOT NULL,
-    txt_row_value VARCHAR(100) DEFAULT (NEWID()),
-    dat_date_added DATETIME DEFAULT CURRENT_TIMESTAMP
+    id INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_mx_section PRIMARY KEY,
+    txt_name NVARCHAR(200) NOT NULL,
+    txt_row_value NVARCHAR(100) NOT NULL CONSTRAINT DF_mx_section_txt_row_value DEFAULT (NEWID()),
+    dat_date_added DATETIME NOT NULL CONSTRAINT DF_mx_section_dat_date_added DEFAULT (GETDATE()),
+    CONSTRAINT UQ_mx_section_txt_name UNIQUE (txt_name)
 );
 
-INSERT INTO mx_section (txt_name) VALUES ('User Management'), ('System Settings'), ('Reporting'), ('Access Control');
+CREATE INDEX IX_mx_section_txt_row_value ON mx_section (txt_row_value);
+
+INSERT INTO mx_section (txt_name) VALUES (N'User Management'), (N'System Settings'), (N'Reporting'), (N'Access Control');
 
 -- 7. Permissions
 CREATE TABLE mx_permission (

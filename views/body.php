@@ -1,4 +1,4 @@
-<div class="main zt-shell" ng-controller="menuController" id="mabrexMenuContainer" ng-init="user_id = <?= \Authentication\Auth::id() ?? 0 ?>; getUserMenu(user_id)">
+<div class="main zt-shell" ng-controller="menuController" id="mabrexMenuContainer" ng-init="getUserMenu()">
 
     <!-- OVERLAY (mobile only) -->
     <div class="zt-overlay" ng-click="closeSidebar()"></div>
@@ -30,57 +30,40 @@
 
         <div class="zt-sidebar__content">
             <ul class="zt-menu list-unstyled">
-                <li class="zt-menu__label zt-menu__label--section">Dashboard</li>
-                <li>
-                    <a class="zt-menu__item active" ng-click="loadPage('dashboard', 'Dashboard', 'dashboard')">
-                        <span class="zt-menu__icon"><i class="fa-solid fa-gauge-high"></i></span>
-                        <span class="zt-menu__text">Dashboard</span>
-                    </a>
-                </li>
+                <li ng-if="menusLoading" class="px-3 py-2 small text-muted">Loading navigation…</li>
+                <li ng-if="menusError && !menusLoading" class="px-3 py-2 small text-warning">Menu could not be loaded; showing defaults.</li>
 
-                <li class="zt-menu__label zt-menu__label--section mt-3">Academic Apps</li>
-                <li>
-                    <a class="zt-menu__item" ng-click="loadPage('Registration', 'Registration')">
-                        <span class="zt-menu__icon"><i class="fa-solid fa-user"></i></span>
-                        <span class="zt-menu__text flex-grow-1">Registration</span>
-                        <i class="fa-solid fa-chevron-left zt-menu__chev"></i>
-                    </a>
-                </li>
-                <li>
-                    <a class="zt-menu__item" ng-click="loadPage('Academic', 'Academic Records')">
-                        <span class="zt-menu__icon"><i class="fa-solid fa-clipboard"></i></span>
-                        <span class="zt-menu__text flex-grow-1">Academic Records</span>
-                        <i class="fa-solid fa-chevron-left zt-menu__chev"></i>
-                    </a>
-                </li>
-                <li>
-                    <a class="zt-menu__item" ng-click="loadPage('Field', 'Field & Project')">
-                        <span class="zt-menu__icon"><i class="fa-solid fa-diagram-project"></i></span>
-                        <span class="zt-menu__text flex-grow-1">Field &amp; Project</span>
-                        <i class="fa-solid fa-chevron-left zt-menu__chev"></i>
-                    </a>
-                </li>
-                <li>
-                    <a class="zt-menu__item" ng-click="loadPage('Graduate', 'Graduate')">
-                        <span class="zt-menu__icon"><i class="fa-solid fa-user-graduate"></i></span>
-                        <span class="zt-menu__text flex-grow-1">Graduate</span>
-                        <i class="fa-solid fa-chevron-left zt-menu__chev"></i>
-                    </a>
-                </li>
+                <li ng-repeat="section in menusGrouped track by ($index + '-' + (section.groupKey || 'x'))" class="zt-menu__section-wrap">
+                    <div ng-if="section.label" class="zt-menu__label zt-menu__label--section" ng-class="{'mt-3': !$first}">{{ section.label }}</div>
+                    <ul class="list-unstyled mb-0">
+                        <li ng-repeat="menu in section.menus track by menu.id" class="zt-menu__group">
+                            <div ng-if="menu.submenus.length">
+                                <a href="javascript:void(0)" class="zt-menu__item zt-menu__item--parent"
+                                   ng-class="{expanded: menu.isExpanded, 'zt-menu__item--open': menuParentActive(menu)}"
+                                   ng-click="toggleMenu(menu); $event.preventDefault()">
+                                    <span class="zt-menu__icon" ng-if="menu.icon"><i ng-class="menu.icon"></i></span>
+                                    <span class="zt-menu__icon" ng-if="!menu.icon"><i class="fa-solid fa-folder"></i></span>
+                                    <span class="zt-menu__text flex-grow-1">{{ menu.title || menu.name }}</span>
+                                    <i class="zt-menu__chev fa-solid" ng-class="menu.isExpanded ? 'fa-chevron-down' : 'fa-chevron-left'" aria-hidden="true"></i>
+                                </a>
+                                <ul class="zt-menu__submenu list-unstyled mb-0" ng-show="menu.isExpanded">
+                                    <li ng-repeat="sub in menu.submenus track by (menu.id + '-' + (sub.link || '') + '-' + $index)">
+                                        <a href="javascript:void(0)" class="zt-menu__subitem"
+                                           ng-class="{active: menuActive(sub.link)}"
+                                           ng-click="openMenuLink(menu, sub)">{{ sub.title || sub.name }}</a>
+                                    </li>
+                                </ul>
+                            </div>
 
-                <li class="zt-menu__label zt-menu__label--section mt-3">Other Apps</li>
-                <li>
-                    <a class="zt-menu__item" ng-click="loadPage('Accommodation', 'Accommodation')">
-                        <span class="zt-menu__icon"><i class="fa-solid fa-bed"></i></span>
-                        <span class="zt-menu__text flex-grow-1">Accommodation</span>
-                        <i class="fa-solid fa-chevron-left zt-menu__chev"></i>
-                    </a>
-                </li>
-                <li>
-                    <a class="zt-menu__item zt-menu__item--no-chev" ng-click="loadPage('Guide', 'Students\' Guide')">
-                        <span class="zt-menu__icon"><i class="fa-solid fa-book-open"></i></span>
-                        <span class="zt-menu__text flex-grow-1">Students' Guide</span>
-                    </a>
+                            <a href="javascript:void(0)" ng-if="!menu.submenus.length" class="zt-menu__item zt-menu__item--no-chev"
+                               ng-class="{active: menuActive(menu.link)}"
+                               ng-click="openMenuLink(menu, null)">
+                                <span class="zt-menu__icon" ng-if="menu.icon"><i ng-class="menu.icon"></i></span>
+                                <span class="zt-menu__icon" ng-if="!menu.icon"><i class="fa-solid fa-circle"></i></span>
+                                <span class="zt-menu__text flex-grow-1">{{ menu.title || menu.name }}</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             </ul>
         </div>

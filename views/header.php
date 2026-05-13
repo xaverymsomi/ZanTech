@@ -42,6 +42,21 @@
 
     <meta name="csrf-token" content="<?= \Authentication\Session::csrfToken() ?>">
 
+    <?php
+    $zt_js_app_url = '';
+    if (defined('URL') && URL !== '') {
+        $zt_js_app_url = rtrim((string)URL, '/');
+    } else {
+        $zt_scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $zt_host = (string)($_SERVER['HTTP_HOST'] ?? 'localhost');
+        $zt_path = defined('APP_DIR') ? (string)APP_DIR : '';
+        if ($zt_path !== '' && ($zt_path[0] ?? '') !== '/') {
+            $zt_path = '/' . $zt_path;
+        }
+        $zt_js_app_url = rtrim($zt_scheme . '://' . $zt_host . $zt_path, '/');
+    }
+    ?>
+    <script>window.app_url = <?= json_encode($zt_js_app_url, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_UNESCAPED_SLASHES) ?>;</script>
     <!-- Unified Application Logic (Custom JS Bundle with versioning) -->
     <script src="<?= APP_DIR ?>/assets/js/zantech.bundle.js?v=<?= time() ?>"></script>
 

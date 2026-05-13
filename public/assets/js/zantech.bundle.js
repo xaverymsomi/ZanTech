@@ -196,7 +196,7 @@
         }]);
 })();
 
-window.app_url = 'http://localhost:9070';
+window.app_url = window.app_url || 'http://localhost:9070';
 window.app_folder = '';
 var app = angular.module("create.modal");
 
@@ -1931,6 +1931,130 @@ angular.module("dashboard.modal")
 
             $scope.breadcrumbs = [];
 
+            $scope.menus = [];
+            $scope.menusGrouped = [];
+            $scope.menusLoading = true;
+            $scope.menusError = false;
+            $scope.activePath = null;
+
+            function normalizeMenuPath(link) {
+                if (!link || link === '#') return null;
+                var p = String(link).trim();
+                if (p.indexOf('/') !== 0) p = '/' + p;
+                var q = p.indexOf('?');
+                if (q >= 0) p = p.substring(0, q);
+                if (p.length > 1) p = p.replace(/\/+$/, '');
+                return p.toLowerCase();
+            }
+
+            $scope.menuActive = function (link) {
+                var n = normalizeMenuPath(link);
+                if (!n || !$scope.activePath) return false;
+                return n === $scope.activePath;
+            };
+
+            $scope.menuParentActive = function (menu) {
+                if (!menu || !menu.submenus || !menu.submenus.length) return false;
+                for (var pi = 0; pi < menu.submenus.length; pi++) {
+                    if ($scope.menuActive(menu.submenus[pi].link)) return true;
+                }
+                return false;
+            };
+
+            $scope.syncMenuExpandedState = function () {
+                if (!$scope.menus || !$scope.menus.length) return;
+                angular.forEach($scope.menus, function (m) {
+                    m.isExpanded = false;
+                    if (m.submenus && m.submenus.length && $scope.activePath) {
+                        for (var si = 0; si < m.submenus.length; si++) {
+                            if ($scope.menuActive(m.submenus[si].link)) {
+                                m.isExpanded = true;
+                                break;
+                            }
+                        }
+                    }
+                });
+            };
+
+            $scope.getFallbackDashboardMenu = function () {
+                return {
+                    id: 'dashboard',
+                    name: 'Dashboard',
+                    link: '/Dashboard',
+                    title: 'Dashboard',
+                    icon: 'fa-solid fa-gauge-high',
+                    sidebarGroup: '',
+                    submenus: []
+                };
+            };
+
+            $scope.rebuildMenusGrouped = function () {
+                $scope.menusGrouped = [];
+                var list = $scope.menus || [];
+                var chunk = null;
+                angular.forEach(list, function (m) {
+                    var g = (m.sidebarGroup !== undefined && m.sidebarGroup !== null) ? String(m.sidebarGroup).trim() : '';
+                    if (!chunk || chunk.groupKey !== g) {
+                        chunk = { groupKey: g, label: (g === '' ? null : g), menus: [] };
+                        $scope.menusGrouped.push(chunk);
+                    }
+                    chunk.menus.push(m);
+                });
+            };
+
+            $scope.getUserMenu = function () {
+                $scope.menusLoading = true;
+                $scope.menusError = false;
+                var base = ($window.app_url || '').replace(/\/+$/, '');
+                var url = base + '/Menu/getUserMenus';
+                $http.get(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } }).then(function (res) {
+                    $scope.menusLoading = false;
+                    var payload = res.data || {};
+                    if (payload.ok && angular.isArray(payload.data)) {
+                        $scope.menus = payload.data;
+                    } else {
+                        $scope.menus = [];
+                    }
+                    if (!$scope.menus.length) {
+                        $scope.menus = [$scope.getFallbackDashboardMenu()];
+                    }
+                    try {
+                        var cl = $window.localStorage.getItem('CurrentLink');
+                        if (cl) {
+                            $scope.activePath = normalizeMenuPath(cl.indexOf('/') === 0 ? cl : '/' + cl);
+                        }
+                    } catch (e) { /* ignore */ }
+                    angular.forEach($scope.menus, function (m) {
+                        if (typeof m.isExpanded === 'undefined') m.isExpanded = false;
+                    });
+                    $scope.syncMenuExpandedState();
+                    $scope.rebuildMenusGrouped();
+                }).catch(function () {
+                    $scope.menusLoading = false;
+                    $scope.menusError = true;
+                    $scope.menus = [$scope.getFallbackDashboardMenu()];
+                    try {
+                        var cl2 = $window.localStorage.getItem('CurrentLink');
+                        if (cl2) {
+                            $scope.activePath = normalizeMenuPath(cl2.indexOf('/') === 0 ? cl2 : '/' + cl2);
+                        }
+                    } catch (e2) { /* ignore */ }
+                    angular.forEach($scope.menus, function (m) {
+                        if (typeof m.isExpanded === 'undefined') m.isExpanded = false;
+                    });
+                    $scope.syncMenuExpandedState();
+                    $scope.rebuildMenusGrouped();
+                });
+            };
+
+            $scope.openMenuLink = function (menu, sub) {
+                var item = sub || menu;
+                $scope.loadPage(item.link, item.title || item.name, menu.id);
+                if ($scope.closeSidebarOnMobile) {
+                    $scope.closeSidebarOnMobile();
+                }
+            };
+
             function updateBreadcrumbs(_link, _title, _id) {
                 var crumbs = [{ name: 'Home', link: 'dashboard', icon: 'home' }];
 
@@ -1947,7 +2071,7 @@ angular.module("dashboard.modal")
                         }
                         if (m.submenus) {
                             for (var j = 0; j < m.submenus.length; j++) {
-                                if (m.submenus[j].link == _link) {
+                                if (normalizeMenuPath(m.submenus[j].link) === normalizeMenuPath(_link)) {
                                     parent = m;
                                     child = m.submenus[j];
                                     break;
@@ -1979,6 +2103,13 @@ angular.module("dashboard.modal")
 
                 // If it's just a parent toggle, handled by toggleMenu in HTML for submenus
                 if (_link === '#') return;
+
+                var pathForActive = String(_link).startsWith('/') ? _link : '/' + _link;
+                $scope.activePath = normalizeMenuPath(pathForActive);
+
+                if ($scope.syncMenuExpandedState) {
+                    $scope.syncMenuExpandedState();
+                }
 
                 $scope.current = _id;
 
@@ -2078,10 +2209,34 @@ angular.module("dashboard.modal")
                     relation: 0,          // 0 main, 1 sub
                     txt_name: '',
                     txt_icon: '',
+                    txt_sidebar_group: '',
                     int_parent: '',
                     int_position: 1,
                     txt_link: '#',
                     txt_title: ''
+                };
+
+                $scope.iconPreviewClasses = function (raw) {
+                    raw = String(raw || '').trim();
+                    if (!raw) {
+                        return 'fa fa-fw fa-circle';
+                    }
+                    if (raw.indexOf('fa-') !== -1) {
+                        return 'fa-fw ' + raw;
+                    }
+                    return 'fa fa-fw fa-' + raw;
+                };
+
+                /** Exclude current root menu from parent list (cannot be its own parent). */
+                $scope.menuParentRowFilter = function (p) {
+                    if (!p || p.id === undefined || p.id === null) {
+                        return false;
+                    }
+                    var ex = $scope.form && $scope.form.int_menu_record_id;
+                    if (ex === undefined || ex === null || ex === '') {
+                        return true;
+                    }
+                    return Number(p.id) !== Number(ex);
                 };
 
                 $scope.loadingMenus = false;
@@ -2127,6 +2282,7 @@ angular.module("dashboard.modal")
                     } else {
                         // Sub menu defaults
                         $scope.new_menu_form.txt_icon = ''; // no icon for submenu
+                        $scope.new_menu_form.txt_sidebar_group = '';
                         if (!$scope.new_menu_form.txt_link || $scope.new_menu_form.txt_link === '#') {
                             $scope.new_menu_form.txt_link = '';
                         }
@@ -2193,6 +2349,7 @@ angular.module("dashboard.modal")
                     }
 
                     var isSub = Number(f.relation) === 1;
+                    var savedParentId = isSub && f.int_parent ? Number(f.int_parent) : null;
 
                     if (isSub && (!f.int_parent || Number(f.int_parent) <= 0)) {
                         toaster.pop('error', 'Validation', 'Parent Node is required for Sub Menu');
@@ -2215,6 +2372,7 @@ angular.module("dashboard.modal")
                             txt_title: String(f.txt_title).trim(),
                             txt_link: (f.txt_link && String(f.txt_link).trim()) ? String(f.txt_link).trim() : '#',
                             txt_icon: isSub ? null : (f.txt_icon ? String(f.txt_icon).trim() : null),
+                            txt_sidebar_group: isSub ? null : (f.txt_sidebar_group ? String(f.txt_sidebar_group).trim() : ''),
                             int_parent: isSub ? Number(f.int_parent) : null,
                             int_position: isSub ? null : Number(f.int_position)
                         }
@@ -2229,8 +2387,8 @@ angular.module("dashboard.modal")
                         headers: { 'Content-Type': 'application/json' }
                     }).then(function (res) {
                         var data = res.data || {};
-                        if (data && data.status === true) {
-                            toaster.pop('success', 'Success', data.message || 'Menu saved');
+                        if (data && data.ok === true) {
+                            toaster.pop('success', 'Success', data.message || data.title || 'Menu saved');
 
                             // reset form (keep relation)
                             var rel = Number($scope.new_menu_form.relation) || 0;
@@ -2238,16 +2396,30 @@ angular.module("dashboard.modal")
                                 relation: rel,
                                 txt_name: '',
                                 txt_icon: '',
+                                txt_sidebar_group: '',
                                 int_parent: '',
                                 int_position: 1,
                                 txt_link: rel === 0 ? '#' : '',
                                 txt_title: ''
                             };
 
+                            if (rel === 0 && $scope.dropdowns.next_top_position) {
+                                var nextPos = Number($scope.dropdowns.next_top_position) || 1;
+                                $scope.new_menu_form.int_position = nextPos;
+                                $scope.dropdowns.next_top_position = nextPos + 1;
+                            } else if (rel === 0) {
+                                $scope.new_menu_form.int_position = 1;
+                            }
+
+                            if (isSub && savedParentId && $scope.dropdowns.next_child_position_by_parent) {
+                                var nextChild = Number($scope.dropdowns.next_child_position_by_parent[savedParentId]) || 1;
+                                $scope.dropdowns.next_child_position_by_parent[savedParentId] = nextChild + 1;
+                            }
+
                             // refresh list quickly
                             $scope.getAllMenus();
                         } else {
-                            toaster.pop('error', 'Error', data.message || 'Failed to save menu');
+                            toaster.pop('error', 'Error', data.message || data.title || 'Failed to save menu');
                         }
                     }).catch(function () {
                         toaster.pop('error', 'Error', 'Failed to save menu');

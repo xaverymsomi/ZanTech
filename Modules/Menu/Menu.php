@@ -2,6 +2,7 @@
 
 namespace Modules\Menu;
 
+use Authentication\Auth;
 use Authentication\Perm_Auth;
 use Exception;
 use Library\Controller;
@@ -121,17 +122,24 @@ class Menu extends Controller
                 $iconToSave = ($icon === '' ? null : $icon);
             }
 
+            $sidebarGroup = null;
+            if (!$isSub) {
+                $g = trim((string)($data['txt_sidebar_group'] ?? ''));
+                $sidebarGroup = ($g === '' ? null : $g);
+            }
+
             $sql = "INSERT INTO mx_menu
-                    (txt_name, txt_icon, int_parent, int_position, txt_link, txt_title, txt_row_value)
-                    VALUES (:name, :icon, :parent, :pos, :link, :title, NEWID())";
+                    (txt_name, txt_icon, int_parent, int_position, txt_link, txt_title, txt_row_value, txt_sidebar_group)
+                    VALUES (:name, :icon, :parent, :pos, :link, :title, NEWID(), :sidebar_group)";
 
             $params = [
-                ':name'   => $name,
-                ':icon'   => $iconToSave,
-                ':parent' => $parent,
-                ':pos'    => $position,
-                ':link'   => $link,
-                ':title'  => $title,
+                ':name'           => $name,
+                ':icon'           => $iconToSave,
+                ':parent'         => $parent,
+                ':pos'            => $position,
+                ':link'           => $link,
+                ':title'          => $title,
+                ':sidebar_group'  => $sidebarGroup,
             ];
 
             $stmt = $this->model->db->prepare($sql);
@@ -172,14 +180,16 @@ class Menu extends Controller
 
             $this->view()->title = 'Update ' . $this->model->getTitle();
             $this->view()->data  = [
-                'id'           => $id,
-                'txt_name'     => $data['txt_name'],
-                'txt_link'     => $data['txt_link'],
-                'txt_title'    => $data['txt_title'],
-                'txt_icon'     => $data['txt_icon'],
-                'int_parent'   => ($data['int_parent'] !== null) ? (int)$data['int_parent'] : null,
-                'int_position' => (int)$data['int_position'],
-                'relation'     => ($data['int_parent'] > 0 ? 1 : 0),
+                'id'                 => $id,
+                'int_menu_record_id' => $recordId,
+                'txt_name'           => $data['txt_name'],
+                'txt_link'           => $data['txt_link'],
+                'txt_title'          => $data['txt_title'],
+                'txt_icon'           => $data['txt_icon'],
+                'int_parent'         => ($data['int_parent'] !== null) ? (int)$data['int_parent'] : null,
+                'int_position'       => (int)$data['int_position'],
+                'relation'           => (($data['int_parent'] ?? null) !== null && (int)$data['int_parent'] > 0) ? 1 : 0,
+                'txt_sidebar_group'  => isset($data['txt_sidebar_group']) ? trim((string)$data['txt_sidebar_group']) : '',
             ];
             $this->view()->dropdowns = $this->model->getFormDropdowns($recordId);
             $this->renderJson('edit');
@@ -198,8 +208,14 @@ class Menu extends Controller
                 $this->permissionDenied();
             }
 
-            $posted = json_decode(file_get_contents("php://input"), true);
-            if (!is_array($posted)) $this->jsonError("Invalid input", 422);
+            $raw = file_get_contents('php://input');
+            $posted = json_decode((string)$raw, true);
+            if (!is_array($posted) || $posted === []) {
+                $posted = $_POST;
+            }
+            if (!is_array($posted)) {
+                $this->jsonError("Invalid input", 422);
+            }
 
             $row_value = trim((string)($posted['id'] ?? ''));
             if ($row_value === '') $this->jsonError("Missing id", 422);
@@ -212,11 +228,16 @@ class Menu extends Controller
             $name   = trim((string)($posted['txt_name'] ?? $current['txt_name']));
             $title  = trim((string)($posted['txt_title'] ?? $current['txt_title']));
             $link   = trim((string)($posted['txt_link'] ?? $current['txt_link']));
-            $icon   = trim((string)($posted['txt_icon'] ?? $current['txt_icon']));
+            $icon   = trim((string)($posted['txt_icon'] ?? ($current['txt_icon'] ?? '')));
 
             $parent = $posted['int_parent'] ?? $current['int_parent'];
             $parent = ($parent === '' || $parent === null) ? null : (int)$parent;
             if ($parent !== null && $parent <= 0) $parent = null;
+
+            $isSub = ($parent !== null);
+            if ($isSub) {
+                $icon = '';
+            }
 
             $position = isset($posted['int_position']) && is_numeric($posted['int_position'])
                 ? max(1, (int)$posted['int_position'])
@@ -235,13 +256,20 @@ class Menu extends Controller
 
             $this->reorderOnMove($id, $oldParent, $oldPos, $parent, $position);
 
+            $sidebarGroup = null;
+            if (!$isSub) {
+                $g = trim((string)($posted['txt_sidebar_group'] ?? ($current['txt_sidebar_group'] ?? '')));
+                $sidebarGroup = ($g === '' ? null : $g);
+            }
+
             $update = [
-                'txt_name'     => $name,
-                'txt_link'     => $link,
-                'txt_title'    => $title,
-                'txt_icon'     => ($icon === '' ? null : $icon),
-                'int_parent'   => $parent,
-                'int_position' => $position,
+                'txt_name'           => $name,
+                'txt_link'           => $link,
+                'txt_title'          => $title,
+                'txt_icon'           => ($icon === '' ? null : $icon),
+                'int_parent'         => $parent,
+                'int_position'       => $position,
+                'txt_sidebar_group'  => $sidebarGroup,
             ];
 
             $this->model->update($update, $this->model->getTable(), $id);
@@ -263,16 +291,16 @@ class Menu extends Controller
     public function getUserMenus(): void
     {
         try {
-            $userId = $_SESSION['id'] ?? null;
+            $userId = Auth::id();
             if (!$userId) {
                 $this->jsonError("User not authenticated", 401);
             }
 
             // 1. Fetch all menus in one query
             $allMenus = $this->model->db->select(
-                "SELECT id, txt_name, txt_icon, int_parent, int_position, txt_link, txt_title, txt_row_value
+                "SELECT id, txt_name, txt_icon, int_parent, int_position, txt_link, txt_title, txt_row_value, txt_sidebar_group
                  FROM mx_menu
-                 ORDER BY int_parent ASC, int_position ASC"
+                 ORDER BY int_parent ASC, int_position ASC, id ASC"
             );
 
             $perm = Perm_Auth::getPermissions();
@@ -290,19 +318,29 @@ class Menu extends Controller
             $children = [];
 
             foreach ($allMenus as $menu) {
-                if ($menu['int_parent'] === null) {
+                $parentId = $menu['int_parent'] ?? null;
+                $isRoot = ($parentId === null || $parentId === '' || $parentId === false);
+                if ($isRoot) {
                     // Only keep main menu if user has permission for that section
                     if (in_array($menu['txt_name'], $allowedNames, true)) {
                         $parents[$menu['id']] = $menu;
                     }
                 } else {
-                    $children[$menu['int_parent']][] = $menu;
+                    $pid = (int) $parentId;
+                    if ($pid > 0) {
+                        $children[$pid][] = $menu;
+                    }
                 }
             }
 
+            uasort($parents, static function (array $a, array $b): int {
+                return ((int) ($a['int_position'] ?? 0)) <=> ((int) ($b['int_position'] ?? 0));
+            });
+
             $final = [];
             foreach ($parents as $parentId => $menu) {
-                $sub = $children[$parentId] ?? [];
+                $pid = (int) $parentId;
+                $sub = $children[$pid] ?? [];
 
                 // 3. Verify submenu permissions if applicable
                 if (method_exists($perm, 'verifySubMenuPermissions')) {
@@ -315,7 +353,8 @@ class Menu extends Controller
 
                     return [
                         'name'  => trans($item['txt_name']),
-                        'link'  => ($link === '#' ? '#' : APP_DIR . $link),
+                        /* Path only (leading slash); client uses window.app_url which already includes APP_DIR */
+                        'link'  => ($link === '#' ? '#' : self::menuLinkForClient($link)),
                         'title' => $item['txt_title'],
                         'icon'  => $item['txt_icon'],
                     ];
@@ -325,12 +364,14 @@ class Menu extends Controller
                 $link = ($link === '' ? '#' : $link);
 
                 $final[] = [
-                    'id'       => $menu['txt_row_value'],
-                    'name'     => trans($menu['txt_name']),
-                    'link'     => ($link === '#' ? '#' : APP_DIR . $link),
-                    'title'    => $menu['txt_title'],
-                    'icon'     => $menu['txt_icon'],
-                    'submenus' => $items,
+                    'id'            => $menu['txt_row_value'],
+                    'name'          => trans($menu['txt_name']),
+                    'link'          => ($link === '#' ? '#' : self::menuLinkForClient($link)),
+                    'title'         => $menu['txt_title'],
+                    'icon'          => $menu['txt_icon'],
+                    'sidebarGroup'  => trim((string) ($menu['txt_sidebar_group'] ?? '')),
+                    'int_position'  => (int) ($menu['int_position'] ?? 0),
+                    'submenus'      => $items,
                 ];
             }
 
@@ -340,6 +381,22 @@ class Menu extends Controller
             Log::sysLog("MENU_USER_MENU_ERROR:" . $e->getMessage());
             $this->jsonError("Failed to load menus", 500);
         }
+    }
+
+    /**
+     * Normalized path for SPA / XHR (single leading slash, no APP_DIR — base URL already includes it).
+     */
+    private static function menuLinkForClient(string $link): string
+    {
+        $link = trim($link);
+        if ($link === '' || $link === '#') {
+            return '#';
+        }
+        if ($link[0] !== '/') {
+            $link = '/' . $link;
+        }
+
+        return $link;
     }
 
     private function reorderOnMove(int $recordId, ?int $oldParent, int $oldPos, ?int $newParent, int $newPos): void

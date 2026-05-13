@@ -57,7 +57,7 @@ class Menu_Model extends Model
     {
         try {
             $parents = $this->db->select("
-                SELECT id, txt_name, txt_icon, int_position, txt_link, txt_title, txt_row_value
+                SELECT id, txt_name, txt_icon, int_position, txt_link, txt_title, txt_row_value, txt_sidebar_group
                 FROM mx_menu
                 WHERE int_parent IS NULL
                 ORDER BY int_position ASC
@@ -67,7 +67,7 @@ class Menu_Model extends Model
 
             foreach ($parents as $p) {
                 $children = $this->db->select("
-                    SELECT id, txt_name, txt_icon, int_parent, int_position, txt_link, txt_title, txt_row_value
+                    SELECT id, txt_name, txt_icon, int_parent, int_position, txt_link, txt_title, txt_row_value, txt_sidebar_group
                     FROM mx_menu
                     WHERE int_parent = :pid
                     ORDER BY int_position ASC
@@ -98,23 +98,52 @@ class Menu_Model extends Model
                 ORDER BY int_position ASC
             ");
 
-            $int_parent_ids = array_map(function ($r) {
+            // Next slot per parent — from full root list (before excluding self on edit).
+            $nextChildByParent = [];
+            foreach ($parents as $row) {
+                $pid = (int)$row['id'];
+                $nextChildByParent[$pid] = $this->getLastPositionInScope($pid) + 1;
+            }
+
+            $int_parent_ids = array_map(static function ($r) {
                 return ['id' => (int)$r['id'], 'name' => $r['txt_name']];
             }, $parents);
+
+            // Editing a root menu: cannot pick itself as parent when switching to Sub Menu.
+            if ($id !== null && $id !== '') {
+                $rid = (int)$id;
+                if ($rid > 0) {
+                    $cur = $this->getRecord($rid, $this->table);
+                    if ($cur !== []) {
+                        $par = $cur['int_parent'] ?? null;
+                        $isRoot = ($par === null || $par === '' || $par === false || (int)$par <= 0);
+                        if ($isRoot) {
+                            $int_parent_ids = array_values(array_filter(
+                                $int_parent_ids,
+                                static fn(array $r): bool => (int)$r['id'] !== $rid
+                            ));
+                        }
+                    }
+                }
+            }
 
             $permissions = $this->db->select("SELECT id, txt_name as name FROM mx_permission ORDER BY txt_name ASC");
 
             return [
-                'int_parent_ids'         => $int_parent_ids,
-                'opt_mx_permission_ids'  => $permissions,
-                'all_menus'              => $this->getMenus(),
+                'int_parent_ids'                => $int_parent_ids,
+                'opt_mx_permission_ids'         => $permissions,
+                'all_menus'                     => $this->getMenus(),
+                'next_top_position'             => $this->getLastPositionInScope(null) + 1,
+                'next_child_position_by_parent' => $nextChildByParent,
             ];
 
         } catch (\Exception $e) {
             Log::sysLog("MENU_MODEL_DROPDOWNS_ERROR:" . $e->getMessage());
             return [
-                'int_parent_ids' => [],
-                'all_menus'      => [],
+                'int_parent_ids'                => [],
+                'all_menus'                     => [],
+                'next_top_position'             => 1,
+                'next_child_position_by_parent' => [],
             ];
         }
     }
