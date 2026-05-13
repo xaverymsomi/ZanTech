@@ -2,7 +2,51 @@
 
 ZanTech is a **PHP 8.2** modular web application framework: URL-driven routing, module-based MVC, session authentication, permission-aware UI, and a small **CLI (`zt`)** for scaffolding and database tasks. The front controller lives under **`public/`**; application code uses **Composer PSR-4** autoloading.
 
+**Framework (app shell):** `4.0.0` (see `public/index.php`).
+
 Repository: [github.com/xaverymsomi/ZanTech](https://github.com/xaverymsomi/ZanTech)
+
+---
+
+## Versions and stack
+
+Pinned or primary versions are the ones loaded in **`views/header.php`** (CDN) and declared in **`composer.json`**. Upgrade those files together when bumping a major dependency. **Details:** [VERSIONS.md](VERSIONS.md) · **CDN lockfile:** [cdn-lock.json](cdn-lock.json).
+
+### Runtime
+
+| Component | Version |
+|-----------|---------|
+| **ZanTech / kernel** | `4.0.0` (`public/index.php`) |
+| **PHP** | `^8.2` (`composer.json`) |
+| **Database** | **SQL Server** (T-SQL migrations under `Database/migrations/`) |
+
+### Frontend (CDN, `views/header.php`)
+
+| Library | Version |
+|---------|---------|
+| **Bootstrap** (CSS + JS) | `5.3.2` |
+| **Font Awesome** | `6.4.2` |
+| **jQuery** | `3.7.1` |
+| **AngularJS** (`angular`, `angular-animate`, `angular-sanitize`) | `1.8.2` |
+| **Angular UI Bootstrap** (`ui-bootstrap-tpls`) | `2.5.6` |
+| **Moment.js** | `2.29.4` |
+| **ng-file-upload** | `12.2.13` |
+| **angular-filter** | `0.5.17` |
+| **ui-select** | `0.20.0` |
+| **angularjs-toaster** (script + CSS) | `3.0.0` |
+| **angular-toaster** (CSS only, legacy) | `3.0.0` |
+
+Bundled app script: **`public/assets/js/zantech.bundle.js`** (build or edit in-repo as needed; not versioned separately from the repo).
+
+### PHP tooling (Composer)
+
+| Tool / package | Constraint |
+|----------------|------------|
+| **PHPUnit** (dev) | `^11.5` |
+| **vlucas/phpdotenv** | `*` |
+| **Other PHP libraries** | See `composer.json` (many use `*` or caret ranges; resolve with `composer show`) |
+
+`composer.json` still lists **`twbs/bootstrap` `3.3.*`** for legacy paths; the **main UI** uses **Bootstrap 5.3.2** from the CDN above.
 
 ---
 
@@ -132,7 +176,7 @@ php zt.php <command>
 
 ## Frontend notes
 
-The app ships with **Bootstrap**-oriented markup and legacy **AngularJS** bundles (for example `public/assets/js/zantech.bundle.js`) for interactive screens such as **Menu management**. Assets live under **`public/assets/`**.
+The app uses **Bootstrap 5.3.2** and **AngularJS 1.8.2** from CDNs (see **Versions and stack**). Interactive screens (e.g. Menu management) also use **`public/assets/js/zantech.bundle.js`**. Custom styling lives in **`public/assets/css/zantech-ui.css`**.
 
 ---
 
