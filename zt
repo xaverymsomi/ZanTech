@@ -39,12 +39,12 @@ if ($command === 'make:module') {
     $arg = $argv[2] ?? null;
     $files = $arg === null
         ? [
-            'database/migrations/20260213_create_mx_section_table.sql',
-            'database/migrations/20260212_create_mx_menu_table.sql',
-            'database/migrations/20260214_seed_sidebar_menus.sql',
-            'database/migrations/20260215_cleanup_utility_menu_children.sql',
-            'database/migrations/20260216_sidebar_menu_restructure.sql',
-            'database/migrations/20260217_mu_arms_sidebar_layout.sql',
+            'Database/migrations/20260213_create_mx_section_table.sql',
+            'Database/migrations/20260212_create_mx_menu_table.sql',
+            'Database/migrations/20260214_seed_sidebar_menus.sql',
+            'Database/migrations/20260215_cleanup_utility_menu_children.sql',
+            'Database/migrations/20260216_sidebar_menu_restructure.sql',
+            'Database/migrations/20260217_mu_arms_sidebar_layout.sql',
         ]
         : [ltrim($arg, '/\\')];
 

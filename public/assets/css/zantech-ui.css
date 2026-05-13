@@ -1411,3 +1411,253 @@ body {
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
     color: #fff !important;
 }
+
+/* ==========================================================================
+   MENU MODULE — Admin UI (create + structure + edit modal)
+   ========================================================================== */
+
+.zt-menu-admin {
+    max-width: 1320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.zt-menu-admin__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.zt-menu-admin__eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--zt-primary);
+}
+
+.zt-menu-admin__title {
+    font-family: "Outfit", system-ui, sans-serif;
+    font-weight: 700;
+    color: var(--zt-text-main);
+}
+
+.zt-menu-admin__lede {
+    max-width: 42rem;
+}
+
+.zt-menu-admin__badge-soft {
+    background: rgba(0, 128, 128, 0.1);
+    color: var(--zt-primary);
+    font-weight: 600;
+    font-size: 0.7rem;
+    padding: 0.4rem 0.75rem;
+}
+
+.zt-menu-admin .zt-card:hover {
+    transform: translateY(-2px);
+}
+
+.zt-menu-admin__panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.zt-menu-admin__panel--table {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.zt-menu-admin__panel-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.zt-menu-admin__panel-icon {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.1rem;
+}
+
+.zt-menu-admin__panel-icon--create {
+    background: linear-gradient(135deg, rgba(0, 128, 128, 0.15), rgba(0, 128, 128, 0.05));
+    color: var(--zt-primary);
+    border: 1px solid rgba(0, 128, 128, 0.2);
+}
+
+.zt-menu-admin__panel-icon--tree {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(14, 165, 233, 0.04));
+    color: #0ea5e9;
+    border: 1px solid rgba(14, 165, 233, 0.2);
+}
+
+.zt-menu-admin__form .form-control,
+.zt-menu-admin__form .form-select {
+    border-radius: 12px;
+    border-color: #e2e8f0;
+}
+
+.zt-menu-admin__form .form-control:focus,
+.zt-menu-admin__form .form-select:focus {
+    border-color: var(--zt-primary);
+    box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.12);
+}
+
+.zt-menu-admin__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+}
+
+.zt-menu-admin__type-btn {
+    font-weight: 600;
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+}
+
+.zt-menu-admin .btn-check:checked + .zt-menu-admin__type-btn {
+    background: var(--zt-primary);
+    border-color: var(--zt-primary);
+    color: #fff;
+}
+
+.zt-menu-admin__icon-group .input-group-text {
+    border-radius: 12px 0 0 12px;
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    min-width: 3.25rem;
+    justify-content: center;
+}
+
+.zt-menu-admin__icon-group .form-control {
+    border-radius: 0 12px 12px 0;
+}
+
+.zt-menu-admin__icon-addon i {
+    font-size: 1.15rem;
+}
+
+.zt-menu-admin__table-wrap {
+    max-height: min(72vh, 640px);
+    overflow: auto;
+}
+
+.zt-menu-admin__table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f8fafc;
+    box-shadow: 0 1px 0 #e2e8f0;
+}
+
+.zt-menu-admin__row--parent td {
+    background: linear-gradient(90deg, rgba(0, 128, 128, 0.06) 0, transparent 12px);
+    border-bottom-color: #e2e8f0;
+}
+
+.zt-menu-admin__row--child td {
+    border-bottom-color: #f1f5f9;
+}
+
+.zt-menu-admin__row:hover td {
+    background-color: rgba(0, 128, 128, 0.04) !important;
+}
+
+.zt-menu-admin__tree-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 10px;
+    background: rgba(0, 128, 128, 0.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.zt-menu-admin__tree-icon i {
+    font-size: 1rem;
+}
+
+.zt-menu-admin__child-mark {
+    margin-top: 0.2rem;
+    opacity: 0.65;
+}
+
+.zt-menu-admin__pos {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #0f172a;
+    color: #fff;
+}
+
+.zt-menu-admin__pos--sub {
+    background: #64748b;
+}
+
+.zt-menu-admin__empty {
+    max-width: 22rem;
+    margin: 0 auto;
+}
+
+/* Edit menu modal (uibModal) */
+.zt-menu-admin-modal .modal-header,
+.zt-menu-admin-modal .modal-body,
+.zt-menu-admin-modal .modal-footer {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.zt-menu-admin-modal__header {
+    padding-top: 1.25rem;
+}
+
+.zt-menu-admin-modal__head-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+}
+
+.zt-menu-admin-modal__footer {
+    padding-bottom: 1.25rem;
+}
+
+.zt-menu-admin-modal .form-control,
+.zt-menu-admin-modal .form-select {
+    border-radius: 12px;
+    border-color: #e2e8f0;
+}
+
+.zt-menu-admin-modal .form-control:focus,
+.zt-menu-admin-modal .form-select:focus {
+    border-color: var(--zt-primary);
+    box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.12);
+}
+
+.zt-menu-admin-modal .btn-check:checked + .zt-menu-admin__type-btn {
+    background: var(--zt-primary);
+    border-color: var(--zt-primary);
+    color: #fff;
+}
+
+.mx-modal-form .modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
+}
