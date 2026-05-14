@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Library;
+namespace Foundation\Routing;
 
 use Exceptions\RouterException;
 use ReflectionMethod;
@@ -30,7 +30,11 @@ class RouterSecurity
     public static function parseSegmentsFromRequest(): array
     {
         $raw = (string)($_GET['url'] ?? ($_SERVER['PATH_INFO'] ?? '') ?? ($_SERVER['REQUEST_URI'] ?? '/'));
-        
+        return self::parseSegments($raw);
+    }
+
+    public static function parseSegments(string $raw): array
+    {
         // Use unified foundation normalization
         $path = zt_normalize_path($raw);
 

@@ -2,7 +2,7 @@
 
 use Database\Database;
 use Library\Model;
-use Loggers\Log;
+use Logging\Log;
 
 /**
  * ============================================================

@@ -6,20 +6,29 @@ namespace Library;
 
 use Authentication\Auth;
 use Authentication\LoginCheck;
-use Exceptions\AuthException;
 use Exceptions\RedirectException;
 use Exceptions\RouterException;
-use Exceptions\ZantechException;
 use Exceptions\ValidationException;
-use Library\Support\Config;
+use Foundation\Middleware\AuthMiddleware;
+use Foundation\Middleware\CsrfMiddleware;
+use Foundation\Middleware\Pipeline;
+use Foundation\Middleware\RateLimitMiddleware;
+use Foundation\Routing\Router;
+use Foundation\Routing\RouterSecurity;
+use Foundation\Routing\RouteContext;
+use Http\Request;
+use Http\Response;
+use Config\Config;
 use Modules\Login\Login;
 use Throwable;
-use Loggers\Log;
+use Logging\Log;
 
 final class Zantech
 {
     private array $segments = [];
     private string $rawUrl = '';
+    private Request $request;
+    private RouteContext $route;
     private mixed $controllerInstance = null;
     private string $modulesPath;
     private string $publicPath;
@@ -31,6 +40,7 @@ final class Zantech
 
     public function __construct()
     {
+        $this->request = Request::capture();
         $this->modulesPath = rtrim(ZT_APP_ROOT, '/\\') . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR;
         $this->publicPath  = rtrim(ZT_BASE_PATH, '/\\') . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR;
 
@@ -47,11 +57,10 @@ final class Zantech
 
     public function init(): void
     {
-        $this->segments = RouterSecurity::parseSegmentsFromRequest();
+        $this->route = (new Router())->context($this->request, $this->routeOffset);
+        $this->segments = $this->route->segments;
 
-        $this->rawUrl = (string)($_GET['url']
-            ?? ($_SERVER['PATH_INFO'] ?? '')
-            ?? ($_SERVER['REQUEST_URI'] ?? '/'));
+        $this->rawUrl = $this->request->uri();
 
 
         // If rewrite accidentally sent an existing static file to PHP, let IIS serve it by returning 404 only
@@ -71,24 +80,35 @@ final class Zantech
 
         $this->logRequestStart();
 
-        if ($this->rateLimitEnabled) {
-            $this->checkRateLimit();
-        }
-
-        if ($this->csrfEnabled) {
-            $this->verifyCsrfToken();
-        }
-
         $controllerSlug = $this->currentControllerSlug();
-        if (!$this->isPublicController($controllerSlug)) {
-            (new LoginCheck())->protect($controllerSlug);
+        $this->runMiddleware(fn (): null => $this->dispatchRoute());
+
+        Log::sysLog("REQUEST-END: " . ($controllerSlug ?: 'root'));
+    }
+
+    private function runMiddleware(callable $destination): mixed
+    {
+        $middleware = [];
+        if ($this->rateLimitEnabled) {
+            $middleware[] = new RateLimitMiddleware($this->rateLimitMaxPerMinute);
+        }
+        if ($this->csrfEnabled) {
+            $middleware[] = new CsrfMiddleware();
+        }
+        $middleware[] = new AuthMiddleware(new LoginCheck());
+
+        return (new Pipeline($middleware))->handle($this->route, fn (): mixed => $destination());
+    }
+
+    private function dispatchRoute(): null
+    {
+        if (!$this->route->isPublicController()) {
             $this->routeAuthenticated();
         } else {
-            (new LoginCheck())->destroy($controllerSlug);
             $this->routePublic();
         }
 
-        Log::sysLog("REQUEST-END: " . ($controllerSlug ?: 'root'));
+        return null;
     }
 
 
@@ -118,17 +138,17 @@ final class Zantech
 
     private function currentControllerSlug(): string
     {
-        return strtolower($this->segments[$this->routeOffset] ?? '');
+        return $this->route->controller();
     }
 
     private function currentMethodSlug(): string
     {
-        return (string)($this->segments[$this->routeOffset + 1] ?? 'index');
+        return $this->route->method();
     }
 
     private function currentParams(): array
     {
-        return array_slice($this->segments, $this->routeOffset + 2);
+        return $this->route->params();
     }
 
     private function logRequestStart(): void
@@ -191,65 +211,6 @@ final class Zantech
         };
 
         $scan($data);
-    }
-
-    private function checkRateLimit(): void
-    {
-        if (session_status() !== \PHP_SESSION_ACTIVE) return;
-
-        $bucket = date('YmdHi');
-        $key = Auth::isLogged()
-            ? 'u:' . (string)(Auth::id() ?? 'unknown')
-            : 'ip:' . (string)($_SERVER['REMOTE_ADDR'] ?? 'unknown');
-
-        $_SESSION['ZT_RATE'] ??= [];
-        $_SESSION['ZT_RATE'][$key] ??= [];
-
-        $_SESSION['ZT_RATE'][$key][$bucket] = (int)($_SESSION['ZT_RATE'][$key][$bucket] ?? 0) + 1;
-
-        if (count($_SESSION['ZT_RATE'][$key]) > 5) {
-            ksort($_SESSION['ZT_RATE'][$key]);
-            $_SESSION['ZT_RATE'][$key] = array_slice($_SESSION['ZT_RATE'][$key], -5, null, true);
-        }
-
-        $count = (int)$_SESSION['ZT_RATE'][$key][$bucket];
-        if ($count > $this->rateLimitMaxPerMinute) {
-            Log::sysLog("RATE-LIMIT TRIGGERED key={$key} count={$count}");
-
-            throw new ZantechException(
-                "Rate limit exceeded key={$key} bucket={$bucket} count={$count}",
-                'Too many requests. Please slow down and try again.',
-                429,
-                ['key' => $key, 'bucket' => $bucket, 'count' => $count]
-            );
-        }
-    }
-
-    private function verifyCsrfToken(): void
-    {
-        $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
-        if (in_array($method, ['GET', 'HEAD', 'OPTIONS'], true)) return;
-        if (session_status() !== \PHP_SESSION_ACTIVE) return;
-
-        $sessionToken = $_SESSION['csrf_token'] ?? null;
-        $headerToken  = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
-        $postToken    = $_POST['_token'] ?? null;
-
-        $provided = $headerToken ?: $postToken;
-
-        Log::sysLog("CSRF-DEBUG: session=" . ($sessionToken ? 'exists' : 'null') . " provided=" . ($provided ? 'exists' : 'null'));
-        
-        if (empty($sessionToken) || empty($provided) || !hash_equals((string)$sessionToken, (string)$provided)) {
-            Log::sysLog("CSRF TOKEN FAIL method={$method} session=" . (string)$sessionToken . " provided=" . (string)$provided);
-            throw new AuthException('CSRF validation failed');
-        }
-
-        // Host check only if configured
-    }
-
-    private function isPublicController(string $controller): bool
-    {
-        return in_array($controller, ['login', 'logout', 'autorun'], true);
     }
 
     private function routeAuthenticated(): void
@@ -379,7 +340,11 @@ final class Zantech
 
         $params = RouterSecurity::sanitizeParams($this->currentParams());
 
-        call_user_func_array([$this->controllerInstance, $method], $params);
+        $result = call_user_func_array([$this->controllerInstance, $method], $params);
+
+        if ($result instanceof Response) {
+            $result->send();
+        }
     }
 
     private function loadLogin(): void

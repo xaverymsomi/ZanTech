@@ -3,7 +3,7 @@
 namespace Modules\Report\Reports;
 
 use Database\Database;
-use Loggers\Log;
+use Logging\Log;
 use Modules\Report\Libs\ReportGenerator;
 
 class generateReceiptReport

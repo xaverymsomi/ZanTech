@@ -29,11 +29,27 @@ if (!defined('ZT_APP_NAME')) {
 }
 
 if (!defined('ZT_APP_VERSION')) {
-    define('ZT_APP_VERSION', '4.0.0');
+    define('ZT_APP_VERSION', '1.0.2');
 }
 
 if (!defined('ZT_PUBLIC_PATH')) {
     define('ZT_PUBLIC_PATH', ZT_APP_ROOT . DS . 'public');
+}
+
+if (!defined('ZT_STORAGE_PATH')) {
+    define('ZT_STORAGE_PATH', ZT_APP_ROOT . DS . 'storage');
+}
+
+if (!defined('ZT_CACHE_PATH')) {
+    define('ZT_CACHE_PATH', ZT_STORAGE_PATH . DS . 'cache');
+}
+
+if (!defined('ZT_REPORT_PATH')) {
+    define('ZT_REPORT_PATH', ZT_STORAGE_PATH . DS . 'reports');
+}
+
+if (!defined('ZT_LOG_ROOT')) {
+    define('ZT_LOG_ROOT', ZT_STORAGE_PATH);
 }
 
 if (!defined('DS')) {

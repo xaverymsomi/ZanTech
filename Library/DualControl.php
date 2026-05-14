@@ -3,7 +3,7 @@
 namespace Library;
 
 use Database\Database;
-use Loggers\Log;
+use Logging\Log;
 use Throwable;
 
 final class DualControl

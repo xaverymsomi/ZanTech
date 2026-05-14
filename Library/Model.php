@@ -6,7 +6,7 @@ namespace Library;
 
 use Database\Database;
 use Database\DB;
-use Loggers\Log;
+use Logging\Log;
 use PDO;
 use Throwable;
 

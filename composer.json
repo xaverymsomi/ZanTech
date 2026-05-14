@@ -25,7 +25,11 @@
   },
   "autoload": {
     "psr-4": {
-      "Loggers\\": "Loggers/",
+      "Logging\\": "Logging/",
+      "Config\\": "Config/",
+      "View\\": "View/",
+      "Validation\\": "Validation/",
+      "Http\\": "Http/",
       "Exceptions\\": "Exceptions/",
       "Library\\": "Library/",
       "Foundation\\": "Foundation/",
@@ -33,8 +37,7 @@
       "Database\\": "Database/",
       "Services\\": "Services/",
       "Notification\\": "Notification/",
-      "Modules\\": "Modules/",
-      "Libs\\": "Libs/"
+      "Modules\\": "Modules/"
     }
   },
   "config": {

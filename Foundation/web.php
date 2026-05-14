@@ -6,7 +6,7 @@ use Authentication\Session;
 use Exceptions\ExceptionHandler;
 use Library\Zantech;
 use Modules\Error\Error;
-use Loggers\Log;
+use Logging\Log;
 
 // Constants are handled in index.php and config.php.
 

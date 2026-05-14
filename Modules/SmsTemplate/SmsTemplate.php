@@ -3,7 +3,7 @@
 namespace Modules\SmsTemplate;
 
 use Exception;
-use Library\Controller;
+use Http\Controller;
 use Database\Database;
 use Authentication\Perm_Auth;
 

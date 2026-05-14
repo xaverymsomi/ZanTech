@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Exceptions;
 
-use Loggers\Log;
+use Logging\Log;
+use Http\Response;
 use Modules\Error\Error;
 use Throwable;
 
@@ -26,6 +27,12 @@ final class ExceptionHandler
     ];
 
     public static function handle(Throwable $e): void
+    {
+        self::render($e)->send();
+        exit;
+    }
+
+    public static function render(Throwable $e): Response
     {
         $requestId = isset($_SERVER['ZT_REQUEST_ID']) ? (string)$_SERVER['ZT_REQUEST_ID'] : null;
 
@@ -68,11 +75,10 @@ final class ExceptionHandler
         }
 
         if (self::expectsJson()) {
-            self::jsonResponse($e, $requestId);
-            return;
+            return self::jsonResponse($e, $requestId);
         }
 
-        self::htmlResponse($e, $severity, $icon);
+        return self::htmlResponse($e, $severity, $icon);
     }
 
     private static function expectsJson(): bool
@@ -92,47 +98,36 @@ final class ExceptionHandler
         return strtolower((string)($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '')) === 'xmlhttprequest';
     }
 
-    private static function jsonResponse(ZantechException $e, ?string $requestId): void
+    private static function jsonResponse(ZantechException $e, ?string $requestId): Response
     {
-        if (!headers_sent()) {
-            http_response_code($e->getStatusCode());
-            header('Content-Type: application/json; charset=utf-8');
-        }
-
         $ctx = $e->getContext();
         $redirect = isset($ctx['redirect']) ? self::sanitizeRedirectTarget((string)$ctx['redirect']) : null;
 
-        echo json_encode([
+        return Response::json([
             // consistent shape
             'code'       => $e->getStatusCode(),               // you can replace later with internal error codes
             'message'    => $e->getPublicMessage(),
             'errors'     => $ctx['errors'] ?? null,
             'request_id' => $requestId,
             'redirect'   => $redirect,
-        ], JSON_UNESCAPED_SLASHES);
-
-        exit;
+        ], $e->getStatusCode());
     }
 
-    private static function htmlResponse(ZantechException $e, string $severity, string $icon): void
+    private static function htmlResponse(ZantechException $e, string $severity, string $icon): Response
     {
         $ctx = $e->getContext();
 
         // 401 -> redirect to login (WEB only)
         if ($e->getStatusCode() === 401) {
             $loginRoute = defined('ZT_ROUTE_LOGIN') ? ZT_ROUTE_LOGIN : 'login';
-            self::redirectTo('/' . $loginRoute, 302);
+            return self::redirectTo('/' . $loginRoute, 302);
         }
 
         // 302 -> redirect intent
         if ($e->getStatusCode() === 302 && !empty($ctx['redirect'])) {
             $fallback = defined('ZT_ROUTE_DASHBOARD') ? ZT_ROUTE_DASHBOARD : 'dashboard';
             $target = self::sanitizeRedirectTarget((string)$ctx['redirect']) ?? $fallback;
-            self::redirectTo('/' . ltrim($target, '/'), 302);
-        }
-
-        if (!headers_sent()) {
-            http_response_code($e->getStatusCode());
+            return self::redirectTo('/' . ltrim($target, '/'), 302);
         }
 
         $err = new Error(
@@ -142,8 +137,9 @@ final class ExceptionHandler
             $icon
         );
 
+        ob_start();
         $err->index();
-        exit;
+        return Response::html((string)ob_get_clean(), $e->getStatusCode());
     }
 
     /**
@@ -193,18 +189,13 @@ final class ExceptionHandler
         return $target;
     }
 
-    private static function redirectTo(string $path, int $statusCode = 302): void
+    private static function redirectTo(string $path, int $statusCode = 302): Response
     {
-        if (headers_sent()) {
-            exit;
-        }
-
         // Use URL constant if defined, else fallback to relative redirect
         $base = defined('URL') ? rtrim((string)URL, '/') : '';
         $location = $base . $path;
 
-        header('Location: ' . $location, true, $statusCode);
-        exit;
+        return Response::redirect($location, $statusCode);
     }
 
     private static function resolveSeverity(ZantechException $e): string

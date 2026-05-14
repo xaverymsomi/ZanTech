@@ -1,10 +1,11 @@
 <?php
 
-namespace Library;
+namespace Http;
 
 use Authentication\Perm_Auth;
-use Loggers\Log;
+use Logging\Log;
 use Modules\Error\Error;
+use View\ViewRenderer;
 
 /**
  * Zantech Base Controller
@@ -13,7 +14,7 @@ use Modules\Error\Error;
  */
 class Controller
 {
-    protected ?View $view = null;
+    protected ?ViewRenderer $view = null;
     protected $model = null;
 
     /**
@@ -42,10 +43,10 @@ class Controller
      * VIEW ACCESS (LAZY)
      * ====================================== */
 
-    protected function view(): View
+    protected function view(): ViewRenderer
     {
         if ($this->view === null) {
-            $this->view = new View();
+            $this->view = new ViewRenderer();
         }
 
         return $this->view;
@@ -72,17 +73,30 @@ class Controller
         $this->view()->renderJson($module, $viewName);
     }
 
-    protected function json(array $payload, int $status = 200): void
+    protected function responseView(string $viewName, int $status = 200): Response
     {
-        http_response_code($status);
-        header('Content-Type: application/json');
-        echo json_encode($payload);
-        exit;
+        $module = $this->resolveModuleName();
+
+        ob_start();
+        $this->view()->render($module, $viewName);
+        return Response::html((string)ob_get_clean(), $status);
     }
 
-    protected function jsonSuccess(int $status, string $msg, array $extra = []): void
+    protected function responseFullView(string $path, int $status = 200): Response
     {
-        $this->json(array_merge([
+        ob_start();
+        $this->view()->renderFull($path);
+        return Response::html((string)ob_get_clean(), $status);
+    }
+
+    protected function responseJson(array $payload, int $status = 200): Response
+    {
+        return Response::json($payload, $status);
+    }
+
+    protected function responseSuccess(int $status, string $msg, array $extra = []): Response
+    {
+        return $this->responseJson(array_merge([
             'status'  => $status,
             'ok'      => true,
             'title'   => $msg,
@@ -91,15 +105,20 @@ class Controller
         ], $extra), $status);
     }
 
-    protected function jsonError(string $msg, int $status = 500, array $extra = []): void
+    protected function responseError(string $msg, int $status = 500, array $extra = []): Response
     {
-        $this->json(array_merge([
+        return $this->responseJson(array_merge([
             'status'  => $status,
             'ok'      => false,
             'title'   => $msg,
             'code'    => $status,
             'message' => $msg,
         ], $extra), $status);
+    }
+
+    protected function responseRedirect(string $to, int $status = 302): Response
+    {
+        return Response::redirect($this->normalizeRedirectTarget($to), $status);
     }
 
     /* ======================================
@@ -287,5 +306,20 @@ class Controller
         $parts = explode("\\", $class);
 
         return $parts[1] ?? 'Unknown';
+    }
+
+    private function normalizeRedirectTarget(string $to): string
+    {
+        $to = trim(str_replace(["\r", "\n"], '', $to));
+
+        if ($to === '') {
+            return '/';
+        }
+
+        if (preg_match('#^(https?:)?//#i', $to)) {
+            return '/';
+        }
+
+        return '/' . ltrim($to, '/');
     }
 }

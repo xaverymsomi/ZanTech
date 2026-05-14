@@ -2,7 +2,7 @@
 
 namespace Modules\Error;
 
-use Library\Controller;
+use Http\Controller;
 
 /**
  * ============================================================================

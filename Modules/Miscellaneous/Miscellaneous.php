@@ -2,7 +2,7 @@
 namespace Modules\Miscellaneous;
 
 use Exception;
-use Library\Controller;
+use Http\Controller;
 use Authentication\Perm_Auth;
 
 /**

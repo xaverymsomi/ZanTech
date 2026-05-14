@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Library\RouterSecurity;
+use Foundation\Routing\RouterSecurity;
 use PHPUnit\Framework\TestCase;
 use Exceptions\RouterException;
 

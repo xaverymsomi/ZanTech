@@ -3,7 +3,7 @@
 namespace Authentication;
 
 use Database\Database;
-use Loggers\Log;
+use Logging\Log;
 use PDO;
 
 class Perm_Auth {

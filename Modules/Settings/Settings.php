@@ -2,7 +2,7 @@
 
 namespace Modules\Settings;
 
-use Library\Controller;
+use Http\Controller;
 
 class Settings extends Controller
 {
@@ -14,14 +14,14 @@ class Settings extends Controller
         $this->model = new Settings_Model();
     }
 
-    public function index(): void
+    public function index()
     {
         $this->view()->title = 'System Settings';
         $this->view()->settings = $this->model->getAllSettings();
         $this->render('index');
     }
 
-    public function update(): void
+    public function update()
     {
         $this->requirePermission('edit_settings');
         $data = $this->validator()->validate([
@@ -30,6 +30,6 @@ class Settings extends Controller
         ]);
 
         $this->model->where('txt_key', $data['txt_key'])->update($data);
-        $this->jsonSuccess('Setting updated successfully');
+        return $this->responseSuccess(200, 'Setting updated successfully');
     }
 }

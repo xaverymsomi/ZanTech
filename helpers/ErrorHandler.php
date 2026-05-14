@@ -1,6 +1,6 @@
 <?php
 
-use Loggers\Log;
+use Logging\Log;
 use Exceptions\ZantechException;
 use Exceptions\ExceptionHandler;
 

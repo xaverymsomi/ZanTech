@@ -11,7 +11,7 @@ use DateTime;
 use Exceptions\ZantechException;
 use Library\CaptchaLib;
 use Library\Model;
-use Loggers\Log;
+use Logging\Log;
 use Services\Hash;
 use Throwable;
 

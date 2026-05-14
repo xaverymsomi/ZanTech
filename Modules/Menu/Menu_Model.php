@@ -3,7 +3,7 @@
 namespace Modules\Menu;
 
 use Library\Model;
-use Loggers\Log;
+use Logging\Log;
 
 class Menu_Model extends Model
 {

@@ -2,7 +2,7 @@
 
 namespace Modules\Report\Libs;
 
-use Loggers\Log;
+use Logging\Log;
 use Mpdf\Mpdf;
 use Mpdf\Config\ConfigVariables;
 use Mpdf\Config\FontVariables;
@@ -56,7 +56,9 @@ class ReportGenerator
         error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE);
 
         // Make sure temp dir exists & is writable
-        $tempDir = __DIR__ . '/tmp';
+        $tempDir = defined('ZT_CACHE_PATH')
+            ? ZT_CACHE_PATH . DIRECTORY_SEPARATOR . 'mpdf'
+            : __DIR__ . '/tmp';
         if (!is_dir($tempDir)) {
             mkdir($tempDir, 0777, true);
         }

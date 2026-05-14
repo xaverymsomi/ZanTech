@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Authentication;
 
-use Loggers\Log;
+use Logging\Log;
 use Exceptions\AuthException;
 
 final class Auth

@@ -4,9 +4,9 @@ namespace Modules\Dashboard;
 
 use Authentication\Auth;
 use Authentication\Perm_Auth;
-use Library\Controller;
+use Http\Controller;
 use Exception;
-use Loggers\Log;
+use Logging\Log;
 
 class Dashboard extends Controller
 {
@@ -19,7 +19,7 @@ class Dashboard extends Controller
         Auth::isLogged();
     }
 
-    public function index(): void
+    public function index()
     {
         $this->view()->title = 'Dashboard';
         $this->view()->modules = $this->model->getLauncherModules();
@@ -29,38 +29,38 @@ class Dashboard extends Controller
     /**
      * API: Fetches optimized launcher dashboard data.
      */
-    public function getLauncherData(): void
+    public function getLauncherData()
     {
         try {
             $data = $this->model->getLauncherModules();
-            $this->jsonSuccess(200, 'Launcher modules loaded', ['data' => $data]);
+            return $this->responseSuccess(200, 'Launcher modules loaded', ['data' => $data]);
         } catch (Exception $e) {
             Log::sysLog("DASHBOARD_LAUNCHER_DATA_ERROR: " . $e->getMessage());
-            $this->jsonError('Failed to load launcher modules', 500);
+            return $this->responseError('Failed to load launcher modules', 500);
         }
     }
 
     /**
      * API: Fetches optimized admin dashboard data.
      */
-    public function getAdminData(): void
+    public function getAdminData()
     {
         try {
             $data = $this->model->getAdminData();
-            $this->jsonSuccess(200, 'Admin data loaded', ['data' => $data]);
+            return $this->responseSuccess(200, 'Admin data loaded', ['data' => $data]);
         } catch (Exception $e) {
             Log::sysLog("DASHBOARD_ADMIN_DATA_ERROR: " . $e->getMessage());
-            $this->jsonError('Failed to load admin data', 500);
+            return $this->responseError('Failed to load admin data', 500);
         }
     }
 
-    public function fetchDashboardMedicalData(): void
+    public function fetchDashboardMedicalData()
     {
         // To be optimized in next phase
         $this->renderJson('fetch_dashboard_medical_data');
     }
 
-    public function createNewTransaction(): void
+    public function createNewTransaction()
     {
         try {
             $permission = Perm_Auth::getPermissions();

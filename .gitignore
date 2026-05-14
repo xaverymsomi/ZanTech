@@ -1,6 +1,11 @@
 /vendor/
 .idea/
+.vscode/
+.phpunit.cache/
 logs/
+storage/*
+!storage/.gitkeep
 *.log
 .env
 .env.*
+Modules/Report/Libs/tmp/

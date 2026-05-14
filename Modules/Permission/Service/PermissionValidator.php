@@ -2,7 +2,7 @@
 
 namespace Modules\Permission\Service;
 use Exception;
-use Loggers\Log;
+use Logging\Log;
 
 class PermissionValidator
 {

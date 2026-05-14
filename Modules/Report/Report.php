@@ -2,7 +2,7 @@
 
 namespace Modules\Report;
 
-use Library\Controller;
+use Http\Controller;
 use Authentication\Perm_Auth;
 
 class Report extends Controller {

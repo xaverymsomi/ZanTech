@@ -6,7 +6,7 @@ namespace Authentication;
 
 use Exceptions\AuthException;
 use Exceptions\RedirectException;
-use Loggers\Log;
+use Logging\Log;
 
 final class LoginCheck
 {

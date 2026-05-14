@@ -9,7 +9,7 @@ This file is the **detailed** companion to the summary in [README.md](README.md)
 
 | Item | Value | Where |
 |------|--------|--------|
-| ZanTech (kernel / shell) | **4.0.0** | `public/index.php` (`@version`) |
+| ZanTech (kernel / shell) | **1.0.2** | `constants/sys_pref.php` (`ZT_APP_VERSION`) |
 | PHP (required) | **^8.2** | `composer.json` → `require.php` |
 | Database (migrations) | **Microsoft SQL Server** (T-SQL) | `Database/migrations/*.sql` |
 
@@ -70,5 +70,5 @@ To lock PHP dependencies for reproducible installs, use a committed **`composer.
 
 ## Changelog vs this file
 
-- Bump **`public/index.php`** `@version` when you ship a notable framework release.
+- Bump **`constants/sys_pref.php`** `ZT_APP_VERSION` when you ship a notable framework release.
 - Bump **`cdn-lock.json`** (and this file’s tables) whenever **`views/header.php`** CDN URLs or versions change.

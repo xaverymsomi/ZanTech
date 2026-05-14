@@ -1,6 +1,6 @@
 <?php
 
-namespace Loggers;
+namespace Logging;
 
 /**
  * Zantech Unified Logging System
@@ -22,6 +22,10 @@ class Log
 
     private static function baseDir(): string
     {
+        if (defined('ZT_LOG_ROOT')) {
+            return ZT_LOG_ROOT;
+        }
+
         return ZT_APP_ROOT;
     }
 

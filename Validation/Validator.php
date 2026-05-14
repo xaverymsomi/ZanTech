@@ -2,19 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Library;
+namespace Validation;
 
 use Exceptions\ValidationException;
 
 final class Validator
 {
-    private array $data;
     private array $errors = [];
 
-    public function __construct(array $data)
-    {
-        $this->data = $data;
-    }
+    public function __construct(private readonly array $data) {}
 
     public static function make(array $data): self
     {
@@ -28,7 +24,7 @@ final class Validator
             $ruleArray = is_string($fieldRules) ? explode('|', $fieldRules) : $fieldRules;
 
             foreach ($ruleArray as $rule) {
-                $this->applyRule($field, $rule, $value);
+                $this->applyRule($field, (string)$rule, $value);
             }
         }
 
@@ -39,11 +35,11 @@ final class Validator
         return array_intersect_key($this->data, array_flip(array_keys($rules)));
     }
 
-    private function applyRule(string $field, string $rule, $value): void
+    private function applyRule(string $field, string $rule, mixed $value): void
     {
         $parameters = [];
-        if (strpos($rule, ':') !== false) {
-            [$rule, $paramString] = explode(':', $rule);
+        if (str_contains($rule, ':')) {
+            [$rule, $paramString] = explode(':', $rule, 2);
             $parameters = explode(',', $paramString);
         }
 
@@ -67,7 +63,7 @@ final class Validator
                 break;
 
             case 'min':
-                $min = (int)$parameters[0];
+                $min = (int)($parameters[0] ?? 0);
                 if (is_string($value) && strlen($value) < $min) {
                     $this->addError($field, "The {$field} must be at least {$min} characters.");
                 } elseif (is_numeric($value) && $value < $min) {
@@ -76,7 +72,7 @@ final class Validator
                 break;
 
             case 'max':
-                $max = (int)$parameters[0];
+                $max = (int)($parameters[0] ?? 0);
                 if (is_string($value) && strlen($value) > $max) {
                     $this->addError($field, "The {$field} may not be greater than {$max} characters.");
                 } elseif (is_numeric($value) && $value > $max) {

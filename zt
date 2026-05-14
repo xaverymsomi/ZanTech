@@ -8,6 +8,7 @@ require_once __DIR__ . '/configuration/config.php';
 
 use Library\Console\ModuleGenerator;
 use Database\Schema\DatabaseInitializer;
+use Database\Migrations\MigrationRunner;
 use Database\Database;
 
 $command = $argv[1] ?? null;
@@ -75,6 +76,28 @@ if ($command === 'make:module') {
     if ($exitCode !== 0) {
         exit($exitCode);
     }
+} elseif ($command === 'migrate') {
+    $runner = new MigrationRunner(new Database());
+    $results = $runner->run(__DIR__ . '/Database/migrations');
+    $exitCode = 0;
+
+    foreach ($results as $result) {
+        echo '[' . strtoupper($result['status']) . '] ' . $result['name'] . ' - ' . $result['message'] . "\n";
+        if ($result['status'] === 'error') {
+            $exitCode = 1;
+        }
+    }
+
+    exit($exitCode);
+} elseif ($command === 'migrate:status') {
+    $runner = new MigrationRunner(new Database());
+    foreach ($runner->status(__DIR__ . '/Database/migrations') as $row) {
+        echo '[' . strtoupper($row['status']) . '] ' . $row['name'];
+        if ($row['applied_at']) {
+            echo ' @ ' . $row['applied_at'];
+        }
+        echo "\n";
+    }
 } else {
     echo "Zantech CLI Utility\n";
     echo "--------------------\n";
@@ -83,4 +106,6 @@ if ($command === 'make:module') {
     echo "  db:init               Initialize database with core schema\n";
     echo "  db:seed               Seed database with initial data\n";
     echo "  db:migrate [file]     Run SQL migration(s); default = section, mx_menu, sidebar seed\n";
+    echo "  migrate               Run pending migrations and record them\n";
+    echo "  migrate:status        Show applied/pending migrations\n";
 }

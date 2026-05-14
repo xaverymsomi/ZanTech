@@ -3,7 +3,7 @@
 namespace Modules\Permission\Service;
 use Database\Database;
 use Exception;
-use Loggers\Log;
+use Logging\Log;
 
 class PermissionService
 {

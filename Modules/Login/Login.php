@@ -7,8 +7,8 @@ namespace Modules\Login;
 use Authentication\Auth;
 use Authentication\Session;
 use Library\CaptchaLib;
-use Library\Controller;
-use Loggers\Log;
+use Http\Controller;
+use Logging\Log;
 use Modules\Error\Error;
 use Throwable;
 
@@ -24,13 +24,13 @@ final class Login extends Controller
         Auth::isLogged();
     }
 
-    public function index(): void
+    public function index()
     {
         $this->view()->title = 'Login';
         $this->render('index');
     }
 
-    public function get_captcha(): void
+    public function get_captcha()
     {
         Session::init();
 
@@ -38,7 +38,7 @@ final class Login extends Controller
         $cap->generateCapture();
     }
 
-    public function login(): void
+    public function login()
     {
         Log::sysLog('Initiating Login Sequence');
 
@@ -55,7 +55,7 @@ final class Login extends Controller
 
             // If model didn't redirect (SPA use-case), respond JSON
             if ($isSpa) {
-                $this->json(['status' => true, 'message' => 'Login successful'], 200);
+                return $this->responseJson(['status' => true, 'message' => 'Login successful'], 200);
             }
         } catch (Throwable $e) {
             Log::sysErr([
@@ -70,7 +70,7 @@ final class Login extends Controller
                 : 'Login failed. Please try again.';
 
             if ($isSpa) {
-                $this->json(['status' => false, 'message' => $publicMessage], 400);
+                return $this->responseJson(['status' => false, 'message' => $publicMessage], 400);
             }
 
             (new Error(
@@ -82,7 +82,7 @@ final class Login extends Controller
         }
     }
 
-    public function recover(): void
+    public function recover()
     {
         Log::sysLog('Initiating Recovering Sequence');
 
@@ -94,7 +94,7 @@ final class Login extends Controller
             $this->model->recover($email);
 
             if ($isSpa) {
-                $this->json(['status' => true, 'message' => 'Recovery initiated'], 200);
+                return $this->responseJson(['status' => true, 'message' => 'Recovery initiated'], 200);
             }
         } catch (Throwable $e) {
             Log::sysErr([
@@ -109,7 +109,7 @@ final class Login extends Controller
                 : 'Recovery failed. Please try again.';
 
             if ($isSpa) {
-                $this->json(['status' => false, 'message' => $publicMessage], 400);
+                return $this->responseJson(['status' => false, 'message' => $publicMessage], 400);
             }
 
             (new Error('Recover failed', $publicMessage, null, 'bi-exclamation-triangle-fill'))->index();

@@ -5,8 +5,8 @@ namespace Modules\Menu;
 use Authentication\Auth;
 use Authentication\Perm_Auth;
 use Exception;
-use Library\Controller;
-use Loggers\Log;
+use Http\Controller;
+use Logging\Log;
 
 class Menu extends Controller
 {
@@ -18,7 +18,7 @@ class Menu extends Controller
         $this->model = new Menu_Model();
     }
 
-    public function index(): void
+    public function index()
     {
         try {
             $permission = Perm_Auth::getPermissions();
@@ -40,7 +40,7 @@ class Menu extends Controller
      * API: used by refresh button
      * GET /Menu/getAllMenus
      */
-    public function getAllMenus(): void
+    public function getAllMenus()
     {
         try {
             $permission = Perm_Auth::getPermissions();
@@ -49,11 +49,11 @@ class Menu extends Controller
             }
 
             $menus = $this->model->getMenus();
-            $this->jsonSuccess(200, 'Menus loaded', ['data' => $menus]);
+            return $this->responseSuccess(200, 'Menus loaded', ['data' => $menus]);
 
         } catch (Exception $e) {
             Log::sysLog("MENU_GET_ALL_ERROR:" . $e->getMessage());
-            $this->jsonError('Failed to load menus', 500);
+            return $this->responseError('Failed to load menus', 500);
         }
     }
 
@@ -61,7 +61,7 @@ class Menu extends Controller
      * CREATE MENU
      * POST /Menu/saveMenu
      */
-    public function saveMenu(): void
+    public function saveMenu()
     {
         try {
             $permission = Perm_Auth::getPermissions();
@@ -71,12 +71,12 @@ class Menu extends Controller
 
             $posted = json_decode(file_get_contents("php://input"), true);
             if (!is_array($posted)) {
-                $this->jsonError("Invalid input data", 422);
+                return $this->responseError("Invalid input data", 422);
             }
 
             $data = $posted['new_data'] ?? [];
             if (!is_array($data)) {
-                $this->jsonError("Invalid new_data", 422);
+                return $this->responseError("Invalid new_data", 422);
             }
 
             $name   = trim((string)($data['txt_name'] ?? ''));
@@ -88,12 +88,12 @@ class Menu extends Controller
             $parent = ($parent === '' || $parent === null) ? null : (int)$parent;
             if ($parent !== null && $parent <= 0) $parent = null;
 
-            if ($name === '')  $this->jsonError("Menu name required", 422);
-            if ($title === '') $this->jsonError("Menu title required", 422);
+            if ($name === '')  return $this->responseError("Menu name required", 422);
+            if ($title === '') return $this->responseError("Menu title required", 422);
             if ($link === '')  $link = '#';
 
             if (stripos($link, 'javascript:') === 0) {
-                $this->jsonError("Invalid link", 422);
+                return $this->responseError("Invalid link", 422);
             }
 
             $isSub = ($parent !== null);
@@ -105,7 +105,7 @@ class Menu extends Controller
             $this->model->db->beginTransaction();
 
             if ($isSub) {
-                if ($parent === null) $this->jsonError("Parent is required for submenu", 422);
+                if ($parent === null) return $this->responseError("Parent is required for submenu", 422);
 
                 if ($position === null) {
                     $position = $this->model->getLastPositionInScope($parent) + 1;
@@ -147,7 +147,7 @@ class Menu extends Controller
 
             $this->model->db->commit();
 
-            $this->jsonSuccess($ok ? 200 : 100, "Menu saved", [
+            return $this->responseSuccess($ok ? 200 : 100, "Menu saved", [
                 'data' => [
                     'int_parent'   => $parent,
                     'int_position' => $position,
@@ -157,11 +157,11 @@ class Menu extends Controller
         } catch (Exception $e) {
             try { $this->model->db->rollBack(); } catch (Exception $ignore) {}
             Log::sysLog("MENU_SAVE_ERROR:" . $e->getMessage());
-            $this->jsonError("Failed to save menu", 500);
+            return $this->responseError("Failed to save menu", 500);
         }
     }
 
-    public function edit($id): void
+    public function edit($id)
     {
         try {
             $id = (string)$id;
@@ -200,7 +200,7 @@ class Menu extends Controller
         }
     }
 
-    public function postEdit(): void
+    public function postEdit()
     {
         try {
             $permission = Perm_Auth::getPermissions();
@@ -214,14 +214,14 @@ class Menu extends Controller
                 $posted = $_POST;
             }
             if (!is_array($posted)) {
-                $this->jsonError("Invalid input", 422);
+                return $this->responseError("Invalid input", 422);
             }
 
             $row_value = trim((string)($posted['id'] ?? ''));
-            if ($row_value === '') $this->jsonError("Missing id", 422);
+            if ($row_value === '') return $this->responseError("Missing id", 422);
 
             $id = $this->model->getRecordIdByRowValue($this->model->getTable(), $row_value);
-            if ($id < 0) $this->jsonError("Record not found", 404);
+            if ($id < 0) return $this->responseError("Record not found", 404);
 
             $current = $this->model->getRecord($id, $this->model->getTable());
 
@@ -243,10 +243,10 @@ class Menu extends Controller
                 ? max(1, (int)$posted['int_position'])
                 : (int)$current['int_position'];
 
-            if ($name === '')  $this->jsonError("Menu name required", 422);
-            if ($title === '') $this->jsonError("Menu title required", 422);
+            if ($name === '')  return $this->responseError("Menu name required", 422);
+            if ($title === '') return $this->responseError("Menu title required", 422);
             if ($link === '')  $link = '#';
-            if (stripos($link, 'javascript:') === 0) $this->jsonError("Invalid link", 422);
+            if (stripos($link, 'javascript:') === 0) return $this->responseError("Invalid link", 422);
 
             $oldParent = $current['int_parent'];
             $oldParent = ($oldParent === null ? null : (int)$oldParent);
@@ -275,12 +275,12 @@ class Menu extends Controller
             $this->model->update($update, $this->model->getTable(), $id);
 
             $this->model->db->commit();
-            $this->jsonSuccess(201, "Updated");
+            return $this->responseSuccess(201, "Updated");
 
         } catch (Exception $e) {
             try { $this->model->db->rollBack(); } catch (Exception $ignore) {}
             Log::sysLog("MENU_POST_EDIT_ERROR:" . $e->getMessage());
-            $this->jsonError("Edit failed", 500);
+            return $this->responseError("Edit failed", 500);
         }
     }
 
@@ -288,12 +288,12 @@ class Menu extends Controller
      * GET USER MENUS (sidebar)
      * Optimized: Fetches all menus in one query to avoid N+1 problem.
      */
-    public function getUserMenus(): void
+    public function getUserMenus()
     {
         try {
             $userId = Auth::id();
             if (!$userId) {
-                $this->jsonError("User not authenticated", 401);
+                return $this->responseError("User not authenticated", 401);
             }
 
             // 1. Fetch all menus in one query
@@ -375,11 +375,11 @@ class Menu extends Controller
                 ];
             }
 
-            $this->jsonSuccess(200, "Menus loaded", ['data' => $final]);
+            return $this->responseSuccess(200, "Menus loaded", ['data' => $final]);
 
         } catch (Exception $e) {
             Log::sysLog("MENU_USER_MENU_ERROR:" . $e->getMessage());
-            $this->jsonError("Failed to load menus", 500);
+            return $this->responseError("Failed to load menus", 500);
         }
     }
 

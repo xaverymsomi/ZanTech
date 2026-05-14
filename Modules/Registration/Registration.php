@@ -2,7 +2,7 @@
 
 namespace Modules\Registration;
 
-use Library\Controller;
+use Http\Controller;
 
 class Registration extends Controller
 {

@@ -2,7 +2,7 @@
 
 ZanTech is a **PHP 8.2** modular web application framework: URL-driven routing, module-based MVC, session authentication, permission-aware UI, and a small **CLI (`zt`)** for scaffolding and database tasks. The front controller lives under **`public/`**; application code uses **Composer PSR-4** autoloading.
 
-**Framework (app shell):** `4.0.0` (see `public/index.php`).
+**Framework (app shell):** `1.0.2` (see `ZT_APP_VERSION` in `constants/sys_pref.php`).
 
 Repository: [github.com/xaverymsomi/ZanTech](https://github.com/xaverymsomi/ZanTech)
 
@@ -16,7 +16,7 @@ Pinned or primary versions are the ones loaded in **`views/header.php`** (CDN) a
 
 | Component | Version |
 |-----------|---------|
-| **ZanTech / kernel** | `4.0.0` (`public/index.php`) |
+| **ZanTech / kernel** | `1.0.2` (`constants/sys_pref.php`) |
 | **PHP** | `^8.2` (`composer.json`) |
 | **Database** | **SQL Server** (T-SQL migrations under `Database/migrations/`) |
 
@@ -110,7 +110,7 @@ Each feature area is a **module** under **`Modules/{ModuleName}/`** (PascalCase 
 
 | Piece | Role |
 |--------|------|
-| **Controller** | Extends `Library\Controller`. Handles permissions, calls the model, sets `$this->view()->…` data, then `render()`, `renderJson()`, or JSON helpers like `jsonSuccess()` / `jsonError()`. |
+| **Controller** | Extends `Http\Controller`. Handles permissions, calls the model, sets `$this->view()->...` data, then `render()`, `renderJson()`, or response helpers such as `responseJson()`, `responseSuccess()`, and `responseError()`. |
 | **Model** | Extends `Library\Model`. Encapsulates tables, queries, dropdowns, and helpers (`getRecord`, `update` / `updateRecord`, etc.). |
 | **Views** | PHP templates under **`Modules/{Module}/Views/`** (e.g. `home.php`, `edit.php`). The view layer composes HTML or JSON payloads for Angular/legacy clients. |
 
@@ -133,7 +133,7 @@ php zt make:module YourModule
 ## HTTP responses
 
 - **HTML pages** use `Controller::render()` and the shared layout under **`views/`** (e.g. `body.php`, `header.php`).
-- **JSON APIs** use `json()`, `jsonSuccess()`, and `jsonError()` on `Library\Controller`, which return structured payloads (including `ok`, `code`, `message`, and `title`) for both modern clients and legacy Angular response handlers.
+- **JSON APIs** use `responseJson()`, `responseSuccess()`, and `responseError()` on `Http\Controller`, which return structured payloads (including `ok`, `code`, `message`, and `title`) for both modern clients and legacy Angular response handlers.
 
 ---
 
@@ -161,7 +161,12 @@ php zt.php <command>
 |------|---------|
 | `public/` | Web root (`index.php`, assets, `.htaccess` / `web.config`) |
 | `Foundation/` | Bootstrapping: `AppLoader.php`, `web.php`, `cronjob.php` |
-| `Library/` | Core: `Zantech` router, `Controller`, `Model`, `View`, `RouterSecurity`, etc. |
+| `Config/` | Dotted-key configuration repository with env and optional DB fallback |
+| `Library/` | Remaining legacy/core services such as `Zantech`, `Model`, `DataView`, and `DualControl` while migration continues. |
+| `Http/` | Request, response, and controller abstractions |
+| `View/` | View rendering |
+| `Validation/` | Input validation |
+| `Foundation/Routing/` | Router and route security |
 | `Modules/` | Application modules (controllers, models, views) |
 | `Database/` | `Schema/` (init, seed), `migrations/` (incremental SQL) |
 | `Authentication/` | Auth, session, permissions |

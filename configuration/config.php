@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Dotenv\Dotenv;
-use Loggers\Log;
+use Logging\Log;
 
 /**
  * ---------------------------------------------------------
