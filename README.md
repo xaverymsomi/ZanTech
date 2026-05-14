@@ -2,7 +2,7 @@
 
 ZanTech is a **PHP 8.2** modular web application framework: URL-driven routing, module-based MVC, session authentication, permission-aware UI, and a small **CLI (`zt`)** for scaffolding and database tasks. The front controller lives under **`public/`**; application code uses **Composer PSR-4** autoloading.
 
-**Framework (app shell):** `1.0.2` (see `ZT_APP_VERSION` in `constants/sys_pref.php`).
+**Framework (app shell):** `1.0.3` (see `ZT_APP_VERSION` in `constants/sys_pref.php`).
 
 Repository: [github.com/xaverymsomi/ZanTech](https://github.com/xaverymsomi/ZanTech)
 
@@ -16,7 +16,7 @@ Pinned or primary versions are the ones loaded in **`views/header.php`** (CDN) a
 
 | Component | Version |
 |-----------|---------|
-| **ZanTech / kernel** | `1.0.2` (`constants/sys_pref.php`) |
+| **ZanTech / kernel** | `1.0.3` (`constants/sys_pref.php`) |
 | **PHP** | `^8.2` (`composer.json`) |
 | **Database** | **SQL Server** (T-SQL migrations under `Database/migrations/`) |
 
@@ -78,6 +78,7 @@ Bundled app script: **`public/assets/js/zantech.bundle.js`** (build or edit in-r
    php zt db:init      # core schema from Database/Schema/init.sql
    php zt db:seed      # optional seed from Database/Schema/seed.sql
    php zt db:migrate   # runs SQL files from Database/migrations/ (default RBAC/sidebar batch)
+   php zt migrate      # runs pending migrations and records them in zt_migrations
    ```
 
    Migration scripts live in **`Database/migrations/`**.
@@ -152,6 +153,8 @@ php zt.php <command>
 | `db:init` | Run `Database/Schema/init.sql` |
 | `db:seed` | Run `Database/Schema/seed.sql` |
 | `db:migrate [path]` | Run one SQL file, or the default migration batch |
+| `migrate` | Run pending SQL migrations and record them in `zt_migrations` |
+| `migrate:status` | Show applied and pending tracked migrations |
 
 ---
 

@@ -11,7 +11,7 @@ final class MigrationRunner
 {
     private const TABLE = 'zt_migrations';
 
-    public function __construct(private readonly Database $db) {}
+    public function __construct(private readonly Database|MigrationConnection $db) {}
 
     /**
      * @return array<int, array{name:string,status:string,message:string}>

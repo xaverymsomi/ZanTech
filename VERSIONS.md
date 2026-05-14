@@ -9,7 +9,7 @@ This file is the **detailed** companion to the summary in [README.md](README.md)
 
 | Item | Value | Where |
 |------|--------|--------|
-| ZanTech (kernel / shell) | **1.0.2** | `constants/sys_pref.php` (`ZT_APP_VERSION`) |
+| ZanTech (kernel / shell) | **1.0.3** | `constants/sys_pref.php` (`ZT_APP_VERSION`) |
 | PHP (required) | **^8.2** | `composer.json` → `require.php` |
 | Database (migrations) | **Microsoft SQL Server** (T-SQL) | `Database/migrations/*.sql` |
 

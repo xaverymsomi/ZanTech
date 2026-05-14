@@ -29,7 +29,7 @@ if (!defined('ZT_APP_NAME')) {
 }
 
 if (!defined('ZT_APP_VERSION')) {
-    define('ZT_APP_VERSION', '1.0.2');
+    define('ZT_APP_VERSION', '1.0.3');
 }
 
 if (!defined('ZT_PUBLIC_PATH')) {
