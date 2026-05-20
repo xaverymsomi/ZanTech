@@ -9,7 +9,7 @@ This file is the **detailed** companion to the summary in [README.md](README.md)
 
 | Item | Value | Where |
 |------|--------|--------|
-| ZanTech (kernel / shell) | **1.0.3** | `constants/sys_pref.php` (`ZT_APP_VERSION`) |
+| ZanTech (kernel / shell) | **2.4.1** | `constants/sys_pref.php` (`ZT_APP_VERSION`) |
 | PHP (required) | **^8.2** | `composer.json` → `require.php` |
 | Database (migrations) | **Microsoft SQL Server** (T-SQL) | `Database/migrations/*.sql` |
 
@@ -21,7 +21,7 @@ All of the following are loaded globally for the main HTML shell (unless a view 
 
 | Package | Version | Role |
 |---------|---------|------|
-| [Bootstrap](https://getbootstrap.com/) | **5.3.2** | CSS grid, components, JS bundle |
+| [Bootstrap](https://getbootstrap.com/) | **5.3.3** | CSS grid, components, JS bundle |
 | [Font Awesome](https://fontawesome.com/) | **6.4.2** | Icons (`fa-solid`, etc.) |
 | [jQuery](https://jquery.com/) | **3.7.1** | Legacy DOM / plugins |
 | [AngularJS](https://angularjs.org/) | **1.8.2** | `angular`, `angular-animate`, `angular-sanitize` |
@@ -53,7 +53,6 @@ All of the following are loaded globally for the main HTML shell (unless a view 
 | Area | Notes |
 |------|--------|
 | **PHPUnit** (dev) | `^11.5` |
-| **twbs/bootstrap** | `3.3.*` — legacy Composer dependency; **not** the UI Bootstrap version (see CDN **5.3.2** above). |
 | **Other packages** | Many use `*` or ranges; run `composer show` after install for exact installed versions. |
 
 To lock PHP dependencies for reproducible installs, use a committed **`composer.lock`** (generate with `composer update` / `composer install` in your environment).

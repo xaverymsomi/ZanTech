@@ -1,13 +1,13 @@
 <?php
 namespace Modules\EmailContent;
 
-use Library\Model;
+use Database\Model;
 
 class EmailContent_Model extends Model {
 
-    public $table = "mx_email_content";
+    protected string $table = "mx_email_content";
     private $view_dir = "/emailcontent/";
-    private $title = "Email Settings";
+    protected string $title = "Email Settings";
 
     public function getHiddenFields() {
         return ['txt_row_value'];
@@ -17,7 +17,7 @@ class EmailContent_Model extends Model {
         return [];
     }
 
-    function getControls() {
+    public function getControls() {
         return [
             ['action' => 'Add_Email_Content', 'color' => 'success', 'title' => 'Add Email Content',
                 'name' => 'New Email Content', 'url' => "'EmailContent'"],
@@ -26,43 +26,42 @@ class EmailContent_Model extends Model {
         ];
     }
 
-    function getActions() {
+    public function getActions() {
         return [
             ["action" => "Edit_Email_Content", "name" => "Edit", "icon" => "fa-edit", "color" => "blue", "url" => "EmailContent"]
         ];
     }
 
-    function getTabs() {
+    public function getTabs() {
         return [];
     }
 
-    function getProfileHiddenColumns() {
+    public function getProfileHiddenColumns() {
         return ["id"];
     }
 
-    function getAssociatedRecordHiddenColumns() {
+    public function getAssociatedRecordHiddenColumns() {
         return [];
     }
 
     public function getTable($view_table = false): string
     {
-        if ($view_table) {
+        if ($view_table && property_exists($this, 'view_table') && !empty($this->view_table)) {
             return $this->view_table;
         }
         return $this->table;
     }
 
-    function getTitle() {
+    public function getTitle($plural = false): string {
         return $this->title;
     }
 
-    function getViewDir() {
+    public function getViewDir() {
         return $this->view_dir;
     }
 
     public function getFormDropdowns($caller = 0) {
         $reasons = [];
-        $institutions = [];
         $languages = [];
         $sql = 'SELECT mx_source.*, COUNT(mx_email_content.opt_mx_source_id) total 
                 FROM mx_source LEFT OUTER JOIN mx_email_content ON mx_email_content.opt_mx_source_id = mx_source.id 
@@ -88,13 +87,6 @@ class EmailContent_Model extends Model {
             }
         }
 
-//        $result1 = $this->db->select("SELECT * FROM mx_institution ORDER BY id ASC");
-//        if ($result1) {
-//            foreach ($result1 as $value) {
-//                $institutions[] = ['id' => $value['id'], 'name' => $value['txt_name']];
-//            }
-//        }
-
         $result2 = $this->db->select("SELECT * FROM mx_email_language ORDER BY id ASC");
         if ($result2) {
             foreach ($result2 as $value) {
@@ -103,7 +95,6 @@ class EmailContent_Model extends Model {
         }
         $data = [
             'opt_mx_source_ids' => $reasons,
-//            'opt_mx_institution_ids' => $institutions,
             'opt_mx_email_language_ids' => $languages
         ];
 
@@ -172,5 +163,4 @@ class EmailContent_Model extends Model {
     private function getMaxEmailReasonId() {
         return $this->db->select("SELECT MAX(id) id FROM mx_email_reason")[0]['id'];
     }
-
 }

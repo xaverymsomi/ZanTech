@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Foundation\Routing;
 
 use Http\Request;
@@ -11,11 +9,7 @@ final class RouteContext
     /**
      * @param string[] $segments
      */
-    public function __construct(
-        public readonly Request $request,
-        public readonly array $segments,
-        public readonly int $offset = 0
-    ) {}
+    public function __construct(public readonly Request $request, public readonly array $segments, public readonly int $offset = 0) {}
 
     public function controller(): string
     {
@@ -24,7 +18,7 @@ final class RouteContext
 
     public function method(): string
     {
-        return (string)($this->segments[$this->offset + 1] ?? 'index');
+        return ($this->segments[$this->offset + 1] ?? 'index');
     }
 
     public function params(): array

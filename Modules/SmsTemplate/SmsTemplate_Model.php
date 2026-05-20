@@ -1,13 +1,13 @@
 <?php
 namespace Modules\SmsTemplate;
 
-use Library\Model;
+use Database\Model;
 
 class SmsTemplate_Model extends Model {
 
-    public $table = "mx_sms_template";
+    protected string $table = "mx_sms_template";
     private $view_dir = "/smstemplate/";
-    private $title = "Sms Setttings";
+    protected string $title = "Sms Setttings";
 
     public function getHiddenFields() {
         return ['txt_row_value'];
@@ -17,7 +17,7 @@ class SmsTemplate_Model extends Model {
         return [];
     }
 
-    function getControls() {
+    public function getControls() {
         return [
             ['action' => 'Add_Sms_template', 'color' => 'success', 'title' => 'Add Sms Template',
                 'name' => 'New Sms Template', 'url' => "'SmsTemplate'"],
@@ -26,25 +26,25 @@ class SmsTemplate_Model extends Model {
         ];
     }
 
-    function getActions() {
+    public function getActions() {
         return [
             ["action" => "Edit_Sms_Content", "name" => "Edit", "icon" => "fa-edit", "color" => "blue", "url" => "SmsTemplate"]
         ];
     }
 
-    function getProfileButtons() {
+    public function getProfileButtons() {
         return [];
     }
 
-    function getTabs() {
+    public function getTabs() {
         return [];
     }
 
-    function getProfileHiddenColumns() {
+    public function getProfileHiddenColumns() {
         return ["id"];
     }
 
-    function getAssociatedRecordHiddenColumns() {
+    public function getAssociatedRecordHiddenColumns() {
         return [];
     }
 
@@ -56,11 +56,12 @@ class SmsTemplate_Model extends Model {
         return $this->table;
     }
 
-    function getTitle() {
+    public function getTitle($plural = false): string
+    {
         return $this->title;
     }
 
-    function getViewDir() {
+    public function getViewDir() {
         return $this->view_dir;
     }
 
@@ -92,21 +93,12 @@ class SmsTemplate_Model extends Model {
             }
         }
 
-//        $result1 = $this->db->select("SELECT * FROM mx_institution ORDER BY id ASC");
-//        if ($result1) {
-//            foreach ($result1 as $value) {
-//                $institutions[] = ['id' => $value['id'], 'name' => $value['txt_name']];
-//            }
-//        }
-
         $result2 = $this->db->select("SELECT * FROM mx_sms_language ORDER BY id ASC");
         if ($result2) {
             foreach ($result2 as $value) {
                 $languages[] = ['id' => $value['id'], 'name' => $value['txt_name']];
             }
         }
-
-
 
         $data = [
             'opt_mx_source_ids' => $reasons,
@@ -199,5 +191,4 @@ class SmsTemplate_Model extends Model {
             'txt_delivery' => ''
         ];
     }
-
 }

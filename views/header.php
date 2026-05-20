@@ -13,17 +13,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Third Party CSS (CDNs for high performance & caching) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-toaster/3.0.0/toaster.min.css">
 
     <!-- Unified Design System (Our Custom Bundle) -->
-    <link rel="stylesheet" href="<?= APP_DIR ?>/assets/css/zantech-ui.css">
+    <link rel="stylesheet" href="/<?= ltrim(APP_DIR . '/assets/css/zantech-ui.css', '/') ?>">
 
     <!-- Core Libraries (CDNs) -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-    <!-- Bootstrap JS: required for data-bs-toggle="dropdown", modals, etc. (CSS alone is not enough) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS: required for data-bs-toggle="dropdown", modals, etc. -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
     
     <!-- AngularJS Ecosystem (CDNs) -->
@@ -58,7 +58,22 @@
     ?>
     <script>window.app_url = <?= json_encode($zt_js_app_url, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_UNESCAPED_SLASHES) ?>;</script>
     <!-- Unified Application Logic (Custom JS Bundle with versioning) -->
-    <script src="<?= APP_DIR ?>/assets/js/zantech.bundle.js?v=<?= time() ?>"></script>
+    <!-- Modular Application Logic (Clean Architecture) -->
+    <script src="/<?= ltrim(APP_DIR . '/assets/js/core/app.js?v=' . time(), '/') ?>"></script>
+    <script src="/<?= ltrim(APP_DIR . '/assets/js/core/api.client.js?v=' . time(), '/') ?>"></script>
+    <script src="/<?= ltrim(APP_DIR . '/assets/js/core/form.loader.js?v=' . time(), '/') ?>"></script>
+
+    <!-- Layout Controllers -->
+    <script src="/<?= ltrim(APP_DIR . '/assets/js/controllers/layout/menu.controller.js?v=' . time(), '/') ?>"></script>
+    <script src="/<?= ltrim(APP_DIR . '/assets/js/controllers/layout/dashboard.controller.js?v=' . time(), '/') ?>"></script>
+
+    <!-- Domain Module Controllers -->
+    <script src="/<?= ltrim(APP_DIR . '/assets/js/controllers/modules/form.controller.js?v=' . time(), '/') ?>"></script>
+    <script src="/<?= ltrim(APP_DIR . '/assets/js/controllers/modules/menu_manage.controller.js?v=' . time(), '/') ?>"></script>
+    <script src="/<?= ltrim(APP_DIR . '/assets/js/controllers/modules/permission.controller.js?v=' . time(), '/') ?>"></script>
+    <script src="/<?= ltrim(APP_DIR . '/assets/js/controllers/modules/profile.controller.js?v=' . time(), '/') ?>"></script>
+    <script src="/<?= ltrim(APP_DIR . '/assets/js/controllers/modules/modal.controller.js?v=' . time(), '/') ?>"></script>
+    <script src="/<?= ltrim(APP_DIR . '/assets/js/controllers/modules/report.controller.js?v=' . time(), '/') ?>"></script>
 
     <?= $this->dynamicStyles ?? '' ?>
 

@@ -1,23 +1,27 @@
 <?php
 
-declare(strict_types=1);
+
 
 namespace Modules\Login;
 
 use Authentication\Auth;
+use Authentication\CaptchaLib;
 use Authentication\Session;
 use Database\Database;
+use Foundation\Middleware\AuthThrottlingMiddleware;
+use Http\Request;
 use DateTime;
 use Exceptions\ZantechException;
-use Library\CaptchaLib;
-use Library\Model;
+use Database\Model;
 use Logging\Log;
 use Services\Hash;
+use Services\MXMailGun;
+use Services\MXSms;
 use Throwable;
 
 final class Login_Model extends Model
 {
-    private string $title = "Dashboard";
+    protected string $title = "Dashboard";
 
     public function getTitle(): string
     {
@@ -48,21 +52,21 @@ final class Login_Model extends Model
         ]);
 
         if (($captcha_response['status'] ?? 500) !== 200) {
+            AuthThrottlingMiddleware::recordFailure((new Request())->ip(), (string)$email);
             Session::set('returned', 1993);
             Log::sysLog('LOGIN_BLOCKED_CAPTCHA');
             header("Location: " . URL);
             exit;
         }
 
-        $hashed = Hash::create(HASH_ALGO, (string)$password, PASS_SALT);
-
-        $result = $this->sysLogin('mx_login_credential', (string)$email, $hashed);
+        $result = $this->sysLogin('mx_login_credential', (string)$email, (string)$password);
         Log::sysLog([
             'event' => 'LOGIN_DB_RESULT',
             'ok' => !empty($result),
         ]);
 
         if (empty($result)) {
+            AuthThrottlingMiddleware::recordFailure((new Request())->ip(), (string)$email);
             Session::set('returned', 10);
             Log::sysLog('LOGIN_FAILED_CREDENTIALS');
             header("Location: " . (URL . '/' . $return_url));
@@ -105,6 +109,7 @@ final class Login_Model extends Model
         Session::set('login_type', 'user');
 
         Log::sysLog('Login Successful');
+        AuthThrottlingMiddleware::clearThrottle((new Request())->ip(), (string)$email);
 
         header("Location: {$redirectToDashboard}");
         exit;
@@ -182,18 +187,28 @@ final class Login_Model extends Model
         SELECT *
         FROM {$tableQ}
         WHERE txt_username = :email
-          AND txt_password = :password
           AND opt_mx_status_id = 1
     ";
 
         $result = $db->select($sql, [
             ':email'    => $email,
-            ':password' => $password,
         ]);
 
         if (!$result) return [];
 
         $user = $result[0];
+
+        // 🛡️ Secure Password Verification (Handles modern and legacy hashes)
+        if (!Hash::check($password, $user['txt_password'])) {
+            return [];
+        }
+
+        // 🔄 Rehash-on-Login (Auto-upgrades legacy hashes to modern ones)
+        if (Hash::needsRehash($user['txt_password'])) {
+            $newHash = Hash::make($password);
+            $db->update($table, ['txt_password' => $newHash], $user['id'], 'id');
+            Log::sysLog('Password rehashed to modern algorithm', ['user_id' => $user['id']]);
+        }
 
         // ✅ whitelist domain tables
         $allowedDomains = ['mx_user', 'mx_agent', 'mx_staff'];
@@ -284,6 +299,7 @@ final class Login_Model extends Model
         );
 
         if (empty($data) || (int)($data[0]['opt_mx_status_id'] ?? 0) !== 1) {
+            AuthThrottlingMiddleware::recordFailure((new Request())->ip(), (string)$email);
             Session::set('returned', 6061);
             header("Location: " . URL);
             exit;
@@ -291,14 +307,20 @@ final class Login_Model extends Model
 
         $user = $data[0];
 
-        // NOTE: Your reset token logic is legacy; later we should replace it with secure random tokens stored in DB with expiry.
-        $link = URL . '/login/reset?udid=' . md5((string)(1290 * 3 + (int)($user['int_token'] ?? 0)));
+        // Generate a secure, randomized OTP and Token
+        $otp   = $this->generateRandomString(8);
+        $token = random_int(100000000, 999999999); // Secure 9-digit token for integer column
+        $hash  = Hash::make($otp);
 
-        $otp  = $this->generateRandomString(8);
-        $hash = Hash::create(HASH_ALGO, $otp, PASS_SALT);
+        // Store the secure token in the user's row
+        $db->prepare("UPDATE mx_user SET int_token = :tk WHERE id = :id")
+            ->execute([':tk' => $token, ':id' => $user['id']]);
 
         $db->prepare("UPDATE mx_login_credential SET txt_password = :pwd WHERE user_id = :uid")
             ->execute([':pwd' => $hash, ':uid' => $user['id']]);
+
+        // Construct the secure link
+        $link = URL . '/login/reset?token=' . $token . '&email=' . urlencode($email);
 
         (new MXSms())->sendTemplateSMS(
             2,
@@ -328,40 +350,34 @@ final class Login_Model extends Model
      * PASSWORD RESET (FINAL)
      * ============================================================ */
 
-    public function reset(string $usr, string $password, string $password_match): void
+    public function reset(string $token, string $email, string $password, string $password_match): void
     {
         Session::init();
 
         $db = new Database();
 
-        $sql = "
-            SELECT *
-            FROM mx_user
-            WHERE CONVERT(VARCHAR(32),
-            HashBytes('MD5', CONVERT (VARCHAR(32), int_token + 1290 * 3)),2) = :hash
-        ";
-
-        $data = $db->select($sql, [':hash' => $usr]);
+        // Secure lookup: MUST match both Email and the exact randomized Token
+        $sql = "SELECT * FROM mx_user WHERE email = :email AND int_token = :token";
+        $data = $db->select($sql, [':email' => $email, ':token' => $token]);
 
         if (empty($data) || (int)($data[0]['opt_mx_status_id'] ?? 0) !== 1) {
+            AuthThrottlingMiddleware::recordFailure((new Request())->ip(), (string)$email);
             Session::set('returned', 6061);
             header("Location: " . URL);
             exit;
         }
 
         if ($password !== $password_match) {
+            AuthThrottlingMiddleware::recordFailure((new Request())->ip(), (string)$email);
             Session::set('returned', 6063);
             header("Location: " . URL);
             exit;
         }
 
-        $hash  = Hash::create(HASH_ALGO, $password, PASS_SALT);
-        $token = $this->generateRandomNo();
-
-        $db->prepare("UPDATE mx_user SET dat_date_last_reset = :dt, int_token = :tk WHERE id = :id")
+        $hash  = Hash::make($password);
+        $db->prepare("UPDATE mx_user SET dat_date_last_reset = :dt, int_token = NULL WHERE id = :id")
             ->execute([
                 ':dt' => date('Y-m-d H:i:s'),
-                ':tk' => $token,
                 ':id' => $data[0]['id']
             ]);
 
@@ -370,6 +386,8 @@ final class Login_Model extends Model
                 ':pwd' => $hash,
                 ':uid' => $data[0]['id']
             ]);
+
+        AuthThrottlingMiddleware::clearThrottle((new Request())->ip(), (string)$email);
 
         Session::set('returned', 6000);
         header("Location: " . URL);

@@ -13,6 +13,7 @@ class Perm_Auth {
 
     //Initiate an empty array for the permissions
     private array $permissionList;
+    private int $userRole = 0;
 
     public function __construct() {
         $this->permissionList = array();
@@ -58,6 +59,10 @@ class Perm_Auth {
         while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
             $perm->permissionList[$row["txt_name"]] = true;
         }
+
+        // Capture user role for Super Admin bypass
+        $perm->userRole = (int)(Auth::user()['role'] ?? 0);
+
         return $perm;
     }
 
@@ -82,6 +87,11 @@ class Perm_Auth {
     //Check if the specific role has a given permission
     public function verifyPermission($permission) : bool
     {
+        // Super Admin Bypass (Role 1 = Super Admin)
+        if ($this->userRole === 1) {
+            return true;
+        }
+
         return isset($this->permissionList[$permission]);
     }
 
@@ -104,12 +114,14 @@ class Perm_Auth {
         $group_id = $this->getUserGroups($user_id);
         $sql = "SELECT DISTINCT mx_permission.* FROM mx_permission 
                     JOIN mx_group_permission ON mx_group_permission.opt_mx_permission_id = mx_permission.id 
-                    WHERE mx_group_permission.opt_mx_group_id IN (" . $group_id . ")
+                    WHERE mx_group_permission.opt_mx_group_id IN (" . ($group_id ?: '0') . ")
                 UNION 
                     SELECT DISTINCT mx_permission.* FROM mx_permission 
                     JOIN mx_login_credential_permission ON mx_login_credential_permission.opt_mx_permission_id = mx_permission.id 
-                    WHERE mx_login_credential_permission.opt_mx_login_credential_id = '" . $user_id . "'";
-        $permissions = self::$db->query($sql)->fetchAll();
+                    WHERE mx_login_credential_permission.opt_mx_login_credential_id = :user_id";
+        $stm = self::$db->prepare($sql);
+        $stm->execute([':user_id' => $user_id]);
+        $permissions = $stm->fetchAll();
 
         $permission_values = [];
         $submenuvalues = [];

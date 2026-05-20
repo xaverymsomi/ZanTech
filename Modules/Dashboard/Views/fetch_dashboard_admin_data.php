@@ -1,5 +1,5 @@
 <?php
-use Library\\Database;
+use Database\Database;
 
 date_default_timezone_set('Africa/Dar_es_Salaam');
 

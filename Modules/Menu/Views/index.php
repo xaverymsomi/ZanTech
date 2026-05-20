@@ -1,7 +1,4 @@
 <?php
-include '../../inc/config.php';
-
-require_once MX17_APP_ROOT . "/vendor/autoload.php";
 /**
  * @group menu
  * @filesource /menu/index
@@ -10,8 +7,9 @@ require_once MX17_APP_ROOT . "/vendor/autoload.php";
 
 use Database\Database;
 use Authentication\Perm_Auth;
+use Authentication\Session;
 
-session_start();
+Session::init();
 
 $db = new Database();
 $perm = new Perm_Auth();

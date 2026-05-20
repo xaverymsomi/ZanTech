@@ -6,10 +6,8 @@
  * and open the template in the editor.
  */
 
-use Library\\Database;
+use Database\Database;
 
-include '../../inc/config.php';
-require '../../libs/Database.php';
 $values = json_decode(file_get_contents("php://input"));
 if (is_object($values)) {
     $permission = $values->{'permission'};
@@ -26,9 +24,9 @@ function getMenus() {
     if ($result) {
         foreach($result as $row) {
             $row['txt_name'] = ucwords($row['txt_name']);
-            $sql = "SELECT * from mx_menu WHERE int_parent = " . $row['id'] . " ORDER BY int_position";
+            $sql = "SELECT * from mx_menu WHERE int_parent = :id ORDER BY int_position";
             
-            $row['children'] = $db->select($sql);
+            $row['children'] = $db->select($sql, [':id' => $row['id']]);
             $data[] = $row;
             
         }

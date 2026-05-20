@@ -1,8 +1,8 @@
 <div id="page-content" class="px-4 py-4">
     <?php
-    use Library\DataView;
     use Authentication\Perm_Auth;
     use Authentication\Session;
+    use View\DataView;
 
     $returned = Session::get('returned') ?? 0;
     $perm = Perm_Auth::getPermissions();

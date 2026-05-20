@@ -2,14 +2,14 @@
 
 namespace Modules\Menu;
 
-use Library\Model;
+use Database\Model;
 use Logging\Log;
 
 class Menu_Model extends Model
 {
-    public string $table = "mx_menu";
+    protected string $table = "mx_menu";
     private string $view_dir = "menu/";
-    private string $title = "Menu";
+    protected string $title = "Menu";
 
     public array $no_old_data = ['saveMenu'];
 
@@ -40,7 +40,7 @@ class Menu_Model extends Model
         return $this->table;
     }
 
-    public function getTitle(): string
+    public function getTitle($plural = false): string
     {
         return $this->title;
     }

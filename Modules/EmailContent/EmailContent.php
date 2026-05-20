@@ -36,7 +36,7 @@ class EmailContent extends Controller
             $this->view()->postData = $data[2];
             $this->render('index');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -57,7 +57,7 @@ class EmailContent extends Controller
             $this->view()->secondary_color = filter_input(INPUT_COOKIE, 'secondary', FILTER_SANITIZE_SPECIAL_CHARS, ["options" => ["default" => "#FF0000"]]);
             $this->render('profile');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -74,7 +74,7 @@ class EmailContent extends Controller
             $this->view()->dropdowns = $this->model->getFormDropdowns($data['opt_mx_source_id']);
             $this->render('edit');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -88,7 +88,7 @@ class EmailContent extends Controller
             $this->view()->dropdowns = [];
             $this->render('edit_email_setup');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -144,7 +144,7 @@ class EmailContent extends Controller
             $this->view()->data = ['has_extra' => 0];
             $this->render('create');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 

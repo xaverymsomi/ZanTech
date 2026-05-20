@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+
 
 namespace View;
 
@@ -27,11 +27,17 @@ class ViewRenderer
 
             $module = trim($module, "/\\");
             $view = trim($view, "/\\");
-            $viewPath = $this->appPath("modules/{$module}/views/{$view}.php");
+            Log::debug("RENDER_REQUEST: {$module}/{$view}");
+            $viewPath = $this->resolveTemplatePath($module, $view);
+            Log::debug("RESOLVED_VIEW_PATH: {$viewPath}");
 
             $this->assertFileExists($viewPath, "View not found: {$module}/{$view}.php");
 
             if ($noLayout || $this->isXhrRequest()) {
+                if (!headers_sent()) {
+                    header('Content-Type: text/html; charset=UTF-8');
+                }
+                $ui = \View\Component::class;
                 require $viewPath;
                 return;
             }
@@ -58,6 +64,7 @@ class ViewRenderer
             $this->assertFileExists($file, "Full view missing: {$path}");
 
             if ($this->isXhrRequest()) {
+                $ui = \View\Component::class;
                 require $file;
                 return;
             }
@@ -70,10 +77,15 @@ class ViewRenderer
             $this->assertFileExists($body, 'Missing body.php');
             $this->assertFileExists($footer, 'Missing footer.php');
 
+            $ui = \View\Component::class;
             require $header;
             require $body;
             require $file;
             require $footer;
+
+            if (class_exists('\\Foundation\\Profiler')) {
+                echo \Foundation\Profiler::renderToolbar();
+            }
         } finally {
             $this->leaveRenderGuard();
         }
@@ -86,7 +98,9 @@ class ViewRenderer
         try {
             $module = trim($module, "/\\");
             $view = trim($view, "/\\");
-            $viewPath = $this->appPath("modules/{$module}/views/{$view}.php");
+            Log::debug("RENDER_JSON_REQUEST: {$module}/{$view}");
+            $viewPath = $this->resolveTemplatePath($module, $view);
+            Log::debug("RESOLVED_JSON_PATH: {$viewPath}");
 
             if (!is_file($viewPath)) {
                 http_response_code(500);
@@ -114,19 +128,38 @@ class ViewRenderer
         $body = $this->appPath('views/body.php');
         $footer = $this->appPath('views/footer.php');
 
+        Log::debug("RENDER_FULL_LAYOUT: {$viewPath}");
+
         $this->assertFileExists($header, 'Missing header.php');
         $this->assertFileExists($body, 'Missing body.php');
         $this->assertFileExists($footer, 'Missing footer.php');
 
         ob_start();
+        $ui = \View\Component::class;
         require $viewPath;
         $this->content = ob_get_clean();
 
-        $this->dynamicStyles = \Library\DataView::getStyles();
+        try {
+            $this->dynamicStyles = \View\DataView::getStyles();
+        } catch (\Throwable $e) {
+            $this->dynamicStyles = '';
+        }
+
+        // Inject dynamic launcher modules for the global Apps Modal
+        try {
+            $dashboardModel = new \Modules\Dashboard\Dashboard_Model();
+            $this->appsModules = $dashboardModel->getLauncherModules();
+        } catch (\Throwable $e) {
+            $this->appsModules = []; // Fallback
+        }
 
         require $header;
         require $body;
         require $footer;
+
+        if (class_exists('\\Foundation\\Profiler')) {
+            echo \Foundation\Profiler::renderToolbar();
+        }
     }
 
     private function renderLoginLayout(string $viewPath): void
@@ -138,13 +171,20 @@ class ViewRenderer
             $footer = $this->appPath('views/footer.php');
 
             if (is_file($header)) {
+                $ui = \View\Component::class;
                 require $header;
             }
 
+            $ui = \View\Component::class;
             require $viewPath;
 
             if (is_file($footer)) {
+                $ui = \View\Component::class;
                 require $footer;
+            }
+
+            if (class_exists('\\Foundation\\Profiler')) {
+                echo \Foundation\Profiler::renderToolbar();
             }
         } finally {
             $this->leaveRenderGuard();
@@ -196,5 +236,25 @@ class ViewRenderer
     private function appPath(string $path): string
     {
         return rtrim($this->appRoot ?? ZT_APP_ROOT, "/\\") . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
+    }
+
+    private function resolveTemplatePath(string $module, string $view): string
+    {
+        // Try project standard (Uppercase)
+        $path = "Modules/{$module}/Views/{$view}.php";
+        $full = $this->appPath($path);
+        Log::debug("CHECKING_PATH: {$full}");
+        if (is_file($full)) return $full;
+
+        // Try lowercase fallback
+        $path = "modules/{$module}/views/{$view}.php";
+        $full = $this->appPath($path);
+        Log::debug("CHECKING_PATH_FALLBACK: {$full}");
+        if (is_file($full)) return $full;
+
+        // Default to project standard (will trigger assertFileExists if missing)
+        $final = $this->appPath("Modules/{$module}/Views/{$view}.php");
+        Log::debug("FALLING_BACK_TO_DEFAULT: {$final}");
+        return $final;
     }
 }

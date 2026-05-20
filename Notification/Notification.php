@@ -3,7 +3,7 @@
 namespace Notification;
 
 use Authentication\Session;
-use Library\View;
+use View\ViewRenderer as View;
 
 class Notification
 {

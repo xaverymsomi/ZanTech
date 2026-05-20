@@ -2,7 +2,6 @@
   "require": {
     "php": "^8.2",
     "phpmailer/phpmailer": "*",
-    "twbs/bootstrap": "3.3.*",
     "ext-pdo": "*",
     "ext-json": "*",
     "ext-fileinfo": "*",
@@ -31,14 +30,16 @@
       "Validation\\": "Validation/",
       "Http\\": "Http/",
       "Exceptions\\": "Exceptions/",
-      "Library\\": "Library/",
       "Foundation\\": "Foundation/",
       "Authentication\\": "Authentication/",
       "Database\\": "Database/",
       "Services\\": "Services/",
       "Notification\\": "Notification/",
       "Modules\\": "Modules/"
-    }
+    },
+    "files": [
+      "Foundation/AppLoaderFunctions.php"
+    ]
   },
   "config": {
     "allow-plugins": {

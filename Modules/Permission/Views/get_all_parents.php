@@ -6,10 +6,8 @@
  * and open the template in the editor.
  */
 
-use Library\\Database;
+use Database\Database;
 
-include '../../inc/config.php';
-require '../../libs/Database.php';
 $values = json_decode(file_get_contents("php://input"));
 if (is_object($values)) {
     $permission = $values->{'permission'};

@@ -2,7 +2,7 @@
 
 ZanTech is a **PHP 8.2** modular web application framework: URL-driven routing, module-based MVC, session authentication, permission-aware UI, and a small **CLI (`zt`)** for scaffolding and database tasks. The front controller lives under **`public/`**; application code uses **Composer PSR-4** autoloading.
 
-**Framework (app shell):** `1.0.3` (see `ZT_APP_VERSION` in `constants/sys_pref.php`).
+**Framework (app shell):** `2.4.1` (see `ZT_APP_VERSION` in `constants/sys_pref.php`).
 
 Repository: [github.com/xaverymsomi/ZanTech](https://github.com/xaverymsomi/ZanTech)
 
@@ -16,7 +16,7 @@ Pinned or primary versions are the ones loaded in **`views/header.php`** (CDN) a
 
 | Component | Version |
 |-----------|---------|
-| **ZanTech / kernel** | `1.0.3` (`constants/sys_pref.php`) |
+| **ZanTech / kernel** | `2.4.1` (`constants/sys_pref.php`) |
 | **PHP** | `^8.2` (`composer.json`) |
 | **Database** | **SQL Server** (T-SQL migrations under `Database/migrations/`) |
 
@@ -24,7 +24,7 @@ Pinned or primary versions are the ones loaded in **`views/header.php`** (CDN) a
 
 | Library | Version |
 |---------|---------|
-| **Bootstrap** (CSS + JS) | `5.3.2` |
+| **Bootstrap** (CSS + JS) | `5.3.3` |
 | **Font Awesome** | `6.4.2` |
 | **jQuery** | `3.7.1` |
 | **AngularJS** (`angular`, `angular-animate`, `angular-sanitize`) | `1.8.2` |
@@ -45,8 +45,6 @@ Bundled app script: **`public/assets/js/zantech.bundle.js`** (build or edit in-r
 | **PHPUnit** (dev) | `^11.5` |
 | **vlucas/phpdotenv** | `*` |
 | **Other PHP libraries** | See `composer.json` (many use `*` or caret ranges; resolve with `composer show`) |
-
-`composer.json` still lists **`twbs/bootstrap` `3.3.*`** for legacy paths; the **main UI** uses **Bootstrap 5.3.2** from the CDN above.
 
 ---
 
@@ -70,7 +68,7 @@ Bundled app script: **`public/assets/js/zantech.bundle.js`** (build or edit in-r
 
 2. **Environment**
 
-   Copy or create a **`.env`** in the project root. Configuration is bootstrapped in `configuration/config.php` (uses `vlucas/phpdotenv`). Database and app settings are typically read via `zt_env()` and related helpers after `.env` is loaded.
+   Copy or create a **`.env`** in the project root. A sample template is available at **`.env.example`**. Configuration is bootstrapped in `configuration/config.php` (uses `vlucas/phpdotenv`). Database and app settings are typically read via `zt_env()` and related helpers after `.env` is loaded.
 
 3. **Database**
 
@@ -98,8 +96,8 @@ Bundled app script: **`public/assets/js/zantech.bundle.js`** (build or edit in-r
 
 1. **`public/index.php`** defines `ZT_BASE_PATH` and loads **`Foundation/AppLoader.php`**.
 2. **AppLoader** normalizes the URI, applies basic security checks, and loads the correct kernel (e.g. **`Foundation/web.php`**).
-3. **`Foundation/web.php`** initializes session, logging context, and runs **`Library\Zantech`**.
-4. **`Library\Zantech`** resolves the URL into **module** and **action** segments, maps slugs such as `get_all_menus` to **`getAllMenus`**, loads **`Modules\{Module}\{Module}`**, and invokes the controller method.
+3. **`Foundation/web.php`** initializes session, logging context, and runs **`Foundation\Zantech`**.
+4. **`Foundation\Zantech`** resolves the URL into **module** and **action** segments, maps slugs such as `get_all_menus` to **`getAllMenus`**, loads **`Modules\{Module}\{Module}`**, and invokes the controller method.
 
 So a URL like `/Menu/index` maps to the **`Menu`** module’s **`index`** method on **`Modules\Menu\Menu`**.
 
@@ -112,7 +110,7 @@ Each feature area is a **module** under **`Modules/{ModuleName}/`** (PascalCase 
 | Piece | Role |
 |--------|------|
 | **Controller** | Extends `Http\Controller`. Handles permissions, calls the model, sets `$this->view()->...` data, then `render()`, `renderJson()`, or response helpers such as `responseJson()`, `responseSuccess()`, and `responseError()`. |
-| **Model** | Extends `Library\Model`. Encapsulates tables, queries, dropdowns, and helpers (`getRecord`, `update` / `updateRecord`, etc.). |
+| **Model** | Extends `Database\Model`. Encapsulates tables, queries, dropdowns, and helpers (`getRecord`, `update` / `updateRecord`, etc.). |
 | **Views** | PHP templates under **`Modules/{Module}/Views/`** (e.g. `home.php`, `edit.php`). The view layer composes HTML or JSON payloads for Angular/legacy clients. |
 
 Optional scaffolding:
@@ -125,7 +123,7 @@ php zt make:module YourModule
 
 ## Authentication and permissions
 
-- **`Authentication\Auth`** and **`Authentication\Session`** handle login state and session hardening (initialized from the web kernel).
+- **`Authentication\Auth`**, **`Authentication\Session`**, **`Authentication\CaptchaLib`**, and **`Authentication\DualControl`** handle login state, session hardening, captcha verification, and maker-checker approvals (initialized from the web kernel).
 - **`Authentication\Perm_Auth`** is used in controllers to gate actions (for example `view_menu`, `add_menu`, `edit_menu` on the Menu module).
 - Menu entries can align with **sections** in the database; the CLI reminds that top-level **`mx_menu.txt_name`** should match **`mx_section.txt_name`** where RBAC-driven sidebar visibility is required.
 
@@ -150,6 +148,9 @@ php zt.php <command>
 | Command | Purpose |
 |---------|---------|
 | `make:module <Name>` | Scaffold a new module |
+| `make:controller <Name>` | Scaffold a module controller and index view |
+| `cache:clear` | Clear runtime cache from `storage/cache` |
+| `test` | Run PHPUnit tests |
 | `db:init` | Run `Database/Schema/init.sql` |
 | `db:seed` | Run `Database/Schema/seed.sql` |
 | `db:migrate [path]` | Run one SQL file, or the default migration batch |
@@ -163,16 +164,17 @@ php zt.php <command>
 | Path | Purpose |
 |------|---------|
 | `public/` | Web root (`index.php`, assets, `.htaccess` / `web.config`) |
-| `Foundation/` | Bootstrapping: `AppLoader.php`, `web.php`, `cronjob.php` |
+| `Foundation/` | Bootstrapping, web kernel, console scaffolding, middleware, and routing |
 | `Config/` | Dotted-key configuration repository with env and optional DB fallback |
-| `Library/` | Remaining legacy/core services such as `Zantech`, `Model`, `DataView`, and `DualControl` while migration continues. |
+| `Library/` | Retired namespace; no PSR-4 autoload mapping remains. |
 | `Http/` | Request, response, and controller abstractions |
-| `View/` | View rendering |
+| `View/` | View rendering and table helper utilities |
 | `Validation/` | Input validation |
 | `Foundation/Routing/` | Router and route security |
 | `Modules/` | Application modules (controllers, models, views) |
-| `Database/` | `Schema/` (init, seed), `migrations/` (incremental SQL) |
-| `Authentication/` | Auth, session, permissions |
+| `Database/` | Database access, base model, `Schema/` (init, seed), and `migrations/` (incremental SQL) |
+| `Authentication/` | Auth, session, captcha, dual control, permissions |
+| `Services/` | Cross-cutting application services such as hashing, validation, notification adapters, log sanitizing, and RBAC helpers |
 | `Exceptions/` | Centralized exception handling |
 | `configuration/` | `config.php` and environment-driven bootstrap |
 | `constants/` | System preferences and constants |
@@ -184,7 +186,7 @@ php zt.php <command>
 
 ## Frontend notes
 
-The app uses **Bootstrap 5.3.2** and **AngularJS 1.8.2** from CDNs (see **Versions and stack**). Interactive screens (e.g. Menu management) also use **`public/assets/js/zantech.bundle.js`**. Custom styling lives in **`public/assets/css/zantech-ui.css`**.
+The app uses **Bootstrap 5.3.3** and **AngularJS 1.8.2** from CDNs (see **Versions and stack**). Interactive screens (e.g. Menu management) also use **`public/assets/js/zantech.bundle.js`**. Custom styling lives in **`public/assets/css/zantech-ui.css`**.
 
 ---
 

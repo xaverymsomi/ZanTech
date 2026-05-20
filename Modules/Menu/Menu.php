@@ -29,9 +29,8 @@ class Menu extends Controller
             $this->view()->title = "All " . $this->model->getTitle() . "s";
             $this->view()->dropdowns = $this->model->getFormDropdowns();
             $this->render('home');
-
         } catch (Exception $e) {
-            Log::sysLog("MENU_INDEX_ERROR:" . $e->getMessage());
+            Log::exception($e, 'MENU_INDEX_ERROR', ['action' => 'index']);
             $this->render('templates/error');
         }
     }
@@ -49,10 +48,13 @@ class Menu extends Controller
             }
 
             $menus = $this->model->getMenus();
-            return $this->responseSuccess(200, 'Menus loaded', ['data' => $menus]);
-
+            $dropdowns = $this->model->getFormDropdowns();
+            return $this->responseSuccess(200, 'Menus loaded', [
+                'data' => $menus,
+                'dropdowns' => $dropdowns
+            ]);
         } catch (Exception $e) {
-            Log::sysLog("MENU_GET_ALL_ERROR:" . $e->getMessage());
+            Log::exception($e, 'MENU_GET_ALL_ERROR', ['action' => 'getAllMenus']);
             return $this->responseError('Failed to load menus', 500);
         }
     }
@@ -153,10 +155,12 @@ class Menu extends Controller
                     'int_position' => $position,
                 ]
             ]);
-
         } catch (Exception $e) {
-            try { $this->model->db->rollBack(); } catch (Exception $ignore) {}
-            Log::sysLog("MENU_SAVE_ERROR:" . $e->getMessage());
+            try {
+                $this->model->db->rollBack();
+            } catch (Exception $ignore) {
+            }
+            Log::exception($e, 'MENU_SAVE_ERROR', ['action' => 'saveMenu']);
             return $this->responseError("Failed to save menu", 500);
         }
     }
@@ -191,11 +195,11 @@ class Menu extends Controller
                 'relation'           => (($data['int_parent'] ?? null) !== null && (int)$data['int_parent'] > 0) ? 1 : 0,
                 'txt_sidebar_group'  => isset($data['txt_sidebar_group']) ? trim((string)$data['txt_sidebar_group']) : '',
             ];
-            $this->view()->dropdowns = $this->model->getFormDropdowns($recordId);
-            $this->renderJson('edit');
 
+            $this->view()->dropdowns = $this->model->getFormDropdowns($recordId);
+            $this->render('edit');
         } catch (Exception $e) {
-            Log::sysLog("MENU_EDIT_ERROR:" . $e->getMessage());
+            Log::exception($e, 'MENU_EDIT_ERROR', ['action' => 'edit']);
             $this->render('templates/error');
         }
     }
@@ -276,10 +280,12 @@ class Menu extends Controller
 
             $this->model->db->commit();
             return $this->responseSuccess(201, "Updated");
-
         } catch (Exception $e) {
-            try { $this->model->db->rollBack(); } catch (Exception $ignore) {}
-            Log::sysLog("MENU_POST_EDIT_ERROR:" . $e->getMessage());
+            try {
+                $this->model->db->rollBack();
+            } catch (Exception $ignore) {
+            }
+            Log::exception($e, 'MENU_POST_EDIT_ERROR', ['action' => 'postEdit']);
             return $this->responseError("Edit failed", 500);
         }
     }
@@ -376,9 +382,8 @@ class Menu extends Controller
             }
 
             return $this->responseSuccess(200, "Menus loaded", ['data' => $final]);
-
         } catch (Exception $e) {
-            Log::sysLog("MENU_USER_MENU_ERROR:" . $e->getMessage());
+            Log::exception($e, 'MENU_USER_MENU_ERROR', ['action' => 'getUserMenus']);
             return $this->responseError("Failed to load menus", 500);
         }
     }
@@ -397,6 +402,61 @@ class Menu extends Controller
         }
 
         return $link;
+    }
+
+    /**
+     * DELETE MENU
+     * POST /Menu/deleteMenu
+     */
+    public function deleteMenu()
+    {
+        try {
+            $permission = Perm_Auth::getPermissions();
+            if (!$permission->verifyPermission('delete_menu')) {
+                $this->permissionDenied();
+            }
+
+            $raw = file_get_contents('php://input');
+            $posted = json_decode((string)$raw, true);
+            
+            $id = trim((string)($posted['id'] ?? ''));
+            if ($id === '') return $this->responseError("Missing ID", 422);
+
+            $record = $this->model->getRecordByRowValue($this->model->getTable(), $id);
+            if (!$record) return $this->responseError("Record not found", 404);
+
+            $recordId = (int)$record['id'];
+            $parent   = $record['int_parent'] ?? null;
+            $parent   = ($parent === null) ? null : (int)$parent;
+            $position = (int)$record['int_position'];
+
+            $this->model->db->beginTransaction();
+
+            // 1. Delete children first if it's a parent
+            if ($parent === null) {
+                $this->model->db->prepare("DELETE FROM mx_menu WHERE int_parent = :p")
+                    ->execute([':p' => $recordId]);
+            }
+
+            // 2. Delete the record
+            $ok = $this->model->deleteRecord($this->model->getTable(), $recordId);
+
+            // 3. Close the gap in positions
+            $this->model->closeGapAfterRemoval($parent, $position);
+
+            $this->model->db->commit();
+
+            \Services\AuditTrail::log('MENU_DELETED', "Menu: {$record['txt_name']}", ['data' => $record]);
+
+            return $this->responseSuccess($ok ? 200 : 100, "Menu deleted");
+
+        } catch (Exception $e) {
+            try {
+                $this->model->db->rollBack();
+            } catch (Exception $ignore) {}
+            Log::exception($e, 'MENU_DELETE_ERROR', ['action' => 'deleteMenu']);
+            return $this->responseError("Delete failed", 500);
+        }
     }
 
     private function reorderOnMove(int $recordId, ?int $oldParent, int $oldPos, ?int $newParent, int $newPos): void

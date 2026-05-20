@@ -6,10 +6,13 @@ require_once __DIR__ . '/vendor/autoload.php';
 // Load framework configuration (handles .env)
 require_once __DIR__ . '/configuration/config.php';
 
-use Library\Console\ModuleGenerator;
+use Foundation\Console\ControllerGenerator;
+use Foundation\Console\ModuleGenerator;
 use Database\Schema\DatabaseInitializer;
 use Database\Migrations\MigrationRunner;
 use Database\Database;
+use Foundation\Console\QueueWorker;
+use Foundation\Console\ModelMigrator;
 
 $command = $argv[1] ?? null;
 
@@ -20,6 +23,34 @@ if ($command === 'make:module') {
         exit(1);
     }
     (new ModuleGenerator())->generate($name);
+} elseif ($command === 'make:controller') {
+    $name = $argv[2] ?? null;
+    if (!$name) {
+        echo "Usage: php zt make:controller <ModuleName>\n";
+        exit(1);
+    }
+    (new ControllerGenerator())->generate($name);
+} elseif ($command === 'cache:clear') {
+    $cacheDir = __DIR__ . '/storage/cache';
+    if (!is_dir($cacheDir)) {
+        echo "No cache directory found at {$cacheDir}.\n";
+        exit(0);
+    }
+    $files = glob($cacheDir . '/*');
+    foreach ($files as $file) {
+        if (is_file($file)) {
+            unlink($file);
+        }
+    }
+    echo "Cache cleared: {$cacheDir}\n";
+} elseif ($command === 'test') {
+    $phpunit = __DIR__ . '/vendor/bin/phpunit';
+    if (!is_file($phpunit)) {
+        $phpunit = 'phpunit';
+    }
+    $cmd = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($phpunit);
+    passthru($cmd, $exitCode);
+    exit($exitCode);
 } elseif ($command === 'db:init') {
     $sqlPath = __DIR__ . '/Database/Schema/init.sql';
     $initializer = new DatabaseInitializer(new Database());
@@ -98,14 +129,24 @@ if ($command === 'make:module') {
         }
         echo "\n";
     }
+} elseif ($command === 'queue:work') {
+    (new QueueWorker())->work();
+} elseif ($command === 'migrate:auto') {
+    $dryRun = in_array('--dry-run', $argv, true);
+    (new ModelMigrator())->migrate($dryRun);
 } else {
     echo "Zantech CLI Utility\n";
     echo "--------------------\n";
     echo "Available commands:\n";
     echo "  make:module <Name>    Scaffold a new module\n";
+    echo "  make:controller <Name> Scaffold a new module controller\n";
+    echo "  cache:clear           Clear runtime cache directory\n";
+    echo "  test                  Run PHPUnit tests\n";
     echo "  db:init               Initialize database with core schema\n";
     echo "  db:seed               Seed database with initial data\n";
     echo "  db:migrate [file]     Run SQL migration(s); default = section, mx_menu, sidebar seed\n";
     echo "  migrate               Run pending migrations and record them\n";
     echo "  migrate:status        Show applied/pending migrations\n";
+    echo "  migrate:auto          Auto-generate tables from Model \$schema arrays\n";
+    echo "  queue:work            Start the background job queue worker\n";
 }

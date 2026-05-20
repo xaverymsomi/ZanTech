@@ -1,12 +1,12 @@
 <?php
 
-declare(strict_types=1);
+
 
 namespace Modules\Login;
 
 use Authentication\Auth;
+use Authentication\CaptchaLib;
 use Authentication\Session;
-use Library\CaptchaLib;
 use Http\Controller;
 use Logging\Log;
 use Modules\Error\Error;
@@ -26,7 +26,20 @@ final class Login extends Controller
 
     public function index()
     {
+        $error = filter_input(INPUT_GET, 'error');
+        $message = null;
+
+        if ($error) {
+            $message = match ($error) {
+                'INACTIVITY_TIMEOUT' => 'Your session has expired due to inactivity. Please log in again.',
+                'SESSION_IP_MISMATCH' => 'Security Alert: Your IP address has changed. Session terminated for your protection.',
+                'SESSION_UA_MISMATCH' => 'Security Alert: Your browser identity has changed. Session terminated.',
+                default => 'Your session has been terminated for security reasons.'
+            };
+        }
+
         $this->view()->title = 'Login';
+        $this->view()->error_message = $message;
         $this->render('index');
     }
 
@@ -58,12 +71,8 @@ final class Login extends Controller
                 return $this->responseJson(['status' => true, 'message' => 'Login successful'], 200);
             }
         } catch (Throwable $e) {
-            Log::sysErr([
-                'level'   => 'ERROR',
-                'message' => $e->getMessage(),
-                'file'    => $e->getFile(),
-                'line'    => $e->getLine(),
-            ]);
+            \Services\AuditTrail::log('LOGIN_FAILED', "Email: {$email}", ['error' => $e->getMessage()]);
+            Log::exception($e, 'LOGIN_FAILURE', ['action' => 'login']);
 
             $publicMessage = $this->isDebug()
                 ? ('Login failed: ' . $e->getMessage())
@@ -91,18 +100,15 @@ final class Login extends Controller
 
         try {
             $email = (string)(filter_input(INPUT_POST, 'email') ?: '');
+            \Services\AuditTrail::log('PASSWORD_RECOVERY_REQUESTED', "Email: {$email}");
             $this->model->recover($email);
 
             if ($isSpa) {
                 return $this->responseJson(['status' => true, 'message' => 'Recovery initiated'], 200);
             }
         } catch (Throwable $e) {
-            Log::sysErr([
-                'level'   => 'ERROR',
-                'message' => $e->getMessage(),
-                'file'    => $e->getFile(),
-                'line'    => $e->getLine(),
-            ]);
+            \Services\AuditTrail::log('PASSWORD_RECOVERY_FAILED', "Email: {$email}", ['error' => $e->getMessage()]);
+            Log::exception($e, 'LOGIN_RECOVER_FAILURE', ['action' => 'recover']);
 
             $publicMessage = $this->isDebug()
                 ? ('Recover failed: ' . $e->getMessage())
@@ -113,6 +119,26 @@ final class Login extends Controller
             }
 
             (new Error('Recover failed', $publicMessage, null, 'bi-exclamation-triangle-fill'))->index();
+        }
+    }
+
+    public function reset()
+    {
+        $token = filter_input(INPUT_GET, 'token') ?: filter_input(INPUT_POST, 'token');
+        $email = filter_input(INPUT_GET, 'email') ?: filter_input(INPUT_POST, 'email');
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $password = filter_input(INPUT_POST, 'password');
+            $password_match = filter_input(INPUT_POST, 'password_match');
+
+            $this->model->reset((string)$token, (string)$email, (string)$password, (string)$password_match);
+            \Services\AuditTrail::log('PASSWORD_RESET_SUCCESS', "Email: {$email}");
+        } else {
+            // Render the reset password view
+            $this->view()->title = 'Reset Password';
+            $this->view()->token = $token;
+            $this->view()->email = $email;
+            $this->render('reset');
         }
     }
 

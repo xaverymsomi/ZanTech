@@ -2,7 +2,7 @@
 
 namespace Modules\Settings;
 
-use Library\Model;
+use Database\Model;
 
 class Settings_Model extends Model
 {

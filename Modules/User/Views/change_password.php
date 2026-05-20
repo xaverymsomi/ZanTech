@@ -1,7 +1,7 @@
 <div id="page-content">
     <?php
 
-    use Library\\Session;
+    use Authentication\Session;
 
     $returned = Session::get('returned') != null || Session::get('returned') != '' ? Session::get('returned') : 0;
     ?>

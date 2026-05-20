@@ -1,26 +1,19 @@
 <?php
 
 namespace Modules\User;
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
-use Library\\Model;
+use Database\Model;
 
 /**
- * Description of User_Model
- *
- * @author abdirahmanhassan
+ * User_Model
  */
 class User_Model extends Model
 {
-    public string $table = "mx_user";
-    private string $title = "User";
-    private string $title_plural = "Users";
-    private string $parent_key = "user_id";
-    private string $view_table = "mx_user_view";
+    protected string $table = "mx_user";
+    protected string $title = "User";
+    protected string $title_plural = "Users";
+    protected string $parent_key = "user_id";
+    protected string $view_table = "mx_user_view";
 
     public function getHiddenFields(): array
     {

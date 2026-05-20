@@ -8,12 +8,12 @@
     <!-- Launcher Grid -->
     <div class="zt-launcher-grid">
         <?php foreach ($this->modules ?? [] as $module): ?>
-            <a href="<?= APP_DIR ?>/<?= $module['link'] ?>" class="zt-launcher-card">
-                <div class="zt-launcher-card__icon" style="color: <?= $module['color'] ?>;">
-                    <i class="fa-solid fa-<?= $module['icon'] ?>"></i>
+            <a href="<?= APP_DIR ?>/<?= htmlspecialchars($module['link'], ENT_QUOTES, 'UTF-8') ?>" class="zt-launcher-card">
+                <div class="zt-launcher-card__icon" style="color: <?= htmlspecialchars($module['color'], ENT_QUOTES, 'UTF-8') ?>;">
+                    <i class="fa-solid fa-<?= htmlspecialchars($module['icon'], ENT_QUOTES, 'UTF-8') ?>"></i>
                 </div>
                 <div class="zt-launcher-card__title">
-                    <?= $module['name'] ?>
+                    <?= htmlspecialchars($module['name'], ENT_QUOTES, 'UTF-8') ?>
                 </div>
             </a>
         <?php endforeach; ?>

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+
 
 use Exceptions\ZantechException;
 use PHPUnit\Framework\TestCase;

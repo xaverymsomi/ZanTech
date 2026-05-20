@@ -36,7 +36,7 @@
                                     <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
                                         <i class="fa fa-key text-primary small"></i>
                                     </div>
-                                    <code class="text-primary fw-bold"><?= $s['txt_key'] ?></code>
+                                    <code class="text-primary fw-bold"><?= htmlspecialchars($s['txt_key'], ENT_QUOTES, 'UTF-8') ?></code>
                                 </div>
                             </td>
                             <td>

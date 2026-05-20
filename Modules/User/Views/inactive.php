@@ -1,34 +1,28 @@
-
-<div id="page-content">
+<div id="page-content" class="px-4 py-4">
     <?php
-    /**
-     * @group user
-     * @filesource /user/inactive
-     * @author A Hassan
-     */
-    $returned = Session::get('returned') != null || Session::get('returned') != '' ? Session::get('returned') : 0;
-     $perm = Perm_Auth::getPermissions();
+    use Authentication\Perm_Auth;
+    use Authentication\Session;
+    use View\DataView;
 
-    echo '<div ng-controller="formController" class="btn-group btn-group-sm " ng-init="buttons=' . sizeof($this->buttons) . '; return_value=' . $returned . '" ng-show="buttons > 0" '
-    . 'ng-model="buttons" style="margin-bottom:10px !important;">';
+    $perm = Perm_Auth::getPermissions();
+    $returned = Session::get('returned') ?? 0;
 
+    echo '<div class="d-flex align-items-center justify-content-between mb-4">';
+    echo '<div><h3 class="fw-bold text-main mb-0">' . htmlspecialchars(trans($this->title), ENT_QUOTES, 'UTF-8') . '</h3>';
+    echo '<p class="text-muted small mb-0">Review and restore inactive user accounts</p></div>';
+
+    echo '<div ng-controller="formController" class="d-flex gap-2" ng-init="buttons=' . (int)sizeof($this->buttons) . '; return_value=' . (int)$returned . '" ng-show="buttons > 0">';
     foreach ($this->buttons as $button) {
-        if ($perm->verifyPermission(strtolower($button['action']))) { //check permission
-            $action = "'" . $button['action'] . "'";
-            echo '<button ng-click="showForm(' . $button['url'] . ', ' . $action . ')" class= "btn btn-' . $button['color']
-            . '" data-name="' . $button['name']
-            . '" data-action="' . $button['action']
-            . '"  data-title= "' . $button['title']
-            //.'" data-toggle="modal" data-target="#myModal"'
-            . '" data-mabrex-dialog="' . $button['url'] . '">'
-            . $button['name'] . '</button>';
+        if ($perm->verifyPermission(strtolower($button['action']))) {
+            $action = "'" . htmlspecialchars($button['action'], ENT_QUOTES, 'UTF-8') . "'";
+            echo '<button ng-click="showForm(' . htmlspecialchars($button['url'], ENT_QUOTES, 'UTF-8') . ', ' . $action . ')" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold d-flex align-items-center gap-2" data-name="' . htmlspecialchars($button['name'], ENT_QUOTES, 'UTF-8') . '" data-action="' . htmlspecialchars($button['action'], ENT_QUOTES, 'UTF-8') . '" data-title="' . htmlspecialchars($button['title'], ENT_QUOTES, 'UTF-8') . '" data-mabrex-dialog="' . htmlspecialchars($button['url'], ENT_QUOTES, 'UTF-8') . '">';
+            echo '<i class="fa fa-plus-circle"></i> ' . htmlspecialchars(trans($button['name']), ENT_QUOTES, 'UTF-8') . '</button>';
         }
     }
-
-    echo '</div>';
+    echo '</div></div>';
 
     $actions = [];
-    if (sizeof($this->actions)) {//Checks permissions for action buttons
+    if (sizeof($this->actions)) {
         foreach ($this->actions as $action) {
             if ($perm->verifyPermission(strtolower($action['action']))) {
                 $actions[] = $action;
@@ -36,37 +30,38 @@
         }
     }
 
-    echo '<div class="panel panel-default" ng-controller="profileController" ng-init="return_value=' . $returned . '">';
-    echo '<div class="panel-heading"><h4 class="panel-title">' . $this->title . '</h4></div>';
-    echo '<div class="panel-body">';
+    echo '<div ng-controller="profileController" ng-init="return_value=' . (int)$returned . '">';
+
     if ($this->resultData['recordsFiltered'] > 0) {
-        // Add mabrex filter
-        echo '<mabrex-filter mx-selected="' . $this->postData['length'] . '" mx-location="\'' .
-        $this->postData['location'] . '\'" mx-title="\'Iactive Users List\'" mx-current-link="\'' .
-        $this->postData['current'] . '\'" mx-page-size="\'' . $this->postData['length'] . '\'" mx-search-term="\'' .
-        $this->postData['search'] . '\'" mx-total-records="' . $this->resultData['recordsTotal'] . '" mx-table-columns="' .
-        $this->resultData['columns'] . '" mx-sort-column="\'' . $this->postData['order_column'] . '\'" mx-sort-order="\'' .
-        $this->postData['order_dir'] . '\'" mx-column-label="\'' . $this->resultData['column_label'] . '\'"></mabrex-filter>';
+        echo '<div class="zt-card mb-4 p-3">';
+        echo '<mabrex-filter mx-selected="' . htmlspecialchars($this->postData['length'], ENT_QUOTES, 'UTF-8') . '" mx-location="\'' .
+        htmlspecialchars($this->postData['location'], ENT_QUOTES, 'UTF-8') . '\'" mx-title="\'' . htmlspecialchars($this->title, ENT_QUOTES, 'UTF-8') . '\'" mx-current-link="\'' .
+        htmlspecialchars($this->postData['current'], ENT_QUOTES, 'UTF-8') . '\'" mx-page-size="\'' . htmlspecialchars($this->postData['length'], ENT_QUOTES, 'UTF-8') . '\'" mx-search-term="\'' .
+        htmlspecialchars($this->postData['search'], ENT_QUOTES, 'UTF-8') . '\'" mx-total-records="' . htmlspecialchars($this->resultData['recordsTotal'], ENT_QUOTES, 'UTF-8') . '" mx-table-columns="' .
+        htmlspecialchars($this->resultData['columns'], ENT_QUOTES, 'UTF-8') . '" mx-sort-column="\'' . htmlspecialchars($this->postData['order_column'], ENT_QUOTES, 'UTF-8') . '\'" mx-sort-order="\'' .
+        htmlspecialchars($this->postData['order_dir'], ENT_QUOTES, 'UTF-8') . '\'" mx-column-label="\'' . htmlspecialchars($this->resultData['column_label'], ENT_QUOTES, 'UTF-8') . '\'"></mabrex-filter>';
+        echo '</div>';
 
         $view = new DataView();
-        echo '<div class="table-responsive" id="data-view">';
-        echo '<table class="table table-striped table-hovered table-condensed">';
-        echo $view->displayTHead($this->headings, $this->hidden, (sizeof($actions)? HAS_ACTION : NO_ACTION));
-        echo $view->displayTBody($this->allRecords, $this->class, $this->table, $this->hidden, $actions, LBL_BIG);
-        echo '</table>';
+        echo $view->renderTable($this->headings, $this->allRecords, $actions, $this->hidden);
+
+        echo '<div class="mt-4">';
+        echo '<mabrex-pager mx-filtered="' . htmlspecialchars($this->resultData['recordsFiltered'], ENT_QUOTES, 'UTF-8') . '" mx-total="' .
+        htmlspecialchars($this->resultData['recordsTotal'], ENT_QUOTES, 'UTF-8') . '" mx-current-page="' . htmlspecialchars($this->resultData['currentPage'], ENT_QUOTES, 'UTF-8') . '" mx-pages="' .
+        htmlspecialchars($this->resultData['totalPages'], ENT_QUOTES, 'UTF-8') . '" mx-page-buttons="10" mx-page-location="\'' .
+        htmlspecialchars($this->postData['location'], ENT_QUOTES, 'UTF-8') . '\'" mx-page-title="\'' . htmlspecialchars($this->title, ENT_QUOTES, 'UTF-8') . '\'" mx-page-current-link="\'' .
+        htmlspecialchars($this->postData['current'], ENT_QUOTES, 'UTF-8') . '\'" mx-page-size="\'' . htmlspecialchars($this->postData['length'], ENT_QUOTES, 'UTF-8') . '\'" mx-page-search-term="\'' .
+        htmlspecialchars($this->postData['search'], ENT_QUOTES, 'UTF-8') . '\'" mx-returned="' . htmlspecialchars($this->resultData['recordsReturned'], ENT_QUOTES, 'UTF-8') . '" mx-sort-column="\'' .
+        htmlspecialchars($this->postData['order_column'], ENT_QUOTES, 'UTF-8') . '\'" mx-sort-order="\'' . htmlspecialchars($this->postData['order_dir'], ENT_QUOTES, 'UTF-8') . '\'"></mabrex-pager>';
         echo '</div>';
-        // Add mabrex pager
-        echo '<mabrex-pager mx-filtered="' . $this->resultData['recordsFiltered'] . '" mx-total="' .
-        $this->resultData['recordsTotal'] . '" mx-current-page="' . $this->resultData['currentPage'] . '" mx-pages="' .
-        $this->resultData['totalPages'] . '" mx-page-buttons="10" mx-page-location="\'' .
-        $this->postData['location'] . '\'" mx-page-title="\'Iactive Users List\'" mx-page-current-link="\'' .
-        $this->postData['current'] . '\'" mx-page-size="\'' . $this->postData['length'] . '\'" mx-page-search-term="\'' .
-        $this->postData['search'] . '\'" mx-returned="' . $this->resultData['recordsReturned'] . '" mx-sort-column="\'' .
-        $this->postData['order_column'] . '\'" mx-sort-order="\'' . $this->postData['order_dir'] . '\'"></mabrex-pager>';echo '</div>';
     } else {
-        echo '<div>No Inactive User Available</div>';
+        echo '<div class="zt-card p-5 text-center">';
+        echo '<div class="mb-4 text-muted opacity-25"><i class="fa fa-user-check fa-5x"></i></div>';
+        echo '<h4 class="fw-bold text-main">No inactive users</h4>';
+        echo '<p class="text-muted">There are currently no inactive user accounts matching your criteria.</p>';
+        echo '</div>';
     }
+
     echo '</div>';
     ?>
 </div>
-

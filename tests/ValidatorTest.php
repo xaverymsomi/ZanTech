@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+
 
 use Exceptions\ValidationException;
 use PHPUnit\Framework\TestCase;

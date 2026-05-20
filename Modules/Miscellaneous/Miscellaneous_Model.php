@@ -1,18 +1,17 @@
 <?php
 namespace Modules\Miscellaneous;
+
 use Exception;
-use Library\Model;
+use Database\Model;
 
 /**
- * Description of Miscellaneous
- *
- * @author Developer
+ * Miscellaneous_Model
  */
 class Miscellaneous_Model extends Model {
-    public $table = "mx_rule_configuration";
-    private $view_dir = "miscellaneous/";
-    private $title = "Miscellaneous";
-    private string $title_plural = "Miscellaneous";
+    protected string $table = "mx_rule_configuration";
+    private string $view_dir = "miscellaneous/";
+    protected string $title = "Miscellaneous";
+    protected string $title_plural = "Miscellaneous";
 
 
     public function getHiddenFields() {
@@ -23,31 +22,31 @@ class Miscellaneous_Model extends Model {
         return array('id');
     }
 
-    function getControls() {
+    public function getControls() {
         return [];
     }
 
-    function getActions() {
+    public function getActions() {
         return [];
     }
 
     public function getTable($view_table = false): string
     {
-        if ($view_table) {
+        if ($view_table && property_exists($this, 'view_table') && !empty($this->view_table)) {
             return $this->view_table;
         }
         return $this->table;
     }
 
-    function getTitle() {
-        return $this->title;
+    public function getTitle($plural = false): string {
+        return $plural ? $this->title_plural : $this->title;
     }
 
-    function getViewDir() {
+    public function getViewDir() {
         return $this->view_dir;
     }
 
-    function getConfigurationData($status = null) {
+    public function getConfigurationData($status = null) {
         $sql = "SELECT 
                 mx_rule.id, 
                 mx_rule_configuration.id AS config_id, 
@@ -69,7 +68,7 @@ class Miscellaneous_Model extends Model {
         return $this->db->select($sql);
     }
 
-    function getMiscellaneousDropdowns() {
+    public function getMiscellaneousDropdowns() {
         $data = [];
         $result = $this->db->select("SELECT txt_row_value, txt_description, txt_type FROM mx_rule ORDER BY txt_name ASC");
         if ($result) {
@@ -80,7 +79,7 @@ class Miscellaneous_Model extends Model {
         return $data;
     }
 
-    function updateConfiguration($data) {
+    public function updateConfiguration($data) {
         try {
             $value = $data['txt_value'];
             $dat_effective_start_date = date('Y-m-d', strtotime($data['txt_effective_start_date']));
@@ -102,7 +101,7 @@ class Miscellaneous_Model extends Model {
         }
     }
 
-    function saveConfiguration($data) {
+    public function saveConfiguration($data) {
         try {
             $rule_id = $this->getRecordIdByRowValue('mx_rule', $data['int_mx_rule_id']);
             $value =  $data['txt_value'];
@@ -111,7 +110,6 @@ class Miscellaneous_Model extends Model {
 
             $this->create([
                 'int_mx_rule_id' => $rule_id,
-//                'opt_mx_council_id' => $_SESSION['council'],
                 'txt_value' => $value,
                 'dat_effective_start_date' => $dat_effective_start_date,
                 'dat_effective_end_date' => $dat_effective_end_date,

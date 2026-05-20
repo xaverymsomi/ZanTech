@@ -2,7 +2,7 @@
 
 namespace Modules\Registration;
 
-use Library\Model;
+use Database\Model;
 
 class Registration_Model extends Model
 {

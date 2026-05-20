@@ -2,12 +2,12 @@
 
 namespace Modules\Dashboard;
 
-use Library\Model;
+use Database\Model;
 
 class Dashboard_Model extends Model
 {
     private string $view_dir = "/dashboard/";
-    private string $title = "Dashboard";
+    protected string $title = "Dashboard";
     private $title_plural;
 
     public function getTitle($plural = false): string
@@ -86,6 +86,27 @@ class Dashboard_Model extends Model
                 'icon' => 'layer-group',
                 'color' => '#3182ce', // Muted Blue
                 'link' => 'Esb'
+            ],
+            [
+                'id' => 'menu',
+                'name' => 'MENU BUILDER',
+                'icon' => 'sitemap',
+                'color' => '#008080', // Teal
+                'link' => 'Menu'
+            ],
+            [
+                'id' => 'user',
+                'name' => 'USER MANAGEMENT',
+                'icon' => 'users-gear',
+                'color' => '#6366f1', // Indigo
+                'link' => 'User'
+            ],
+            [
+                'id' => 'permission',
+                'name' => 'ACCESS CONTROL',
+                'icon' => 'shield-halved',
+                'color' => '#f43f5e', // Rose
+                'link' => 'Permission'
             ]
         ];
     }

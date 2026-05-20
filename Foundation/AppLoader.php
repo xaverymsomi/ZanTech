@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * -------------------------------------------------------------------------
  * ZANTECH FRAMEWORK - APPLICATION FOUNDATION ROUTER
@@ -74,8 +72,7 @@ if (zt_is_forbidden_boot_probe($path)) {
     if (!headers_sent()) {
         header('Content-Type: text/plain; charset=UTF-8');
     }
-    echo '404 Not Found';
-    exit;
+    echo '404 Not Found';exit;
 }
 
 $namespace = zt_detect_namespace($path);

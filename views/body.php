@@ -114,21 +114,21 @@
                     </div>
                     <div class="zt-user-dropdown__body">
                         <?php if ($ztUserId > 0): ?>
-                        <a class="zt-user-dropdown__item" href="<?= APP_DIR ?>/User/profile/<?= $ztUserId ?>">
+                        <a class="zt-user-dropdown__item" href="/<?= ltrim(APP_DIR . '/User/profile/' . $ztUserId, '/') ?>">
                             <span>Profile</span>
                             <i class="fa-regular fa-user" aria-hidden="true"></i>
                         </a>
                         <?php endif; ?>
-                        <a class="zt-user-dropdown__item" href="<?= APP_DIR ?>/Settings">
+                        <a class="zt-user-dropdown__item" href="/<?= ltrim(APP_DIR . '/Settings', '/') ?>">
                             <span>Settings</span>
                             <i class="fa-solid fa-gear" aria-hidden="true"></i>
                         </a>
                         <div class="zt-user-dropdown__divider"></div>
-                        <a class="zt-user-dropdown__item" href="<?= APP_DIR ?>/User/password">
+                        <a class="zt-user-dropdown__item" href="/<?= ltrim(APP_DIR . '/User/password', '/') ?>">
                             <span>Lock Account</span>
                             <i class="fa-solid fa-lock" aria-hidden="true"></i>
                         </a>
-                        <a class="zt-user-dropdown__item zt-user-dropdown__item--danger" href="<?= APP_DIR ?>/<?= ZT_ROUTE_LOGOUT ?>">
+                        <a class="zt-user-dropdown__item zt-user-dropdown__item--danger" href="/<?= ltrim(APP_DIR . '/' . ZT_ROUTE_LOGOUT, '/') ?>">
                             <span>Log Out</span>
                             <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
                         </a>
@@ -159,18 +159,10 @@
                     </button>
                 </div>
                 <div class="zt-apps-modal__grid">
-                    <?php
-                    $appsModules = [
-                        ['name'=>'Registration',    'icon'=>'book-open-reader', 'color'=>'#474a6b', 'link'=>'Registration'],
-                        ['name'=>'Academic Records','icon'=>'file-circle-check','color'=>'#38a169', 'link'=>'Academic'],
-                        ['name'=>'Field & Project', 'icon'=>'diagram-project',  'color'=>'#c0392b', 'link'=>'Field'],
-                        ['name'=>'Accommodation',   'icon'=>'bed',              'color'=>'#d68910', 'link'=>'Accommodation'],
-                    ];
-                    foreach ($appsModules as $app):
-                    ?>
-                    <a href="<?= APP_DIR ?>/<?= $app['link'] ?>" class="zt-app-card" style="background:<?= $app['color'] ?>">
-                        <i class="fa-solid fa-<?= $app['icon'] ?>"></i>
-                        <span><?= $app['name'] ?></span>
+                    <?php foreach (($this->appsModules ?? []) as $app): ?>
+                    <a href="/<?= ltrim(APP_DIR . '/' . htmlspecialchars($app['link'], ENT_QUOTES, 'UTF-8'), '/') ?>" class="zt-app-card" style="background:<?= htmlspecialchars($app['color'], ENT_QUOTES, 'UTF-8') ?>">
+                        <i class="fa-solid fa-<?= htmlspecialchars($app['icon'], ENT_QUOTES, 'UTF-8') ?>"></i>
+                        <span><?= htmlspecialchars($app['name'], ENT_QUOTES, 'UTF-8') ?></span>
                     </a>
                     <?php endforeach; ?>
                 </div>

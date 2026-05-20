@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+
 
 use Foundation\Routing\RouterSecurity;
 use PHPUnit\Framework\TestCase;

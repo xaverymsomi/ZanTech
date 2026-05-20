@@ -2,7 +2,7 @@
 
     <div id="data_content"
          data-form="<?php echo htmlspecialchars(json_encode($this->data ?? [], JSON_NUMERIC_CHECK), ENT_COMPAT, 'UTF-8'); ?>"
-         data-dropdowns="<?php echo htmlspecialchars(json_encode($this->dropdowns ?? [], JSON_NUMERIC_CHECK), ENT_COMPAT, 'UTF-8'); ?>">
+         data-dropdowns="<?php echo htmlspecialchars(json_encode(['int_parent_ids' => $this->dropdowns['int_parent_ids'] ?? []], JSON_NUMERIC_CHECK), ENT_COMPAT, 'UTF-8'); ?>">
     </div>
 
     <div id="display_content">
@@ -125,7 +125,7 @@
 
             <button type="button"
                     class="btn btn-premium rounded-pill px-4"
-                    ng-click="menu.$setSubmitted(); saveProfileOperation('Menu', 'post_edit')"
+                    ng-click="menu.$setSubmitted(); saveProfileOperation('Menu', 'postEdit')"
                     ng-disabled="menu.$invalid || ProcessingData === true">
                 <i class="fa-solid fa-check me-2" aria-hidden="true"></i>Save changes
             </button>

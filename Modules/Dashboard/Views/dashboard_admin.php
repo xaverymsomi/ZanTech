@@ -16,7 +16,7 @@ date_default_timezone_set('Africa/Dar_es_Salaam');
             <li class="nav-item">
                 <a class="nav-link active rounded-pill px-4 fw-bold" data-bs-toggle="tab" href="#work_permit">
                     <i class="fa fa-briefcase me-2"></i>
-                    <?= ($user['int_role_id'] == 3) ? 'WORK PERMIT' : 'LABOUR COMMISSION' ?>
+                    <?= htmlspecialchars(($user['int_role_id'] == 3) ? 'WORK PERMIT' : 'LABOUR COMMISSION', ENT_QUOTES, 'UTF-8') ?>
                 </a>
             </li>
         </ul>

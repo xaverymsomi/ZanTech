@@ -2,7 +2,7 @@
 
 namespace Modules\Permission;
 
-use Library\Model;
+use Database\Model;
 
 /**
  * Permission Model
@@ -15,10 +15,10 @@ use Library\Model;
  */
 class Permission_Model extends Model
 {
-    public string $table = 'mx_permission';
+    protected string $table = 'mx_permission';
 
     private string $view_dir = 'permission/';
-    private string $title = 'Permission';
+    protected string $title = 'Permission';
 
     public function getHiddenFields(): array
     {
@@ -48,7 +48,7 @@ class Permission_Model extends Model
         return $this->table;
     }
 
-    public function getTitle(): string
+    public function getTitle($plural = false): string
     {
         return $this->title;
     }

@@ -1,9 +1,9 @@
 <?php
-include '../../inc/config.php';
-include '../../libs/Database.php';
-if(!session_start()){
-    session_start();
-}
+
+use Authentication\Session;
+use Database\Database;
+
+Session::init();
 $data['opt_mx_institution_ids'] = getInstitutions();
 
 function getInstitutions() {
@@ -27,8 +27,8 @@ $data['opt_mx_groups_ids'] = getGroups();
 function getGroups() {
     $array = [];
     $db = new Database();
-    $sql = "SELECT * FROM mx_group WHERE opt_mx_institution_id = ".$_SESSION['council']." ORDER BY id ASC";
-    $result = $db->select($sql);
+    $sql = "SELECT * FROM mx_group WHERE opt_mx_institution_id = :council ORDER BY id ASC";
+    $result = $db->select($sql, [':council' => $_SESSION['council']]);
 
     if ($result) {
         foreach ($result as $value) {
@@ -45,8 +45,8 @@ $data['opt_mx_branches_ids'] = getBranches();
 function getBranches() {
     $array = [];
     $db = new Database();
-    $sql = "SELECT * FROM mx_branch WHERE opt_mx_institution_id = " .$_SESSION['council']. " ORDER BY id ASC";
-    $result = $db->select($sql);
+    $sql = "SELECT * FROM mx_branch WHERE opt_mx_institution_id = :council ORDER BY id ASC";
+    $result = $db->select($sql, [':council' => $_SESSION['council']]);
 
     if ($result) {
         foreach ($result as $value) {

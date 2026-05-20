@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 use Authentication\Session;
 use Exceptions\ExceptionHandler;
-use Library\Zantech;
+use Foundation\Zantech;
 use Modules\Error\Error;
 use Logging\Log;
 
@@ -57,7 +55,7 @@ if (!empty($_SERVER['ZT_REQUEST_ID']) && is_string($_SERVER['ZT_REQUEST_ID'])) {
     try {
         Log::$request_number = bin2hex(random_bytes(16));
     } catch (Throwable) {
-        Log::$request_number = (string) (time() . '-' . mt_rand(1000, 9999));
+        Log::$request_number = (time() . '-' . mt_rand(1000, 9999));
     }
     $_SERVER['ZT_REQUEST_ID'] = Log::$request_number;
 }

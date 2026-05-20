@@ -35,7 +35,7 @@ class Dashboard extends Controller
             $data = $this->model->getLauncherModules();
             return $this->responseSuccess(200, 'Launcher modules loaded', ['data' => $data]);
         } catch (Exception $e) {
-            Log::sysLog("DASHBOARD_LAUNCHER_DATA_ERROR: " . $e->getMessage());
+            Log::exception($e, 'DASHBOARD_LAUNCHER_DATA_ERROR', ['action' => 'getLauncherData']);
             return $this->responseError('Failed to load launcher modules', 500);
         }
     }
@@ -49,7 +49,7 @@ class Dashboard extends Controller
             $data = $this->model->getAdminData();
             return $this->responseSuccess(200, 'Admin data loaded', ['data' => $data]);
         } catch (Exception $e) {
-            Log::sysLog("DASHBOARD_ADMIN_DATA_ERROR: " . $e->getMessage());
+            Log::exception($e, 'DASHBOARD_ADMIN_DATA_ERROR', ['action' => 'getAdminData']);
             return $this->responseError('Failed to load admin data', 500);
         }
     }
@@ -77,7 +77,7 @@ class Dashboard extends Controller
                 $this->permissionDenied();
             }
         } catch (Exception $e) {
-            Log::sysLog("DASHBOARD_CREATE_TRANSACTION_ERROR: " . $e->getMessage());
+            Log::exception($e, 'DASHBOARD_CREATE_TRANSACTION_ERROR', ['action' => 'createNewTransaction']);
             $this->render('templates/error');
         }
     }

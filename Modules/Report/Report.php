@@ -21,10 +21,10 @@ class Report extends Controller {
             if (sizeof($this->view()->report_types)) {
                 $this->render('index');
             } else {
-                $this->_permissionDenied(__METHOD__);
+                $this->permissionDenied();
             }
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -37,7 +37,7 @@ class Report extends Controller {
             $this->view()->form_fields = $this->model->getReportFormfields($type);
             $this->render('get_form_fields');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -52,7 +52,7 @@ class Report extends Controller {
             $this->view()->filtering_fields = $this->model->getReportFilterValues($filter, $type, $category);
             $this->render('get_filtering_fields');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -64,7 +64,7 @@ class Report extends Controller {
             $table = $posted_data['filter_value'];
             echo json_encode($this->model->getAuditActions($table));
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -103,7 +103,7 @@ class Report extends Controller {
             }
 
           } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -119,7 +119,7 @@ class Report extends Controller {
             $this->view()->formHiddenFields = $this->model->getFormHiddenFields();
             $this->render('subscription/subscribers');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 

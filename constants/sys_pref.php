@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * ========================================================================
  *  Zantech v4 - System Preferences / Global Constants
@@ -9,7 +7,6 @@ declare(strict_types=1);
  *
  *  ✔ Central definition of ALL universal constants
  *  ✔ New ZT_ prefix for framework-wide consistency
- *  ✔ Backward-compatible with MX17 legacy constants
  *  ✔ Improves readability, grouping and organization
  *
  *  NOTE:
@@ -29,7 +26,7 @@ if (!defined('ZT_APP_NAME')) {
 }
 
 if (!defined('ZT_APP_VERSION')) {
-    define('ZT_APP_VERSION', '1.0.3');
+    define('ZT_APP_VERSION', '2.4.1');
 }
 
 if (!defined('ZT_PUBLIC_PATH')) {
@@ -210,14 +207,6 @@ if (!defined('ZT_STATE_DISABLED')) {
 if (!defined('ZT_STATE_DELETED')) {
     define('ZT_STATE_DELETED', 9);
 }
-
-
-/* ========================================================================
- |  6. LEGACY COMPATIBILITY (MX17 state constants)
- * ======================================================================== */
-
-if (!defined('ACTIVE'))         define('ACTIVE', ZT_STATE_ACTIVE);
-if (!defined('INACTIVE'))       define('INACTIVE', ZT_STATE_INACTIVE);
 
 
 /* ========================================================================

@@ -38,7 +38,7 @@ class SmsTemplate extends Controller
             $this->view()->postData = $data[2];
             $this->render('index');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -59,7 +59,7 @@ class SmsTemplate extends Controller
             $this->view()->secondary_color = filter_input(INPUT_COOKIE, 'secondary', FILTER_SANITIZE_SPECIAL_CHARS, ["options" => ["default" => "#FF0000"]]);
             $this->render('profile');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -76,7 +76,7 @@ class SmsTemplate extends Controller
             $this->view()->dropdowns = $this->model->getFormDropdowns($data['opt_mx_source_id']);
             $this->render('edit');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -90,7 +90,7 @@ class SmsTemplate extends Controller
             $this->view()->dropdowns = [];
             $this->render('edit_sms_setup');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -138,7 +138,7 @@ class SmsTemplate extends Controller
             $this->view()->data = ['has_extra' => 0];
             $this->render('create');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -181,9 +181,9 @@ class SmsTemplate extends Controller
 
     public function getContent($source_id)
     {
-        $query = "SELECT * FROM mx_sms_template WHERE opt_mx_source_id = $source_id";
+        $query = "SELECT * FROM mx_sms_template WHERE opt_mx_source_id = :source_id";
         $db = new Database();
-        $content = $db->select($query);
+        $content = $db->select($query, [':source_id' => $source_id]);
         return $content[0];
     }
 

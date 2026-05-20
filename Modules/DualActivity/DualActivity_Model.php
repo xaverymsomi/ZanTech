@@ -1,13 +1,13 @@
 <?php
 namespace Modules\DualActivity;
 
-use Library\\Model;
+use Database\Model;
 
 class DualActivity_Model extends Model {
 
-    public $table = "mx_dual_activity";
-    private $view_dir = "/dualactivity/";
-    private $title = "Dual Activity";
+    protected string $table = "mx_dual_activity";
+    private string $view_dir = "/dualactivity/";
+    protected string $title = "Dual Activity";
 
     public function getHiddenFields() {
         return ['txt_row_value'];
@@ -17,35 +17,35 @@ class DualActivity_Model extends Model {
         return [];
     }
 
-    function getControls() {
+    public function getControls() {
         return [];
     }
 
-    function getActions() {
+    public function getActions() {
         return [["action" => "Edit_Dual_Activity", "name" => "Edit", "icon" => "fa-edit", "color" => "blue", "url" => "DualActivity"]];
     }
 
     public function getTable($view_table = false): string
     {
-        if ($view_table) {
+        if ($view_table && property_exists($this, 'view_table') && !empty($this->view_table)) {
             return $this->view_table;
         }
         return $this->table;
     }
 
-    function setTable($table) {
+    public function setTable($table) {
         $this->table = $table;
     }
 
-    function getTitle() {
+    public function getTitle($plural = false): string {
         return $this->title;
     }
 
-    function getViewDir() {
+    public function getViewDir() {
         return $this->view_dir;
     }
 
-    function setViewDir($view_dir) {
+    public function setViewDir($view_dir) {
         $this->view_dir = $view_dir;
     }
 
@@ -70,7 +70,7 @@ class DualActivity_Model extends Model {
 
     public function getCouncilsGroups($activity) {
         $data = [];
-        $councils = $this->db->select("SELECT id, txt_name, txt_row_value FROM mx_council WHERE opt_mx_state_id = :state", [':state' => ACTIVE]);
+        $councils = $this->db->select("SELECT id, txt_name, txt_row_value FROM mx_council WHERE opt_mx_state_id = :state", [':state' => 1]);
         if (count($councils) > 0){
             foreach ($councils as $council) {
                 $groups = $this->db->select("SELECT id, txt_name, txt_row_value, (SELECT COUNT(mx_dual_activity_group.opt_mx_group_id) FROM mx_dual_activity_group WHERE mx_dual_activity_group.opt_mx_group_id = mx_group.id AND mx_dual_activity_group.opt_mx_dual_activity_id = :activity) AS 'selected' FROM mx_group WHERE opt_mx_council_id = :council", [':activity' => $activity, ':council' => $council['id']]);

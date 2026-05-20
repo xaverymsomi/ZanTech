@@ -2,20 +2,18 @@
 
 namespace Modules\Report;
 
-use Library\Model;
+use Database\Model;
 use Authentication\Perm_Auth;
 
 /**
- * Description of Report
- *
- * @author Fatma Azad
+ * Report_Model
  */
 class Report_Model extends Model
 {
 
-    private string $table = "";
+    protected string $table = "";
     private string $view_dir = "report/";
-    private string $title = "Reports";
+    protected string $title = "Reports";
     public $no_old_data = ['generate_report'];
 
     public function getHiddenFields(): array
@@ -28,34 +26,34 @@ class Report_Model extends Model
         return [];
     }
 
-    function getControls(): array
+    public function getControls(): array
     {
         $controls = [];
         return $controls;
     }
 
-    function getActions(): array
+    public function getActions(): array
     {
         $actions = [];
         return $actions;
     }
 
-    function getTable()
+    public function getTable($view_table = false): string
     {
         return $this->table;
     }
 
-    function getTitle(): string
+    public function getTitle($plural = false): string
     {
         return $this->title;
     }
 
-    function getViewDir(): string
+    public function getViewDir(): string
     {
         return $this->view_dir;
     }
 
-    function getReportTypes(): array
+    public function getReportTypes(): array
     {
         $permitted_section = [];
         $permission = Perm_Auth::getPermissions();
@@ -77,7 +75,7 @@ class Report_Model extends Model
         return $permitted_section;
     }
 
-    function getReportFormfields($type): array
+    public function getReportFormfields($type): array
     {
         $formfields = [];
         if ($type == "General_Report") {
@@ -180,11 +178,9 @@ class Report_Model extends Model
         return $formfields;
     }
 
-    function getReportFilterValues($filter, $type, $category): array
+    public function getReportFilterValues($filter, $type, $category): array
     {
         $data = [];
-        if ($type == 1) {
-        }
         if ($type == 2) {
             switch ($filter) {
                 case 1:

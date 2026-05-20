@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * Pure functions extracted from AppLoader.php so PHPUnit can load them
  * without booting the application.

@@ -3,8 +3,10 @@
 namespace Http;
 
 use Authentication\Perm_Auth;
+use Http\Request;
 use Logging\Log;
 use Modules\Error\Error;
+use Throwable;
 use View\ViewRenderer;
 
 /**
@@ -56,10 +58,10 @@ class Controller
      * RENDER HELPERS
      * ====================================== */
 
-    protected function render(string $viewName): void
+    protected function render(string $viewName, bool $noLayout = false): void
     {
         $module = $this->resolveModuleName();
-        $this->view()->render($module, $viewName);
+        $this->view()->render($module, $viewName, $noLayout);
     }
 
     protected function renderFull(string $path): void
@@ -121,6 +123,31 @@ class Controller
         return Response::redirect($this->normalizeRedirectTarget($to), $status);
     }
 
+    protected function logControllerEvent(string $event, array $data = []): int
+    {
+        return Log::debug(array_merge([
+            'event'      => $event,
+            'controller' => get_class($this),
+        ], $data));
+    }
+
+    protected function logControllerException(\Throwable $exception, string $context = 'CONTROLLER_EXCEPTION', array $data = []): int
+    {
+        return Log::exception($exception, strtoupper($context), array_merge([
+            'controller' => get_class($this),
+        ], $data));
+    }
+
+    protected function request(): Request
+    {
+        return Request::capture();
+    }
+
+    protected function validate(array $rules): array
+    {
+        return $this->request()->validate($rules);
+    }
+
     /* ======================================
      * PERMISSIONS
      * ====================================== */
@@ -134,31 +161,16 @@ class Controller
         }
     }
 
-    /** @deprecated Use permissionDenied() instead — kept for backward compatibility only */
-    public function _permissionDenied($unauthorized_task = null): void
-    {
-        if ($unauthorized_task !== null && $unauthorized_task !== '') {
-            Log::sysLog('No permission to access: ' . $unauthorized_task);
-        }
-        $this->permissionDenied();
-    }
+
 
     protected function permissionDenied(): void
     {
-        Log::sysLog(
-            "PERMISSION DENIED: " .
-            (debug_backtrace()[1]['class'] ?? '') . "::" .
-            (debug_backtrace()[1]['function'] ?? '')
-        );
+        $class = debug_backtrace()[1]['class'] ?? 'Unknown';
+        $method = debug_backtrace()[1]['function'] ?? 'Unknown';
 
-        (new Error(
-            "Error 007",
-            "Permission Denied",
-            "You are not authorised to perform this action",
-            "bi-lock-fill"
-        ))->index();
+        Log::sysLog("PERMISSION DENIED: {$class}::{$method}");
 
-        exit;
+        throw new \Exceptions\ForbiddenException("Access denied to {$class}::{$method}");
     }
 
     /* ======================================
@@ -209,16 +221,16 @@ class Controller
         $this->requirePermission($permission);
 
         $this->view()->title = $title;
-        
+
         if ($this->model) {
             $this->view()->buttons = method_exists($this->model, 'getControls') ? $this->model->getControls() : [];
             $this->view()->class = getClassName(get_class($this->model));
             $this->view()->table = $this->model->getTable($view);
             $this->view()->allRecords = $data[0] ?? [];
-            
+
             $schema = method_exists($this->model, 'getClassFields') ? $this->model->getClassFields($this->model->getTable($view)) : [];
             $this->view()->headings = $schema['properties'] ?? [];
-            
+
             $this->view()->hidden = method_exists($this->model, 'getHiddenFields') ? $this->model->getHiddenFields() : [];
             $this->view()->actions = method_exists($this->model, 'getActions') ? $this->model->getActions() : [];
             $this->view()->resultData = $data[1] ?? [];
@@ -247,7 +259,7 @@ class Controller
             $this->view()->tabs = method_exists($this->model, 'getTabs') ? $this->model->getTabs() : [];
             $this->view()->hidden_columns = method_exists($this->model, 'getProfileHiddenColumns') ? $this->model->getProfileHiddenColumns() : [];
             $this->view()->buttons = method_exists($this->model, 'getProfileButtons') ? $this->model->getProfileButtons() : [];
-            
+
             $this->render('profile/profile');
         } else {
             $this->view()->subtitle = "Record not found";
@@ -260,8 +272,8 @@ class Controller
         $this->requirePermission($permission);
 
         if (!$this->model) {
-             $this->renderFull('views/templates/not_found');
-             return;
+            $this->renderFull('views/templates/not_found');
+            return;
         }
 
         $returned_id = $this->model->getRecordIdByRowValue($this->model->getTable(), $record_id);
@@ -288,7 +300,7 @@ class Controller
             $this->view()->caller = str_replace("_", " ", filter_var($valid_caller, FILTER_SANITIZE_SPECIAL_CHARS));
             $this->view()->actions = method_exists($this->model, 'getAssociatedRecordActions') ? $this->model->getAssociatedRecordActions($valid_caller) : [];
             $this->view()->show_cards = false;
-            
+
             $this->render('associated_records/main');
         } else {
             $this->view()->subtitle = "Record not found";

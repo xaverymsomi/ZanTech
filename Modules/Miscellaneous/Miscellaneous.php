@@ -26,7 +26,7 @@ class Miscellaneous extends Controller {
             $this->view()->dropdowns = $this->model->getMiscellaneousDropdowns();
             $this->render('index');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 

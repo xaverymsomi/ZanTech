@@ -354,7 +354,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 2rem;
+    padding: 2rem 3rem;
 }
 
 /* Topbar - Floated Glass */
@@ -980,7 +980,7 @@ body {
 }
 
 .zt-content-wrapper {
-    padding: 0 !important;               /* Kill the 2rem body padding that floats the topbar */
+    padding: 0 3rem !important;               /* Kill the 2rem body padding that floats the topbar, but keep side space */
 }
 
 .zt-icon-btn {
@@ -1198,6 +1198,16 @@ body {
     padding: 0 2rem;
     display: flex;
     align-items: center;
+    margin-left: -3rem;
+    margin-right: -3rem;
+    margin-top: 0;
+}
+
+@media (max-width: 991px) {
+    .zt-dashboard-header {
+        margin-left: -1rem;
+        margin-right: -1rem;
+    }
 }
 
 .zt-dashboard-header h1 {
@@ -1661,3 +1671,269 @@ body {
     border: 1px solid #e2e8f0;
     box-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
 }
+
+.zt-menu-architect__actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.zt-menu-architect__node:hover .zt-menu-architect__actions {
+    opacity: 1;
+}
+
+/* Form Enhancements for Architect */
+.zt-menu-architect .form-control,
+.zt-menu-architect .form-select {
+    background: rgba(0,0,0,0.2) !important;
+    border: 1px solid var(--architect-border) !important;
+    color: #fff !important;
+    border-radius: 14px;
+}
+
+.zt-menu-architect .form-control:focus {
+    border-color: var(--architect-accent) !important;
+    box-shadow: 0 0 0 4px rgba(var(--zt-primary-rgb), 0.1) !important;
+}
+
+/* ==========================================================================
+   PERMISSION ARCHITECT - CINEMATIC SPLIT PANEL
+   ========================================================================== */
+
+.zt-permission-architect .list-group-item {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: transparent;
+    border-left: 3px solid transparent !important;
+}
+
+.zt-permission-architect .list-group-item:hover {
+    background: rgba(15, 23, 42, 0.03);
+    padding-left: 1.5rem !important;
+}
+
+.zt-permission-architect .list-group-item.active {
+    border-left-color: var(--zt-primary) !important;
+    background: rgba(var(--zt-primary-rgb), 0.05) !important;
+    color: var(--zt-primary) !important;
+    font-weight: 600 !important;
+}
+
+.zt-permission-architect .zt-search__input {
+    border-radius: 10px;
+    height: 42px;
+}
+
+.zt-permission-architect .zt-card {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.zt-permission-architect .zt-menu-admin__row:hover td {
+    background: rgba(var(--zt-primary-rgb), 0.03) !important;
+}
+
+/* ==========================================================================
+   ANGULAR UI-BOOTSTRAP (BS3) TO BOOTSTRAP 5 MODAL BRIDGE & PREMIUM DESIGN
+   ========================================================================== */
+.modal.in {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+.modal.fade .modal-dialog {
+    transform: translate(0, 0) !important;
+    transition: transform 0.3s ease-out;
+}
+
+.modal-backdrop.in {
+    opacity: 0.5 !important;
+    display: block !important;
+}
+
+.modal-open {
+    overflow: hidden;
+}
+
+/* Cinematic Spacious Form Modal Sizing */
+.mx-modal-form .modal-dialog {
+    max-width: 960px !important;
+    width: 90% !important;
+    margin: 2.5rem auto !important;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.mx-modal-form .modal-content {
+    border: none !important;
+    border-radius: 24px !important;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+    font-family: 'Outfit', sans-serif !important;
+}
+
+/* Premium Slate & Ocean Gradient Header */
+.mx-modal-form .modal-header {
+    background: linear-gradient(135deg, #0f172a, #1e293b) !important;
+    color: #ffffff !important;
+    border-bottom: none !important;
+    padding: 1.5rem 2.5rem !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.mx-modal-form .modal-title {
+    font-size: 1.35rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    letter-spacing: -0.025em !important;
+    color: #ffffff !important;
+}
+
+.mx-modal-form .modal-title i {
+    font-size: 1.6rem !important;
+    color: #6366f1 !important;
+}
+
+.mx-modal-form .close {
+    background: transparent !important;
+    border: none !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 2rem !important;
+    font-weight: 300 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.mx-modal-form .close:hover {
+    color: #ffffff !important;
+    transform: scale(1.15) !important;
+}
+
+/* Spacious Premium Body & Decoupled Cards */
+.mx-modal-form .modal-body {
+    padding: 2.5rem !important;
+    background: #f8fafc !important;
+}
+
+.mx-modal-form .panel.panel-default,
+.mx-modal-form .card {
+    border: none !important;
+    background: #ffffff !important;
+    border-radius: 18px !important;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04) !important;
+    padding: 2rem !important;
+    margin-bottom: 0 !important;
+}
+
+.mx-modal-form hr {
+    border-top: 1px solid #e2e8f0 !important;
+    opacity: 0.6 !important;
+    margin: 1.75rem 0 !important;
+}
+
+/* Beautiful Modern Fields, Inputs, Labels */
+.mx-modal-form label {
+    font-weight: 500 !important;
+    color: #475569 !important;
+    font-size: 0.875rem !important;
+    margin-bottom: 0.625rem !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+}
+
+.mx-modal-form .form-control {
+    border-radius: 12px !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.95rem !important;
+    color: #1e293b !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.mx-modal-form .form-control:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+    outline: none !important;
+}
+
+.mx-modal-form select.form-control {
+    appearance: none !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23475569' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 1rem center !important;
+    background-size: 16px 12px !important;
+    padding-right: 2.5rem !important;
+}
+
+/* Action Footer Redesign */
+.mx-modal-form .modal-footer {
+    background: #ffffff !important;
+    border-top: 1px solid #f1f5f9 !important;
+    padding: 1.5rem 2.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 14px !important;
+}
+
+/* Interactive Action Buttons */
+.mx-modal-form .btn-info {
+    background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 500 !important;
+    font-family: 'Outfit', sans-serif !important;
+    padding: 0.75rem 1.75rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.mx-modal-form .btn-info:hover {
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25) !important;
+    transform: translateY(-2px) !important;
+    filter: brightness(1.05) !important;
+}
+
+.mx-modal-form .btn-info:disabled {
+    opacity: 0.6 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.mx-modal-form .btn-danger {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #64748b !important;
+    font-weight: 500 !important;
+    font-family: 'Outfit', sans-serif !important;
+    padding: 0.75rem 1.75rem !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.mx-modal-form .btn-danger:hover {
+    background: #f1f5f9 !important;
+    color: #334155 !important;
+    border-color: #cbd5e1 !important;
+    transform: translateY(-2px) !important;
+}
+

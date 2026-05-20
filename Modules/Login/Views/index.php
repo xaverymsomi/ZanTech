@@ -506,6 +506,14 @@
                     <div class="text-center">
                         <i class="fa fa-shield-alt fa-4x text-muted mb-4 opacity-10"></i>
                     </div>
+
+                    <?php if (!empty($this->error_message)): ?>
+                        <div class="alert alert-warning border-0 shadow-sm small text-start mb-4 py-2 px-3 d-flex align-items-center rounded-3 animate__animated animate__fadeIn">
+                            <i class="fa fa-exclamation-circle me-2"></i>
+                            <div><?= htmlspecialchars($this->error_message) ?></div>
+                        </div>
+                    <?php endif; ?>
+
                     <div class="card-title">Sign in with credentials</div>
                     <form method="post" action="<?php echo URL; ?>/login/login">
                         <input type="hidden" name="_token" value="<?= \Authentication\Session::csrfToken() ?>">

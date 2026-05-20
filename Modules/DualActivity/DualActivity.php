@@ -1,7 +1,9 @@
 <?php
 namespace Modules\DualActivity;
-use Library\\Controller;
-use Library\\Perm_Auth;
+
+use Authentication\Perm_Auth;
+use Exception;
+use Http\Controller;
 
 /**
  * Description of utility
@@ -34,7 +36,7 @@ class DualActivity extends Controller {
             $this->view->postData = $data[2];
             $this->render('index');
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 
@@ -64,7 +66,7 @@ class DualActivity extends Controller {
                 $this->view->renderFull('views/templates/not_found');
             }
         } else {
-            $this->_permissionDenied(__METHOD__);
+            $this->permissionDenied();
         }
     }
 

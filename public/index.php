@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+
 
 /**
  * -------------------------------------------------------------------------
@@ -14,9 +14,15 @@ declare(strict_types=1);
  * @version 4.0.0
  */
 
-// 1. Define the absolute base path of the project
+// 0. Initialize Developer Profiler
 if (!defined('ZT_BASE_PATH')) {
     define('ZT_BASE_PATH', dirname(__DIR__));
+}
+
+$profiler = ZT_BASE_PATH . DIRECTORY_SEPARATOR . 'Foundation' . DIRECTORY_SEPARATOR . 'Profiler.php';
+if (is_file($profiler)) {
+    require_once $profiler;
+    \Foundation\Profiler::start();
 }
 
 // 2. Delegate to the Foundation Loader

@@ -1,5 +1,5 @@
 <div id="page-content" class="p-3">
-    <?= Library\DataView::getStyles() ?>
+    <?= View\DataView::getStyles() ?>
     
     <style>
         /* Miscellaneous Module Specific Styles */

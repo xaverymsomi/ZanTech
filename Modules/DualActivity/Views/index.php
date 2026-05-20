@@ -1,8 +1,8 @@
 <div id="page-content" class="px-4 py-4 zt-animate-fade-in">
     <?php
-    use Library\DataView;
-    use Library\Perm_Auth;
-    use Library\Session;
+    use Authentication\Perm_Auth;
+    use Authentication\Session;
+    use View\DataView;
 
     $perm = Perm_Auth::getPermissions();
     $returned = Session::get('returned') ?? 0;

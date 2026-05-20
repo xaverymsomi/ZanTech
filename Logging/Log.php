@@ -48,7 +48,7 @@ class Log
         $req       = self::$request_number ?? 'NO-REQ-ID';
 
         if (is_array($msg) || is_object($msg)) {
-            $msg = json_encode($msg, JSON_UNESCAPED_UNICODE);
+            $msg = json_encode($msg, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
         }
 
         return "[{$timestamp}] | {$req} | {$tag} | {$msg}";
@@ -60,6 +60,9 @@ class Log
 
     public static function sysLog($msg): int
     {
+        if (!defined('APP_DEBUG') || APP_DEBUG !== true) {
+            return 1;
+        }
         $dir  = self::baseDir() . '/logs/sys/';
         $file = $dir . date('Y-m') . '-sys.log';
 
@@ -76,7 +79,7 @@ class Log
         return 1;
     }
 
-    public static function customSysLog($tag, $msg): int
+    public static function entry(string $tag, $msg): int
     {
         $dir  = self::baseDir() . '/logs/sys/';
         $file = $dir . date('Y-m') . '-sys.log';
@@ -85,12 +88,73 @@ class Log
         return 1;
     }
 
+    public static function customSysLog($tag, $msg): int
+    {
+        return self::entry($tag, $msg);
+    }
+
+    public static function info($msg): int
+    {
+        if (!defined('APP_DEBUG') || APP_DEBUG !== true) {
+            return 1;
+        }
+        return self::entry('INFO', $msg);
+    }
+
+    public static function warning($msg): int
+    {
+        return self::entry('WARNING', $msg);
+    }
+
+    public static function debug($msg): int
+    {
+        if (!defined('APP_DEBUG') || APP_DEBUG !== true) {
+            return 1;
+        }
+        return self::entry('DEBUG', $msg);
+    }
+
+    public static function error($msg): int
+    {
+        return self::sysErr($msg);
+    }
+
+    public static function exception(\Throwable $exception, string $tag = 'EXCEPTION', array $context = []): int
+    {
+        $payload = array_merge(
+            [
+                'type'        => get_class($exception),
+                'message'     => $exception->getMessage(),
+                'file'        => $exception->getFile(),
+                'line'        => $exception->getLine(),
+                'trace'       => $exception->getTraceAsString(),
+                'request_id'  => self::$request_number,
+            ],
+            $context
+        );
+
+        if ($previous = $exception->getPrevious()) {
+            $payload['previous'] = [
+                'type'    => get_class($previous),
+                'message' => $previous->getMessage(),
+                'file'    => $previous->getFile(),
+                'line'    => $previous->getLine(),
+                'trace'   => $previous->getTraceAsString(),
+            ];
+        }
+
+        return self::entry($tag, $payload);
+    }
+
     /* ============================================================
  *  LEGACY COMPAT: savePlainLog
  *  Used by Zantech / bootstrap to dump a raw line (e.g. ******)
  * ============================================================ */
     public static function savePlainLog($msg): int
     {
+        if (!defined('APP_DEBUG') || APP_DEBUG !== true) {
+            return 1;
+        }
         $dir  = self::baseDir() . '/logs/sys/';
         $file = $dir . date('Y-m') . '-sys.log';
         self::write($file, (string)$msg);
@@ -114,6 +178,9 @@ class Log
 
     public static function queryLog($type, $query, $params = []): int
     {
+        if (!defined('APP_DEBUG') || APP_DEBUG !== true) {
+            return 1;
+        }
         $dir  = self::baseDir() . '/logs/query/';
         $file = $dir . date('Y-m') . '-query.log';
 

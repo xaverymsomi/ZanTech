@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Exceptions;
 
 use Logging\Log;
@@ -20,6 +18,7 @@ final class ExceptionHandler
     private const EXCEPTION_SEVERITY = [
         ValidationException::class => 'warning',
         AuthException::class       => 'warning',
+        ForbiddenException::class  => 'warning',
         NotFoundException::class   => 'info',
         RouterException::class     => 'danger',
         ZantechException::class    => 'danger',
@@ -61,15 +60,7 @@ final class ExceptionHandler
         $logLevel = self::SEVERITY_MAP[$severity]['level'];
 
         try {
-            Log::sysLog([
-                'level'      => $logLevel,
-                'exception'  => get_class($e),
-                'message'    => $e->getMessage(),
-                'status'     => $e->getStatusCode(),
-                'severity'   => $severity,
-                'context'    => $e->getContext(),
-                'request_id' => $requestId,
-            ]);
+            Log::exception($e, 'APPLICATION_EXCEPTION');
         } catch (Throwable) {
             error_log($e->getMessage());
         }
@@ -174,14 +165,14 @@ final class ExceptionHandler
 
         // optional: allowlist top-level controllers
         $first = strtolower(explode('/', $target, 2)[0]);
-        
+
         $allowedFirst = [
             defined('ZT_ROUTE_DASHBOARD') ? ZT_ROUTE_DASHBOARD : 'dashboard',
             defined('ZT_ROUTE_LOGIN') ? ZT_ROUTE_LOGIN : 'login',
             defined('ZT_ROUTE_LOGOUT') ? ZT_ROUTE_LOGOUT : 'logout',
             'autorun'
         ];
-        
+
         if (!in_array($first, $allowedFirst, true)) {
             return null;
         }

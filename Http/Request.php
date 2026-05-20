@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Http;
 
 final class Request
@@ -16,12 +14,18 @@ final class Request
         private readonly string $rawBody = ''
     ) {}
 
+    private static ?self $instance = null;
+
     public static function capture(): self
     {
+        if (self::$instance !== null) {
+            return self::$instance;
+        }
+
         $rawBody = (string)file_get_contents('php://input');
         $decoded = json_decode($rawBody, true);
 
-        return new self(
+        self::$instance = new self(
             $_GET,
             $_POST,
             $_FILES,
@@ -30,6 +34,8 @@ final class Request
             is_array($decoded) ? $decoded : [],
             $rawBody
         );
+
+        return self::$instance;
     }
 
     public static function fake(
@@ -116,5 +122,39 @@ final class Request
     public function rawBody(): string
     {
         return $this->rawBody;
+    }
+
+    public function validate(array $rules): array
+    {
+        return \Validation\Validator::make($this->all())->validate($rules);
+    }
+
+    public function only(array $keys): array
+    {
+        return array_intersect_key($this->all(), array_flip($keys));
+    }
+
+    public function isAjax(): bool
+    {
+        // 1. Standard XHR Header
+        if (isset($this->server['HTTP_X_REQUESTED_WITH'])
+            && strtolower((string)$this->server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+        ) {
+            return true;
+        }
+
+        // 2. JSON Request Content-Type Header
+        $contentType = $this->server['CONTENT_TYPE'] ?? $this->server['HTTP_CONTENT_TYPE'] ?? '';
+        if (str_contains(strtolower((string)$contentType), 'application/json')) {
+            return true;
+        }
+
+        // 3. Accept JSON Header
+        $accept = $this->server['HTTP_ACCEPT'] ?? '';
+        if (str_contains(strtolower((string)$accept), 'application/json')) {
+            return true;
+        }
+
+        return false;
     }
 }

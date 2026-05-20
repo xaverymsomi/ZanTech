@@ -1,9 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Database;
-use PDO;
 
 class QueryBuilder
 {
@@ -24,7 +21,7 @@ class QueryBuilder
 
     private function dbType(): string
     {
-        return defined('DB_TYPE') ? DB_TYPE : ($_ENV['DB_TYPE'] ?? 'sqlsrv');
+        return method_exists($this->db, 'getDriverType') ? $this->db->getDriverType() : (defined('DB_TYPE') ? DB_TYPE : 'sqlsrv');
     }
 
     public function where(string $column, mixed $value, string $operator = '='): self

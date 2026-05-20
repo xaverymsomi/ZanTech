@@ -1,23 +1,23 @@
 <div id="page-content" class="px-4 py-4">
     <?php
-    use Library\DataView;
     use Authentication\Perm_Auth;
     use Authentication\Session;
+    use View\DataView;
 
     $perm = Perm_Auth::getPermissions();
     $returned = Session::get('returned') ?? 0;
     
     // Modern Header Section
     echo '<div class="d-flex align-items-center justify-content-between mb-4">';
-    echo '<div><h3 class="fw-bold text-main mb-0">' . trans($this->title) . '</h3>';
+    echo '<div><h3 class="fw-bold text-main mb-0">' . htmlspecialchars(trans($this->title), ENT_QUOTES, 'UTF-8') . '</h3>';
     echo '<p class="text-muted small mb-0">Manage system SMS templates and automation</p></div>';
 
-    echo '<div ng-controller="formController" class="d-flex gap-2" ng-init="buttons=' . sizeof($this->buttons) . '; return_value=' . $returned . '" ng-show="buttons > 0">';
+    echo '<div ng-controller="formController" class="d-flex gap-2" ng-init="buttons=' . (int)sizeof($this->buttons) . '; return_value=' . (int)$returned . '" ng-show="buttons > 0">';
     foreach ($this->buttons as $button) {
         if ($perm->verifyPermission(strtolower($button['action']))) {
-            $action = "'" . $button['action'] . "'";
-            echo '<button ng-click="showForm(' . $button['url'] . ', ' . $action . ')" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold d-flex align-items-center gap-2">'
-                . '<i class="fa fa-plus-circle"></i> ' . trans($button['name']) . '</button>';
+            $action = "'" . htmlspecialchars($button['action'], ENT_QUOTES, 'UTF-8') . "'";
+            echo '<button ng-click="showForm(' . htmlspecialchars($button['url'], ENT_QUOTES, 'UTF-8') . ', ' . $action . ')" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold d-flex align-items-center gap-2">'
+                . '<i class="fa fa-plus-circle"></i> ' . htmlspecialchars(trans($button['name']), ENT_QUOTES, 'UTF-8') . '</button>';
         }
     }
     echo '</div></div>';
@@ -31,7 +31,7 @@
         }
     }
 
-    echo '<div ng-controller="profileController" ng-init="return_value=' . $returned . '">';
+    echo '<div ng-controller="profileController" ng-init="return_value=' . (int)$returned . '">';
     
     if (isset($this->resultData['recordsFiltered']) && $this->resultData['recordsFiltered'] > 0) {
         $view = new DataView();

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Authentication;
 
 use Logging\Log;
@@ -14,8 +12,8 @@ final class Auth
 
     public static function login(array $user): void
     {
-        if (empty($user) || empty($user['id'])) {
-            throw new AuthException('Invalid user payload during login');
+        if (empty($user) || empty($user['id']) || empty($user['txt_username']) || trim($user['txt_username']) === '') {
+            throw new AuthException('Invalid user payload or empty username during login');
         }
 
         Session::init();
@@ -28,11 +26,18 @@ final class Auth
             'txt_name'        => (string) ($user['txt_name'] ?? ''),
             'txt_domain'      => (string) ($user['txt_domain'] ?? ''),
             'opt_mx_group_id' => (int) ($user['opt_mx_group_id'] ?? 0),
-            'role'            => (int) ($user['opt_mx_group_id'] ?? 0),
+            'role'            => (int) ($user['role'] ?? $user['opt_mx_group_id'] ?? 0),
         ];
 
         Session::set(self::KEY_USER, $cleanUser);
         Session::set(self::KEY_FLAG, true);
+        
+        // Security Fingerprinting
+        Session::set('zt_auth_ip', $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0');
+        Session::set('zt_auth_ua', $_SERVER['HTTP_USER_AGENT'] ?? 'unknown');
+        Session::set('zt_last_activity', time());
+
+        \Services\AuditTrail::log('LOGIN_SUCCESS', "User: {$cleanUser['txt_username']}");
 
         Log::sysLog([
             'event' => 'AUTH_LOGIN',
@@ -43,6 +48,11 @@ final class Auth
 
     public static function logout(): void
     {
+        $user = self::user();
+        $username = $user['txt_username'] ?? 'UNKNOWN';
+
+        \Services\AuditTrail::log('LOGOUT', "User: {$username}");
+
         Session::init();
         Session::set(self::KEY_USER, null);
         Session::set(self::KEY_FLAG, false);

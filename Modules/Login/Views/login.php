@@ -1,8 +1,6 @@
 <?php
 //require_once "../vendor/autoload.php";
 //
-//use Library\\Init;
-//use Library\\Log;
 //
 //include '../inc/config.php';
 //Log::sysLog('Initiating Login Sequence');

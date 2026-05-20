@@ -1,7 +1,7 @@
 <?php
 
 use Database\Database;
-use Library\Model;
+use Database\Model;
 use Logging\Log;
 
 /**
@@ -118,11 +118,18 @@ function lastInsertId(Database $db, array $data = [], ?string $table = null): in
     $params = [];
 
     foreach ($data as $column => $value) {
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $column)) {
+            Log::sysErr("Invalid column name in lastInsertId: {$column}");
+            continue;
+        }
+
+        $colQ = method_exists($db, 'quoteColumn') ? $db->quoteColumn($column) : $column;
+
         if ($value === null || $value === '') {
-            $where[] = " {$column} IS NULL ";
+            $where[] = " {$colQ} IS NULL ";
         } else {
-            $where[] = " {$column} = :{$column} ";
-            $params[$column] = $value;
+            $where[] = " {$colQ} = :w_{$column} ";
+            $params["w_{$column}"] = $value;
         }
     }
 
@@ -205,41 +212,29 @@ function getLabels(string $table, string $key, string $value): array
 
 /**
  * ============================================================
- *  LEGACY RAW LOG
- * ============================================================
- */
-function logData(string $tag, mixed $data): void
-{
-    $base = defined('ZT_APP_ROOT') ? ZT_APP_ROOT : __DIR__;
-
-    $file = "{$base}/" . date('Y-m') . "_syslog.txt";
-    $line = date('d-m-Y H:i:s') . " - {$tag}: " . json_encode($data, JSON_UNESCAPED_UNICODE) . PHP_EOL;
-
-    @file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
-}
-
-/**
- * ============================================================
  *  TRANSLATION
  * ============================================================
  */
 function trans(string $key): string
 {
+    static $translationsCache = [];
+
     $lang = \Authentication\Session::get('lang') ?? 'en';
 
-    if (!defined('ZT_APP_ROOT')) return $key;
-
-    $file = ZT_APP_ROOT . "/locale/lang.{$lang}.php";
-
-    if (file_exists($file)) {
-        $translations = require $file;
-
-        if (isset($translations[$key])) {
-            return $translations[$key];
+    if (!isset($translationsCache[$lang])) {
+        $translationsCache[$lang] = [];
+        if (defined('ZT_APP_ROOT')) {
+            $file = ZT_APP_ROOT . "/locale/lang.{$lang}.php";
+            if (file_exists($file)) {
+                $loaded = require $file;
+                if (is_array($loaded)) {
+                    $translationsCache[$lang] = $loaded;
+                }
+            }
         }
     }
 
-    return $key;
+    return $translationsCache[$lang][$key] ?? $key;
 }
 
 /**

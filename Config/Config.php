@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Config;
 
 use Throwable;
@@ -10,6 +8,7 @@ final class Config
 {
     private static array $items = [];
     private static array $cache = [];
+    private static bool $dbSettingsLoaded = false;
 
     public static function load(array $items): void
     {
@@ -34,23 +33,51 @@ final class Config
             }
         }
 
-        try {
-            $db = \Database\DB::connection();
-            foreach (self::envKeys($key) as $lookupKey) {
-                $result = $db->select(
-                    'SELECT txt_value FROM mx_setting WHERE txt_key = :key',
-                    [':key' => $lookupKey]
-                );
+        // Lazy-load database configurations in a single batch query if not already done
+        if (!self::$dbSettingsLoaded) {
+            self::loadDbSettings();
+        }
 
-                if (!empty($result)) {
-                    return self::$cache[$key] = self::normalizeValue($result[0]['txt_value']);
-                }
+        // Check if loading the DB settings populated the cache
+        if (array_key_exists($key, self::$cache)) {
+            return self::$cache[$key];
+        }
+
+        // Also check with uppercase underscore key variation in cache
+        foreach (self::envKeys($key) as $lookupKey) {
+            if (array_key_exists($lookupKey, self::$cache)) {
+                return self::$cache[$key] = self::$cache[$lookupKey];
             }
-        } catch (Throwable) {
-            // DB-backed config is optional during bootstrap and tests.
         }
 
         return self::$cache[$key] = $default;
+    }
+
+    /**
+     * Load all database settings in a single efficient query.
+     */
+    private static function loadDbSettings(): void
+    {
+        self::$dbSettingsLoaded = true;
+        try {
+            $db = \Database\DB::connection();
+            $results = $db->select('SELECT txt_key, txt_value FROM mx_setting');
+            if (is_array($results)) {
+                foreach ($results as $row) {
+                    if (isset($row['txt_key'])) {
+                        $k = $row['txt_key'];
+                        $v = $row['txt_value'] ?? null;
+                        self::$cache[$k] = self::normalizeValue($v);
+                        
+                        // Register alternative env-style uppercase keys
+                        $upperKey = strtoupper(str_replace('.', '_', $k));
+                        self::$cache[$upperKey] = self::normalizeValue($v);
+                    }
+                }
+            }
+        } catch (Throwable) {
+            // DB configurations are optional during early bootstrapping or testing.
+        }
     }
 
     public static function set(string $key, mixed $value): void
@@ -63,6 +90,7 @@ final class Config
     {
         self::$items = [];
         self::$cache = [];
+        self::$dbSettingsLoaded = false;
     }
 
     private static function hasNested(string $key): bool
