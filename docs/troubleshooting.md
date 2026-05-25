@@ -1,13 +1,13 @@
 # Troubleshooting
 
-This guide lists common ZanTech setup and runtime problems.
+This guide lists common Oryn setup and runtime problems.
 
 ## Missing Composer Autoload
 
 Symptom:
 
 ```text
-Zantech Foundation Error: Run "composer install" to generate autoload.php
+Oryn Foundation Error: Run "composer install" to generate autoload.php
 ```
 
 Fix:
@@ -40,7 +40,7 @@ Fix:
 
    ```bash
    composer install
-   php zt test
+   php oryn test
    ```
 
 ## Database Connection Failure
@@ -60,7 +60,7 @@ Fix:
 4. Run:
 
    ```bash
-   php zt migrate:status
+   php oryn migrate:status
    ```
 
 ## Route Not Found
@@ -148,14 +148,14 @@ Likely causes:
 Fix:
 
 ```bash
-php zt migrate:status
-php zt migrate
+php oryn migrate:status
+php oryn migrate
 ```
 
 For a single file:
 
 ```bash
-php zt db:migrate src/Database/migrations/example.sql
+php oryn db:migrate src/Database/migrations/example.sql
 ```
 
 Use `GO` separators on their own line for SQL Server batches.
@@ -180,7 +180,7 @@ Fix:
 
 ```bash
 composer install
-php zt test
+php oryn test
 ```
 
 On Windows, direct PHPUnit execution may be:

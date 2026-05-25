@@ -6,7 +6,9 @@ use Exception;
 use Throwable;
 
 /**
- * Base exception for all Zantech framework errors.
+ * Base exception for all Oryn framework errors.
+ *
+ * The class name is retained for backward compatibility.
  *
  * - Wraps native Throwable
  * - Adds safe public message

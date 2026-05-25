@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This guide covers the practical steps for deploying ZanTech to a server.
+This guide covers the practical steps for deploying Oryn to a server.
 
 ## Deployment Principles
 
@@ -51,9 +51,9 @@ Install:
 7. Initialize or migrate the database as needed:
 
    ```bash
-   php zt db:init
-   php zt db:seed
-   php zt migrate
+   php oryn db:init
+   php oryn db:seed
+   php oryn migrate
    ```
 
 8. Point the web server to `public/`.
@@ -65,8 +65,8 @@ Before switching traffic, run:
 
 ```bash
 composer validate --no-check-publish
-php zt test
-php zt migrate:status
+php oryn test
+php oryn migrate:status
 ```
 
 For a quick web check:

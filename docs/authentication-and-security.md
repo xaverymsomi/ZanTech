@@ -1,6 +1,6 @@
 # Authentication And Security
 
-ZanTech combines session authentication, permission checks, middleware, request normalization, and optional maker-checker approvals.
+Oryn combines session authentication, permission checks, middleware, request normalization, and optional maker-checker approvals.
 
 ## Authentication Classes
 

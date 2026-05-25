@@ -203,7 +203,7 @@
                     contentArea.html(targetHtml);
                     $compile(contentArea.contents())($scope);
 
-                    if (_title) $window.document.title = 'ZanTech - ' + _title;
+                    if (_title) $window.document.title = 'Oryn - ' + _title;
                     $window.history.pushState({ path: _link }, '', finalUrl);
                 }).catch(function (err) {
                     $('.overlay').addClass('hidden');

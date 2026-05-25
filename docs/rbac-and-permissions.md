@@ -1,6 +1,6 @@
 # RBAC And Permissions
 
-ZanTech uses role-based access control with group permissions, direct user permission overrides, and a super admin bypass.
+Oryn uses role-based access control with group permissions, direct user permission overrides, and a super admin bypass.
 
 ## Main Concepts
 
@@ -72,7 +72,7 @@ Keep names lowercase and underscore-separated.
 
 ## Groups
 
-A user may belong to multiple groups. ZanTech reads all group IDs assigned through `mx_login_credential_group` and grants the union of their permissions.
+A user may belong to multiple groups. Oryn reads all group IDs assigned through `mx_login_credential_group` and grants the union of their permissions.
 
 If a user should temporarily receive a permission without changing group policy, use a direct user permission override.
 

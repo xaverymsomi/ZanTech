@@ -23,7 +23,7 @@ if (!function_exists('ztBootstrapAbort')) {
         $debug = is_string($debugVal) && in_array(strtolower($debugVal), ['1', 'true', 'yes', 'on'], true);
 
         $err = $debug
-            ? new Error('Zantech Bootstrap Error', $message, null, 'bi-exclamation-triangle-fill')
+            ? new Error('Oryn Bootstrap Error', $message, null, 'bi-exclamation-triangle-fill')
             : new Error('Application Error', 'Please try again later.', null, 'bi-exclamation-triangle-fill');
 
         $err->index();

@@ -11,7 +11,7 @@ class QueueWorker
 {
     public function work(): void
     {
-        echo "Starting ZanTech Queue Worker...\n";
+        echo "Starting Oryn Queue Worker...\n";
         echo "Polling mx_job_queue every 3 seconds...\n";
 
         $db = DB::connection();

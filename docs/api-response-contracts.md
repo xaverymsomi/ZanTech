@@ -1,6 +1,6 @@
 # API And Response Contracts
 
-ZanTech supports both full HTML views and JSON-style controller responses. This guide documents the response shapes used by the base HTTP layer.
+Oryn supports both full HTML views and JSON-style controller responses. This guide documents the response shapes used by the base HTTP layer.
 
 ## Response Class
 

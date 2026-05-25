@@ -1,4 +1,4 @@
-# ZanTech — version matrix
+# Oryn Version Matrix
 
 This file is the **detailed** companion to the summary in [README.md](README.md).  
 **CDN URLs** are recorded in [cdn-lock.json](cdn-lock.json). When you change `resources/views/header.php`, update `cdn-lock.json` in the same commit.
@@ -9,7 +9,7 @@ This file is the **detailed** companion to the summary in [README.md](README.md)
 
 | Item | Value | Where |
 |------|--------|--------|
-| ZanTech (kernel / shell) | **2.4.1** | `bootstrap/sys_pref.php` (`ZT_APP_VERSION`) |
+| Oryn (kernel / shell) | **2.4.1** | `bootstrap/sys_pref.php` (`ZT_APP_VERSION`) |
 | PHP (required) | **^8.2** | `composer.json` → `require.php` |
 | Database (migrations) | **Microsoft SQL Server** (T-SQL) | `src/Database/migrations/*.sql` |
 
@@ -63,7 +63,8 @@ To lock PHP dependencies for reproducible installs, use a committed **`composer.
 
 | Entry | Notes |
 |-------|--------|
-| `zt` / `zt.php` | PHP CLI; same commands. |
+| `oryn` | Preferred PHP CLI entry. |
+| `zt` / `zt.php` | Legacy CLI aliases; same commands. |
 
 ---
 

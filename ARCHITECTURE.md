@@ -1,6 +1,6 @@
-# ZanTech Framework Architecture (v2.4.0)
+# Oryn Framework Architecture (v2.4.0)
 
-ZanTech is a high-fidelity, modular, URL-driven web application framework built on **PHP 8.2**. It is engineered for secure, enterprise-grade enterprise portals, natively supporting multi-database connection abstractions (MySQL, SQL Server, ODBC, PostgreSQL, SQLite), comprehensive middleware pipelines, Role-Based Access Control (RBAC), and transactional Maker-Checker (Dual Control) approvals.
+Oryn is a high-fidelity, modular, URL-driven web application framework built on **PHP 8.2**. It is engineered for secure, enterprise-grade enterprise portals, natively supporting multi-database connection abstractions (MySQL, SQL Server, ODBC, PostgreSQL, SQLite), comprehensive middleware pipelines, Role-Based Access Control (RBAC), and transactional Maker-Checker (Dual Control) approvals.
 
 ---
 
@@ -22,7 +22,8 @@ The repository structure cleanly decouples configuration, framework foundation c
 ├── src/helpers/              # Standard global helper libraries
 ├── public/               # Web Document Root (front-controller entry, assets)
 ├── storage/              # File cache, session stores, and reports
-├── zt / zt.php           # Console CLI commands
+├── oryn                  # Preferred console CLI entry
+├── zt / zt.php           # Legacy console CLI aliases
 ```
 
 ---
@@ -43,7 +44,7 @@ Every HTTP request enters the web root and is processed linearly:
 
 ## 3. Middleware Pipeline
 
-ZanTech routes all dispatch actions through a sequential pipeline of middlewares defined in [src/Foundation/Zantech.php](file:///e:/personal/zanTech/src/Foundation/Zantech.php):
+Oryn routes all dispatch actions through a sequential pipeline of middlewares defined in [src/Foundation/Oryn.php](file:///e:/personal/zanTech/src/Foundation/Oryn.php):
 
 ```
 [ Request ] 
@@ -123,27 +124,27 @@ To prevent unauthorized transactions or configurations, the dispatcher supports 
 
 ---
 
-## 6. Development CLI (`zt` Tooling)
+## 6. Development CLI (`oryn` Tooling)
 
-The ZanTech framework includes a specialized command-line utility for database tasks and rapid module scaffolding:
+The Oryn framework includes a specialized command-line utility for database tasks and rapid module scaffolding:
 
 ```bash
 # Code Scaffolding
-php zt make:module [Name]      # Automatically scaffolds localized MVC structure
-php zt make:controller [Name]  # Generates controller actions and corresponding views
+php oryn make:module [Name]      # Automatically scaffolds localized MVC structure
+php oryn make:controller [Name]  # Generates controller actions and corresponding views
 
 # Migration Management
-php zt db:init                 # Restores core database schema structure
-php zt db:seed                 # Seeds database with system configurations and administrative roles
-php zt migrate                 # Executes all pending incremental T-SQL migrations
-php zt migrate:status          # Shows applied vs pending migrations in the timeline
+php oryn db:init                 # Restores core database schema structure
+php oryn db:seed                 # Seeds database with system configurations and administrative roles
+php oryn migrate                 # Executes all pending incremental T-SQL migrations
+php oryn migrate:status          # Shows applied vs pending migrations in the timeline
 ```
 
 ---
 
 ## 7. Frontend Integration & Premium UI Standards
 
-ZanTech coordinates modern responsive interfaces by pairing modular PHP template blocks with AngularJS application stacks:
+Oryn coordinates modern responsive interfaces by pairing modular PHP template blocks with AngularJS application stacks:
 * **Responsive Styling**: Enforced by **Bootstrap 5.3.3** utilizing curated primary components, fluid spacing layouts, and glassmorphic inputs defined in [zantech-ui.css](file:///e:/personal/zanTech/public/assets/css/zantech-ui.css).
 * **Single-Page Mechanics**: Embedded AngularJS applications (v1.8.2) interact with server REST routes to update table structures dynamically without refreshing layouts.
 * **Controller-to-Frontend Binding**: Backend attributes are safely serialized into HTML container tags, which the AngularJS app maps upon bootstrapping to maintain seamless dynamic states.
@@ -152,30 +153,30 @@ ZanTech coordinates modern responsive interfaces by pairing modular PHP template
 
 ## 8. High-Performance Optimization Engine
 
-ZanTech implements active performance optimization strategies to ensure extremely lightweight request loading and execution:
+Oryn implements active performance optimization strategies to ensure extremely lightweight request loading and execution:
 
 ### 1. Lazy-Loaded Single-Query Config Cache
-Instead of initiating redundant database queries during bootstrap to load environment parameters or toggles (e.g., rate limit and CSRF statuses), ZanTech employs a **batch cache loading mechanism**:
+Instead of initiating redundant database queries during bootstrap to load environment parameters or toggles (e.g., rate limit and CSRF statuses), Oryn employs a **batch cache loading mechanism**:
 * **Single Query Execution**: A single database select query retrieves all key-value entries from `mx_setting` during the initial config read.
 * **In-Memory Cache**: Populates all configuration settings directly inside a static cache array, rendering subsequent setting lookups instantaneous CPU-memory operations without additional database roundtrips.
 * **Non-Blocking Resiliency**: Gracefully fails once and bypasses repetitive lookup processes if the database engine is offline or during test suites.
 
 ### 2. Physical I/O Elimination (Production Logging)
-File system I/O (writing log rows to disk) is one of the heaviest bottlenecks in PHP execution. ZanTech resolves this by introducing strict **environment guards**:
+File system I/O (writing log rows to disk) is one of the heaviest bottlenecks in PHP execution. Oryn resolves this by introducing strict **environment guards**:
 * **Logging Early-Exit**: When `APP_DEBUG` is false, low-severity log statements (`sysLog()`, `savePlainLog()`, `info()`, `debug()`, and full query-statement logging `queryLog()`) early-exit immediately.
 * **Disk Write Reductions**: Decreases physical disk writes from ~10 writes per page load to **exactly 0** for normal requests in production.
 * **Anomalous Transparency**: Only high-priority anomalies (like system errors, database exception mapping, email/sms delivery failures, and strict audit trails) bypass guards and write to disk, maintaining ultimate stability and auditability.
 
 ### 3. Lightweight Request Bootstrapping (Zero-Allocation Logging)
-To ensure the front controller boots instantly on every web request, ZanTech bypasses heavy housekeeping routines:
-* **Logging Allocation Bypass**: When `APP_DEBUG` is false, `Zantech::logRequestStart()` completely skips loading session caller users, formatting 7 separate verbose log rows, and executing multiple expensive `json_encode()` calls.
+To ensure the front controller boots instantly on every web request, Oryn bypasses heavy housekeeping routines:
+* **Logging Allocation Bypass**: When `APP_DEBUG` is false, `Oryn::logRequestStart()` completely skips loading session caller users, formatting 7 separate verbose log rows, and executing multiple expensive `json_encode()` calls.
 * **Security Guard Preservation**: The critical malicious script input scanner (`scanMaliciousInputs()`) is fully preserved and executed on the redacted request payload, guaranteeing enterprise-grade security at maximum performance.
 
 ---
 
 ## 9. Bug Fixes, Security Patches & Visual Refinements (v2.4.1)
 
-ZanTech applies target-hardening protocols and layout adjustments with zero changes to existing class APIs or signatures:
+Oryn applies target-hardening protocols and layout adjustments with zero changes to existing class APIs or signatures:
 
 ### 1. Database Insertion Sanitization (Zero-Crash Binding)
 Previously, direct database operations `save()`, `update()`, and `updateFiltered()` constructed PDO bindings directly from array keys. If any array key contained spaces, dashes, or dots, PDO compilation failed.

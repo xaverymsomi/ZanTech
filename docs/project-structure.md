@@ -1,6 +1,6 @@
 # Project Structure
 
-ZanTech separates application code, framework code, boot files, shared templates, and public assets.
+Oryn separates application code, framework code, boot files, shared templates, and public assets.
 
 ```text
 app/
@@ -28,8 +28,8 @@ src/
   View/                    View renderer and UI helpers.
 storage/                   Cache, generated files, reports, runtime storage.
 tests/                     PHPUnit tests.
-zt                         CLI entry.
-zt.php                     PHP wrapper for `zt`.
+oryn                       Preferred CLI entry.
+zt / zt.php                Legacy CLI aliases.
 ```
 
 ## App Code

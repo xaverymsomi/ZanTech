@@ -1,11 +1,11 @@
 # Module Tutorial
 
-This tutorial builds a small `Billing` module. It follows ZanTech conventions and can be adapted for real feature modules.
+This tutorial builds a small `Billing` module. It follows Oryn conventions and can be adapted for real feature modules.
 
 ## 1. Generate The Module
 
 ```bash
-php zt make:module Billing
+php oryn make:module Billing
 ```
 
 Generated files:
@@ -42,13 +42,13 @@ END
 Run tracked migrations:
 
 ```bash
-php zt migrate
+php oryn migrate
 ```
 
 Or run only the file:
 
 ```bash
-php zt db:migrate src/Database/migrations/20260601_create_mx_billing_table.sql
+php oryn db:migrate src/Database/migrations/20260601_create_mx_billing_table.sql
 ```
 
 ## 3. Configure The Model
@@ -209,7 +209,7 @@ Prefer testing controller-independent behavior first:
 Run:
 
 ```bash
-php zt test
+php oryn test
 ```
 
 ## 8. Verify In Browser

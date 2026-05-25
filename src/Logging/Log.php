@@ -3,11 +3,11 @@
 namespace Logging;
 
 /**
- * Zantech Unified Logging System
+ * Oryn Unified Logging System
  *
  * - JSON-based structured logs
  * - Auto-creates directories
- * - Compatible with both new ZtDatabase + legacy modules
+ * - Compatible with framework database helpers and legacy modules
  * - Provides clean log grouping (sys/db/query/email/sms/custom/audit)
  * - Includes request_number tracing
  */
@@ -148,7 +148,7 @@ class Log
 
     /* ============================================================
  *  LEGACY COMPAT: savePlainLog
- *  Used by Zantech / bootstrap to dump a raw line (e.g. ******)
+ *  Used by Oryn/bootstrap to dump a raw line (e.g. ******)
  * ============================================================ */
     public static function savePlainLog($msg): int
     {

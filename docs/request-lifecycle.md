@@ -22,7 +22,7 @@ src/helpers/helpers.php
 src/Foundation/web.php
   |
   v
-Foundation\Zantech
+Foundation\Oryn
   |
   v
 Middleware pipeline
@@ -54,11 +54,11 @@ The web server should route all application requests to this file.
 
 ## Web Kernel
 
-`src/Foundation/web.php` starts output buffering, initializes secure sessions for web requests, assigns a request ID, and runs `Foundation\Zantech`.
+`src/Foundation/web.php` starts output buffering, initializes secure sessions for web requests, assigns a request ID, and runs `Foundation\Oryn`.
 
 ## Application Dispatcher
 
-`Foundation\Zantech` captures the request, creates a route context, runs middleware, resolves the controller, and calls the matching action.
+`Foundation\Oryn` captures the request, creates a route context, runs middleware, resolves the controller, and calls the matching action.
 
 For example:
 

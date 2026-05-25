@@ -323,7 +323,7 @@ class Database extends PDO
     }
 
     /* ============================================================
-     *  EXCEPTION BRIDGE (PDO → Zantech)
+     *  EXCEPTION BRIDGE (PDO -> Oryn)
      * ============================================================ */
 
     private function throwDbException(PDOException $e): void

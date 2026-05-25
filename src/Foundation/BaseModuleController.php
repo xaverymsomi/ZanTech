@@ -143,7 +143,7 @@ abstract class BaseModuleController extends Controller
 
     /**
      * Wrapper for Dual Control awareness.
-     * Zantech Kernel calls this if Dual Control is triggered.
+     * Oryn kernel calls this if Dual Control is triggered.
      */
     public function isDualControlRequired(string $method): bool
     {

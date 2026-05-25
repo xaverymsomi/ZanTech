@@ -1,17 +1,17 @@
 -- ============================================================
--- ZANTECH FRAMEWORK SEED DATA
+-- ORYN FRAMEWORK SEED DATA
 -- Default Super Admin and Core Permissions
 -- ============================================================
 
 -- 1. Create Default Super Admin User
 -- Password: password123 (Hashed with SHA256 + MaBrExMoI50%BaH50%)
 INSERT INTO mx_user (txt_name, email, password, opt_mx_status_id, opt_mx_groups_ids)
-VALUES ('Super Admin', 'admin@zantech.com', '8aecc967e25a466de4a0fb9eb3044bcecc829dcbc19c6b0edcfa0064d6cfb8e5', 1, 1);
+VALUES ('Super Admin', 'admin@oryn.local', '8aecc967e25a466de4a0fb9eb3044bcecc829dcbc19c6b0edcfa0064d6cfb8e5', 1, 1);
 
 -- 2. Create Login Credentials for Admin
 INSERT INTO mx_login_credential (user_id, txt_domain, txt_username, txt_password, opt_mx_status_id)
 SELECT id, 'mx_user', 'admin', '8aecc967e25a466de4a0fb9eb3044bcecc829dcbc19c6b0edcfa0064d6cfb8e5', 1
-FROM mx_user WHERE email = 'admin@zantech.com';
+FROM mx_user WHERE email = 'admin@oryn.local';
 
 -- 3. Assign Admin to Super Admin Group (Group ID 1)
 INSERT INTO mx_login_credential_group (opt_mx_login_credential_id, opt_mx_group_id)

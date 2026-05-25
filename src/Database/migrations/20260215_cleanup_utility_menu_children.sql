@@ -1,7 +1,7 @@
 /*
   Remove legacy Utility children (Submenus, Dual) if present — Utility should only expose Menu management.
 
-  Idempotent. Run: php zt db:migrate database/migrations/20260215_cleanup_utility_menu_children.sql
+  Idempotent. Run: php oryn db:migrate database/migrations/20260215_cleanup_utility_menu_children.sql
 */
 
 SET NOCOUNT ON;

@@ -144,7 +144,7 @@ final class Profiler
         <div class='zt-profiler-toolbar'>
             <div class='zt-profiler-metrics'>
                 <div class='zt-profiler-metric'>
-                    <span class='zt-profiler-label'>ZanTech v" . (defined('ZT_APP_VERSION') ? ZT_APP_VERSION : '2.x') . "</span>
+                    <span class='zt-profiler-label'>Oryn v" . (defined('ZT_APP_VERSION') ? ZT_APP_VERSION : '2.x') . "</span>
                 </div>
                 <div class='zt-profiler-metric' style='margin-left: 20px;'>
                     <span class='zt-profiler-label'>Total App Time</span>

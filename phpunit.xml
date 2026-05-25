@@ -9,7 +9,7 @@
         failOnWarning="true"
 >
     <testsuites>
-        <testsuite name="Zantech Test Suite">
+        <testsuite name="Oryn Test Suite">
             <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>

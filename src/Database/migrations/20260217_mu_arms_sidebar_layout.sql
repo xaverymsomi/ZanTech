@@ -7,7 +7,7 @@
   - txt_sidebar_group: ACADEMIC APPS | OTHER APPS | ADMINISTRATION
   - Super Admin grants for new view_* permissions
 
-  Run: php zt db:migrate database/migrations/20260217_mu_arms_sidebar_layout.sql
+  Run: php oryn db:migrate database/migrations/20260217_mu_arms_sidebar_layout.sql
 */
 
 SET NOCOUNT ON;

@@ -1,5 +1,5 @@
 /**
- * Zantech Application Bundle (Legacy)
+ * Oryn Application Bundle (Legacy)
  * 
  * The system has been fully modularized. 
  * Please see /views/header.php for the new modular script inclusions.
@@ -10,4 +10,4 @@
  * - /assets/js/directives/    : Shared UI components
  * - /assets/js/utils/         : Utility helpers
  */
-console.log('Zantech System: Modular Architecture Active.');
+console.log('Oryn System: Modular Architecture Active.');

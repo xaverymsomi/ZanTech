@@ -25,7 +25,7 @@ Group membership lookups must not be concatenated directly into `IN (...)` SQL. 
 Use:
 
 ```bash
-php zt doctor
+php oryn doctor
 ```
 
 for deployment readiness checks that should not touch the database. Use full migrations and application tests separately when the target database is available.

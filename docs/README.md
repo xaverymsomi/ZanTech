@@ -1,6 +1,6 @@
-# ZanTech Documentation
+# Oryn Documentation
 
-This documentation explains how ZanTech is organized, how requests move through the framework, and how to build modules safely.
+This documentation explains how Oryn is organized, how requests move through the framework, and how to build modules safely.
 
 ## Start Here
 
@@ -20,16 +20,16 @@ This documentation explains how ZanTech is organized, how requests move through 
 | [RBAC And Permissions](rbac-and-permissions.md) | Configure permission names, groups, direct overrides, sections, menus, and controller guards. |
 | [Security And Performance Notes](security-and-performance-notes.md) | Preserve menu, permission, RBAC, and lightweight health-check hardening. |
 | [Views And Frontend](views-and-frontend.md) | Work with shared layouts, module templates, assets, Bootstrap, and AngularJS. |
-| [CLI Reference](cli.md) | Use `zt` commands for scaffolding, database tasks, tests, cache clearing, and workers. |
+| [CLI Reference](cli.md) | Use `oryn` commands for scaffolding, database tasks, tests, cache clearing, and workers. |
 | [Testing](testing.md) | Run PHPUnit and understand the test bootstrap. |
-| [Deployment Guide](deployment.md) | Deploy ZanTech safely behind IIS, Apache, or Nginx. |
+| [Deployment Guide](deployment.md) | Deploy Oryn safely behind IIS, Apache, or Nginx. |
 | [Troubleshooting](troubleshooting.md) | Diagnose common setup, routing, database, permission, and deployment issues. |
 | [Contributing Guide](contributing.md) | Follow project conventions for code, modules, security, tests, docs, and commits. |
 | [Maintenance Guide](maintenance.md) | Common checks before shipping framework or module changes. |
 
 ## Framework Summary
 
-ZanTech is a PHP 8.2 modular MVC framework. It uses Composer PSR-4 autoloading, a public front controller, URL-driven module routing, session authentication, permission-aware controllers, shared PHP views, SQL migrations, and a small CLI named `zt`.
+Oryn is a PHP 8.2 modular MVC framework. It uses Composer PSR-4 autoloading, a public front controller, URL-driven module routing, session authentication, permission-aware controllers, shared PHP views, SQL migrations, and a small CLI named `oryn`.
 
 The current layout separates the framework into four main areas:
 
@@ -39,3 +39,5 @@ The current layout separates the framework into four main areas:
 - `resources/views/`: shared layouts and global templates.
 
 The web server should point at `public/`, not the repository root.
+
+The legacy `zt` CLI remains available for existing projects.

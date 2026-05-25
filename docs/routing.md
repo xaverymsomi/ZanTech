@@ -1,6 +1,6 @@
 # Routing
 
-ZanTech primarily uses convention-based URL routing with optional custom route definitions.
+Oryn primarily uses convention-based URL routing with optional custom route definitions.
 
 ## Convention
 
@@ -52,7 +52,7 @@ Use custom routes when a clean URL should map to a conventional module/action se
 
 ## Static File Requests
 
-`Foundation\Zantech` detects static file requests under `public/`. Existing static files should be served by the web server. Broken static paths return `404` instead of falling through to module dispatch.
+`Foundation\Oryn` detects static file requests under `public/`. Existing static files should be served by the web server. Broken static paths return `404` instead of falling through to module dispatch.
 
 ## Route Security
 

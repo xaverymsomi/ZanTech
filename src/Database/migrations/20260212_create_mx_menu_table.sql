@@ -2,8 +2,8 @@
   Create dbo.mx_menu if missing (full column set including txt_sidebar_group).
   If the table already exists, only adds txt_sidebar_group when absent.
 
-  Run: php zt db:migrate database/migrations/20260212_create_mx_menu_table.sql
-  Or fresh install: php zt db:init   (includes mx_menu in init.sql)
+  Run: php oryn db:migrate database/migrations/20260212_create_mx_menu_table.sql
+  Or fresh install: php oryn db:init   (includes mx_menu in init.sql)
 */
 
 IF OBJECT_ID(N'dbo.mx_menu', N'U') IS NULL

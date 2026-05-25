@@ -1,6 +1,6 @@
 # Contributing Guide
 
-This guide documents the conventions to follow when changing ZanTech.
+This guide documents the conventions to follow when changing Oryn.
 
 ## Branches And Commits
 
@@ -88,7 +88,7 @@ delete_billing
 Run:
 
 ```bash
-php zt test
+php oryn test
 ```
 
 Also run:

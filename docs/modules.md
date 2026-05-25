@@ -1,6 +1,6 @@
 # Modules
 
-Modules are the main unit of application behavior in ZanTech. Each module groups a controller, model, and views for a feature area.
+Modules are the main unit of application behavior in Oryn. Each module groups a controller, model, and views for a feature area.
 
 ## Layout
 
@@ -21,7 +21,7 @@ app/Modules/Billing/
 Use the CLI:
 
 ```bash
-php zt make:module Billing
+php oryn make:module Billing
 ```
 
 This creates:
@@ -33,7 +33,7 @@ This creates:
 For a permission-aware starter module:
 
 ```bash
-php zt make:module Billing --example
+php oryn make:module Billing --example
 ```
 
 The example scaffold includes a guarded `index()` action, a JSON `status()` action, a small model method for sample rows, and an escaped table view. It is useful when creating the first module in a new application because it shows the controller/model/view contract without requiring a database table.

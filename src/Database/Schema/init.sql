@@ -1,5 +1,5 @@
 -- ============================================================
--- ZANTECH FRAMEWORK DATABASE INITIALIZATION
+-- ORYN FRAMEWORK DATABASE INITIALIZATION
 -- Core Schema for User Management, RBAC, and Configuration
 -- ============================================================
 

@@ -5,7 +5,7 @@ use Logging\Log;
 
 /**
  * ---------------------------------------------------------
- *  Zantech Global Configuration Bootstrap (v4)
+ *  Oryn Global Configuration Bootstrap (v4)
  * ---------------------------------------------------------
  *
  * Responsibilities:
@@ -61,10 +61,10 @@ try {
         $dotenv = Dotenv::createImmutable(ZT_APP_ROOT);
         $dotenv->load();
     } else {
-        Log::sysErr('Zantech config warning: Dotenv class missing');
+        Log::sysErr('Oryn config warning: Dotenv class missing');
     }
 } catch (Throwable $e) {
-    Log::sysErr('Zantech config error: ' . $e->getMessage());
+    Log::sysErr('Oryn config error: ' . $e->getMessage());
 }
 
 /**

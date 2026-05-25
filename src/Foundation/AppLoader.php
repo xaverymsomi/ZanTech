@@ -2,7 +2,7 @@
 
 /**
  * -------------------------------------------------------------------------
- * ZANTECH FRAMEWORK - APPLICATION FOUNDATION ROUTER
+ * ORYN FRAMEWORK - APPLICATION FOUNDATION ROUTER
  * -------------------------------------------------------------------------
  *
  * Responsibilities:
@@ -24,7 +24,7 @@ if (!defined('ZT_BASE_PATH')) {
 $autoload = ZT_BASE_PATH . '/vendor/autoload.php';
 if (!is_file($autoload) || !is_readable($autoload)) {
     http_response_code(500);
-    echo 'Zantech Foundation Error: Run "composer install" to generate autoload.php';
+    echo 'Oryn Foundation Error: Run "composer install" to generate autoload.php';
     exit;
 }
 require_once $autoload;
@@ -96,7 +96,7 @@ try {
     if ($debug) {
         $safePath = str_replace(["\r", "\n"], '', $path);
 
-        echo "Zantech Foundation Error\n";
+        echo "Oryn Foundation Error\n";
         echo "Namespace: {$namespace}\n";
         echo "Path: {$safePath}\n";
         echo "Error: " . $e->getMessage() . "\n";

@@ -2,7 +2,7 @@
 
 ## Requirements
 
-ZanTech requires:
+Oryn requires:
 
 - PHP 8.2 or newer matching the `composer.json` constraint.
 - Composer.
@@ -14,8 +14,8 @@ ZanTech requires:
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/xaverymsomi/ZanTech.git
-cd ZanTech
+git clone https://github.com/xaverymsomi/Oryn.git
+cd Oryn
 composer install
 ```
 
@@ -48,31 +48,31 @@ The exact database keys depend on the database code and deployment environment. 
 Initialize the core schema:
 
 ```bash
-php zt db:init
+php oryn db:init
 ```
 
 Optionally seed baseline data:
 
 ```bash
-php zt db:seed
+php oryn db:seed
 ```
 
 Run the default RBAC/sidebar migration batch:
 
 ```bash
-php zt db:migrate
+php oryn db:migrate
 ```
 
 Run tracked migrations:
 
 ```bash
-php zt migrate
+php oryn migrate
 ```
 
 Check migration status:
 
 ```bash
-php zt migrate:status
+php oryn migrate:status
 ```
 
 ## Web Server
@@ -92,7 +92,7 @@ In production, configure Apache, Nginx, or IIS so requests enter through `public
 Run the test suite:
 
 ```bash
-php zt test
+php oryn test
 ```
 
 Expected result:

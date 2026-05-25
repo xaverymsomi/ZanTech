@@ -3,9 +3,9 @@
   (menu txt_name must match mx_section.txt_name for top-level items).
 
   Run alone:
-    php zt db:migrate database/migrations/20260213_create_mx_section_table.sql
+    php oryn db:migrate database/migrations/20260213_create_mx_section_table.sql
 
-  Default `php zt db:migrate` runs this before the mx_menu migration.
+  Default `php oryn db:migrate` runs this before the mx_menu migration.
 */
 
 IF OBJECT_ID(N'dbo.mx_section', N'U') IS NULL

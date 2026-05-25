@@ -1,4 +1,7 @@
 {
+  "name": "oryn/framework",
+  "description": "Oryn is a lightweight modular PHP framework with MVC modules, RBAC, CLI tooling, and SQL migrations.",
+  "license": "MIT",
   "require": {
     "php": "^8.2",
     "phpmailer/phpmailer": "*",

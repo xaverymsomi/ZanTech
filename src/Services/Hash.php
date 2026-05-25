@@ -3,7 +3,7 @@
 namespace Services;
 
 /**
- * Modern Cryptography Service for Zantech Framework.
+ * Modern cryptography service for Oryn.
  * Transitioning from HMAC-SHA256 to secure password_hash (Bcrypt/Argon2id).
  */
 class Hash

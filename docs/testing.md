@@ -1,11 +1,11 @@
 # Testing
 
-ZanTech uses PHPUnit.
+Oryn uses PHPUnit.
 
 ## Run Tests
 
 ```bash
-php zt test
+php oryn test
 ```
 
 Or directly:

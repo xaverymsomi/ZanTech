@@ -17,7 +17,7 @@ final class Doctor
         ];
 
         $exitCode = 0;
-        echo "ZanTech doctor\n";
+        echo "Oryn doctor\n";
         echo "--------------\n";
 
         foreach ($checks as $check) {

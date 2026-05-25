@@ -1,6 +1,6 @@
 # Views And Frontend
 
-ZanTech renders PHP templates and uses Bootstrap, AngularJS, and bundled JavaScript assets for interactive screens.
+Oryn renders PHP templates and uses Bootstrap, AngularJS, and bundled JavaScript assets for interactive screens.
 
 ## Shared Layout
 

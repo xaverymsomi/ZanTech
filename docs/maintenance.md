@@ -31,7 +31,7 @@ Use this checklist before shipping framework or module changes.
 - Prefer model/query helpers over raw SQL in controllers.
 - Keep migration files idempotent where possible.
 - Use `GO` batch separators only on their own line.
-- Test migration behavior with `php zt migrate:status`.
+- Test migration behavior with `php oryn migrate:status`.
 
 ## Before Changing Frontend Dependencies
 
@@ -46,9 +46,9 @@ Update all of these together:
 Run:
 
 ```bash
-php zt doctor
+php oryn doctor
 composer validate --no-check-publish
-php zt test
+php oryn test
 ```
 
 Composer may report existing dependency warnings. Treat new validation failures as blockers.

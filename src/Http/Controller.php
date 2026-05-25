@@ -10,7 +10,7 @@ use Throwable;
 use View\ViewRenderer;
 
 /**
- * Zantech Base Controller
+ * Oryn Base Controller
  * - Prevents recursive instantiation
  * - Lazy-loads View
  */

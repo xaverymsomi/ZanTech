@@ -1,6 +1,6 @@
 # Database And Models
 
-ZanTech database code lives under `src/Database/`.
+Oryn database code lives under `src/Database/`.
 
 ## Main Classes
 
@@ -67,8 +67,8 @@ src/Database/Schema/
 Run:
 
 ```bash
-php zt db:init
-php zt db:seed
+php oryn db:init
+php oryn db:seed
 ```
 
 ## Migrations
@@ -82,19 +82,19 @@ src/Database/migrations/
 Run a single migration file:
 
 ```bash
-php zt db:migrate src/Database/migrations/20260212_create_mx_menu_table.sql
+php oryn db:migrate src/Database/migrations/20260212_create_mx_menu_table.sql
 ```
 
 Run tracked pending migrations:
 
 ```bash
-php zt migrate
+php oryn migrate
 ```
 
 Check status:
 
 ```bash
-php zt migrate:status
+php oryn migrate:status
 ```
 
 Tracked migrations are recorded in `zt_migrations`.

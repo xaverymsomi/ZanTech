@@ -20,7 +20,7 @@ $command = $argv[1] ?? null;
 if ($command === 'make:module') {
     $name = $argv[2] ?? null;
     if (!$name) {
-        echo "Usage: php zt make:module <ModuleName>\n";
+        echo "Usage: php oryn make:module <ModuleName>\n";
         exit(1);
     }
     $example = in_array('--example', $argv, true);
@@ -28,7 +28,7 @@ if ($command === 'make:module') {
 } elseif ($command === 'make:controller') {
     $name = $argv[2] ?? null;
     if (!$name) {
-        echo "Usage: php zt make:controller <ModuleName>\n";
+        echo "Usage: php oryn make:controller <ModuleName>\n";
         exit(1);
     }
     (new ControllerGenerator())->generate($name);
@@ -93,7 +93,7 @@ if ($command === 'make:module') {
 
         if (!is_file($sqlPath)) {
             echo "SQL file not found: {$sqlPath}\n";
-            echo "Usage: php zt db:migrate [relative/path/to/file.sql]\n";
+            echo "Usage: php oryn db:migrate [relative/path/to/file.sql]\n";
             exit(1);
         }
 
@@ -140,8 +140,9 @@ if ($command === 'make:module') {
     $dryRun = in_array('--dry-run', $argv, true);
     (new ModelMigrator())->migrate($dryRun);
 } else {
-    echo "Zantech CLI Utility\n";
+    echo "Oryn CLI Utility\n";
     echo "--------------------\n";
+    echo "Use `php oryn <command>` or legacy `php zt <command>`.\n";
     echo "Available commands:\n";
     echo "  make:module <Name> [--example] Scaffold a new module\n";
     echo "  make:controller <Name> Scaffold a new module controller\n";

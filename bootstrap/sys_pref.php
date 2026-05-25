@@ -2,11 +2,11 @@
 
 /**
  * ========================================================================
- *  Zantech v4 - System Preferences / Global Constants
+ *  Oryn v4 - System Preferences / Global Constants
  * ========================================================================
  *
  *  ✔ Central definition of ALL universal constants
- *  ✔ New ZT_ prefix for framework-wide consistency
+ *  ✔ ZT_ prefix retained for framework-wide backward compatibility
  *  ✔ Improves readability, grouping and organization
  *
  *  NOTE:
@@ -22,7 +22,7 @@
  * ======================================================================== */
 
 if (!defined('ZT_APP_NAME')) {
-    define('ZT_APP_NAME', 'ZANTECH');
+    define('ZT_APP_NAME', 'ORYN');
 }
 
 if (!defined('ZT_APP_VERSION')) {

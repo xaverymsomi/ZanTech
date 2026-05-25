@@ -1,11 +1,17 @@
 # CLI Reference
 
-ZanTech includes a CLI named `zt`.
+Oryn includes a CLI named `oryn`.
 
-Both forms work:
+Preferred form:
 
 ```bash
-php zt <command>
+php oryn <command>
+```
+
+Backward-compatible forms:
+
+```bash
+php oryn <command>
 php zt.php <command>
 ```
 
@@ -30,7 +36,7 @@ php zt.php <command>
 ## Module Scaffolding
 
 ```bash
-php zt make:module Billing
+php oryn make:module Billing
 ```
 
 Creates:
@@ -44,7 +50,7 @@ app/Modules/Billing/Views/index.php
 For a richer starter module:
 
 ```bash
-php zt make:module Billing --example
+php oryn make:module Billing --example
 ```
 
 The example scaffold adds:
@@ -59,49 +65,31 @@ Add the matching permission row through the Permission module or a migration bef
 ## Doctor Checks
 
 ```bash
-php zt doctor
+php oryn doctor
 ```
 
-The command checks PHP version, required extensions, Composer autoload, `.env`, the public front controller, storage writability, and the migrations directory. It is intentionally lightweight and does not connect to the database, so it is safe to run during deploy health checks.
+The command checks PHP version, required extensions, Composer autoload, `.env`, the public front controller, storage writability, and the migrations directory. It is intentionally lightweight and does not connect to the database.
 
 ## Database Commands
 
-Initialize:
-
 ```bash
-php zt db:init
+php oryn db:init
+php oryn db:seed
+php oryn db:migrate
+php oryn migrate
+php oryn migrate:status
 ```
 
-Seed:
+Run a specific SQL file:
 
 ```bash
-php zt db:seed
-```
-
-Run default migration batch:
-
-```bash
-php zt db:migrate
-```
-
-Run a specific file:
-
-```bash
-php zt db:migrate src/Database/migrations/20260212_create_mx_menu_table.sql
-```
-
-Tracked migrations:
-
-```bash
-php zt migrate
-php zt migrate:status
+php oryn db:migrate src/Database/migrations/20260212_create_mx_menu_table.sql
 ```
 
 ## Tests
 
 ```bash
-php zt test
+php oryn test
 ```
 
 The command prefers `vendor/bin/phpunit` and falls back to a global `phpunit` command.
-

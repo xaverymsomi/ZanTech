@@ -4,13 +4,13 @@
 
 /**
  * -------------------------------------------------------------------------
- * ZANTECH FRAMEWORK - PUBLIC ENTRY POINT
+ * ORYN FRAMEWORK - PUBLIC ENTRY POINT
  * -------------------------------------------------------------------------
  *
  * This file is the entry point for all web requests. It defines the base
  * application path and delegates the execution to the Foundation layer.
  *
- * @author Zantech Team
+ * @author Oryn Team
  * @version 4.0.0
  */
 
@@ -31,7 +31,7 @@ $loader = ZT_BASE_PATH . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Fo
 
 if (!is_file($loader) || !is_readable($loader)) {
     http_response_code(500);
-    echo 'Zantech Fatal Error: Foundation Loader missing. Check your directory structure.';
+    echo 'Oryn Fatal Error: Foundation Loader missing. Check your directory structure.';
     exit;
 }
 

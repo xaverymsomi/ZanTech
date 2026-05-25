@@ -3,7 +3,10 @@
 
 
 /**
- * Console entry (same as `zt`). Use either:
+ * Legacy console entry. Prefer:
+ *   php oryn db:migrate
+ *
+ * Backward-compatible forms:
  *   php zt.php db:migrate
  *   php zt db:migrate
  */
