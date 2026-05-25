@@ -12,8 +12,8 @@ class PermissionService
 
     public function __construct(Database $db, $model)
     {
-        $this->db = $db;
         $this->model = $model;
+        $this->db = $model->db ?? $db;
     }
 
     public function logError(string $context, Exception $e): void
@@ -213,6 +213,12 @@ class PermissionService
     public function createGroup(string $name, int $addedBy): array
     {
         $safeName = PermissionValidator::sanitizeName($name);
+        if ($safeName === '') {
+            return ['status' => 422, 'title' => 'Group name is required'];
+        }
+        if ($this->exists('mx_group', 'txt_name', $safeName)) {
+            return ['status' => 409, 'title' => 'Group already exists'];
+        }
 
         $sql = "INSERT INTO mx_group (txt_name, int_added_by, txt_row_value)
                 VALUES (:name, :added_by, " . $this->guidExpr() . ")";
@@ -225,6 +231,15 @@ class PermissionService
     {
         $safeDisplay = PermissionValidator::sanitizeName($displayName, 120);
         $safeName = PermissionValidator::sanitizePermissionKey($name);
+        if ($safeName === '') {
+            return ['status' => 422, 'title' => 'Permission key is required'];
+        }
+        if (!$this->exists('mx_section', 'id', $sectionId)) {
+            return ['status' => 404, 'title' => 'Section not found'];
+        }
+        if ($this->exists('mx_permission', 'txt_name', $safeName)) {
+            return ['status' => 409, 'title' => 'Permission already exists'];
+        }
 
         $sql = "INSERT INTO mx_permission (txt_display_name, txt_name, opt_mx_section_id, txt_row_value)
                 VALUES (:display, :name, :section_id, " . $this->guidExpr() . ")";
@@ -240,10 +255,18 @@ class PermissionService
 
     public function createSection(string $name): array
     {
+        $safeName = PermissionValidator::sanitizeName($name, 120);
+        if ($safeName === '') {
+            return ['status' => 422, 'title' => 'Section name is required'];
+        }
+        if ($this->exists('mx_section', 'txt_name', $safeName)) {
+            return ['status' => 409, 'title' => 'Section already exists'];
+        }
+
         $this->model->db->beginTransaction();
         try {
             $data = [
-                'txt_name' => PermissionValidator::sanitizeName($name, 120),
+                'txt_name' => $safeName,
                 'txt_row_value' => $this->model->getGUID('mx_section'),
             ];
 
@@ -272,9 +295,23 @@ class PermissionService
         return $stmt->execute($params);
     }
 
+    private function exists(string $table, string $field, mixed $value): bool
+    {
+        $tableQ = $this->db->quoteTable($table);
+        $fieldQ = $this->db->quoteColumn($field);
+        $rows = $this->db->select(
+            "SELECT 1 AS found FROM {$tableQ} WHERE {$fieldQ} = :value",
+            [':value' => $value]
+        );
+
+        return $rows !== [];
+    }
+
     private function saveCheckedData(array $rows, int $pkId, string $table, string $fields): int
     {
         $status = 200;
+        $seen = [];
+        $stmt = null;
 
         foreach ($rows as $row) {
             // row expected [isAllowed, fk_id]
@@ -283,11 +320,14 @@ class PermissionService
 
             if ($isAllowed !== 1) continue;
             if ($fkId <= 0) continue;
+            if (isset($seen[$fkId])) continue;
+            $seen[$fkId] = true;
 
             $sql = "INSERT INTO {$table} ({$fields})
                     VALUES (:pk, :fk, " . $this->guidExpr() . ")";
 
-            $ok = $this->exec($sql, [':pk' => $pkId, ':fk' => $fkId]);
+            $stmt ??= $this->db->prepare($sql);
+            $ok = $stmt->execute([':pk' => $pkId, ':fk' => $fkId]);
             if (!$ok) $status = 100;
         }
 

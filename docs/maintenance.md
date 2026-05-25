@@ -46,6 +46,7 @@ Update all of these together:
 Run:
 
 ```bash
+php zt doctor
 composer validate --no-check-publish
 php zt test
 ```

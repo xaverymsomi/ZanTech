@@ -92,9 +92,8 @@ class Menu extends Controller
 
             if ($name === '')  return $this->responseError("Menu name required", 422);
             if ($title === '') return $this->responseError("Menu title required", 422);
-            if ($link === '')  $link = '#';
-
-            if (stripos($link, 'javascript:') === 0) {
+            $link = self::normalizeSubmittedLink($link);
+            if ($link === null) {
                 return $this->responseError("Invalid link", 422);
             }
 
@@ -249,8 +248,8 @@ class Menu extends Controller
 
             if ($name === '')  return $this->responseError("Menu name required", 422);
             if ($title === '') return $this->responseError("Menu title required", 422);
-            if ($link === '')  $link = '#';
-            if (stripos($link, 'javascript:') === 0) return $this->responseError("Invalid link", 422);
+            $link = self::normalizeSubmittedLink($link);
+            if ($link === null) return $this->responseError("Invalid link", 422);
 
             $oldParent = $current['int_parent'];
             $oldParent = ($oldParent === null ? null : (int)$oldParent);
@@ -402,6 +401,29 @@ class Menu extends Controller
         }
 
         return $link;
+    }
+
+    private static function normalizeSubmittedLink(string $link): ?string
+    {
+        $link = trim($link);
+        if ($link === '') {
+            return '#';
+        }
+
+        if (preg_match('/[\x00-\x1F\x7F]/', $link)) {
+            return null;
+        }
+
+        $lower = strtolower($link);
+        if (str_starts_with($lower, 'javascript:') || str_starts_with($lower, 'data:') || str_starts_with($lower, '//')) {
+            return null;
+        }
+
+        if (preg_match('/^[a-z][a-z0-9+\-.]*:/i', $link)) {
+            return null;
+        }
+
+        return mb_substr($link, 0, 500);
     }
 
     /**

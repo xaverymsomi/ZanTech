@@ -30,6 +30,14 @@ This creates:
 - `app/Modules/Billing/Billing_Model.php`
 - `app/Modules/Billing/Views/index.php`
 
+For a permission-aware starter module:
+
+```bash
+php zt make:module Billing --example
+```
+
+The example scaffold includes a guarded `index()` action, a JSON `status()` action, a small model method for sample rows, and an escaped table view. It is useful when creating the first module in a new application because it shows the controller/model/view contract without requiring a database table.
+
 ## Controller
 
 Controllers extend `Http\Controller`.
@@ -112,5 +120,27 @@ Keep model names in the existing convention:
 
 ```text
 EmailContent_Model.php
+```
+
+## Lightweight Module Pattern
+
+Use lightweight endpoints for health and readiness checks. A module action that returns JSON through `responseSuccess()` avoids rendering the shared layout and keeps deploy checks cheap:
+
+```php
+public function status()
+{
+    return $this->responseSuccess(200, 'Billing ready', [
+        'module' => 'Billing',
+    ]);
+}
+```
+
+Use permission guards on human-facing screens and privileged API actions:
+
+```php
+$perm = Perm_Auth::getPermissions();
+if (!$perm->verifyPermission('view_billing')) {
+    $this->permissionDenied();
+}
 ```
 

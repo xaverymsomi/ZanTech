@@ -14,8 +14,10 @@ php zt.php <command>
 | Command | Purpose |
 |---------|---------|
 | `make:module <Name>` | Generate a controller, model, and index view under `app/Modules/<Name>`. |
+| `make:module <Name> --example` | Generate a working example module with a permission guard, sample view data, and JSON status endpoint. |
 | `make:controller <Name>` | Generate a controller and index view for a module. |
 | `cache:clear` | Delete files from `storage/cache`. |
+| `doctor` | Run lightweight environment checks without opening a database connection. |
 | `test` | Run PHPUnit. |
 | `db:init` | Run `src/Database/Schema/init.sql`. |
 | `db:seed` | Run `src/Database/Schema/seed.sql`. |
@@ -38,6 +40,29 @@ app/Modules/Billing/Billing.php
 app/Modules/Billing/Billing_Model.php
 app/Modules/Billing/Views/index.php
 ```
+
+For a richer starter module:
+
+```bash
+php zt make:module Billing --example
+```
+
+The example scaffold adds:
+
+- `index()` with a `view_billing` permission guard.
+- `status()` returning a standard JSON success response.
+- A model method that supplies safe sample rows.
+- A view that escapes dynamic output.
+
+Add the matching permission row through the Permission module or a migration before exposing the module to non-admin users.
+
+## Doctor Checks
+
+```bash
+php zt doctor
+```
+
+The command checks PHP version, required extensions, Composer autoload, `.env`, the public front controller, storage writability, and the migrations directory. It is intentionally lightweight and does not connect to the database, so it is safe to run during deploy health checks.
 
 ## Database Commands
 

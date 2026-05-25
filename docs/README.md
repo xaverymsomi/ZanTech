@@ -18,6 +18,7 @@ This documentation explains how ZanTech is organized, how requests move through 
 | [Configuration](configuration.md) | Load environment values, use framework constants, and read application settings. |
 | [Authentication And Security](authentication-and-security.md) | Understand sessions, permissions, middleware, CSRF, rate limiting, and dual control. |
 | [RBAC And Permissions](rbac-and-permissions.md) | Configure permission names, groups, direct overrides, sections, menus, and controller guards. |
+| [Security And Performance Notes](security-and-performance-notes.md) | Preserve menu, permission, RBAC, and lightweight health-check hardening. |
 | [Views And Frontend](views-and-frontend.md) | Work with shared layouts, module templates, assets, Bootstrap, and AngularJS. |
 | [CLI Reference](cli.md) | Use `zt` commands for scaffolding, database tasks, tests, cache clearing, and workers. |
 | [Testing](testing.md) | Run PHPUnit and understand the test bootstrap. |

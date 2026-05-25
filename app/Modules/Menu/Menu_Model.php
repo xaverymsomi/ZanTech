@@ -56,24 +56,33 @@ class Menu_Model extends Model
     public function getMenus(): array
     {
         try {
-            $parents = $this->db->select("
-                SELECT id, txt_name, txt_icon, int_position, txt_link, txt_title, txt_row_value, txt_sidebar_group
+            $rows = $this->db->select("
+                SELECT id, txt_name, txt_icon, int_parent, int_position, txt_link, txt_title, txt_row_value, txt_sidebar_group
                 FROM mx_menu
-                WHERE int_parent IS NULL
-                ORDER BY int_position ASC
+                ORDER BY
+                    CASE WHEN int_parent IS NULL THEN 0 ELSE 1 END,
+                    int_parent ASC,
+                    int_position ASC,
+                    id ASC
             ");
 
+            $parents = [];
+            $children = [];
+            foreach ($rows ?: [] as $row) {
+                $parentId = $row['int_parent'] ?? null;
+                $isRoot = ($parentId === null || $parentId === '' || $parentId === false);
+                if ($isRoot) {
+                    $row['children'] = [];
+                    $parents[(int)$row['id']] = $row;
+                    continue;
+                }
+
+                $children[(int)$parentId][] = $row;
+            }
+
             $out = [];
-
             foreach ($parents as $p) {
-                $children = $this->db->select("
-                    SELECT id, txt_name, txt_icon, int_parent, int_position, txt_link, txt_title, txt_row_value, txt_sidebar_group
-                    FROM mx_menu
-                    WHERE int_parent = :pid
-                    ORDER BY int_position ASC
-                ", [':pid' => (int)$p['id']]);
-
-                $p['children'] = $children;
+                $p['children'] = $children[(int)$p['id']] ?? [];
                 $out[] = $p;
             }
 
@@ -100,9 +109,19 @@ class Menu_Model extends Model
 
             // Next slot per parent — from full root list (before excluding self on edit).
             $nextChildByParent = [];
+            $positionRows = $this->db->select("
+                SELECT int_parent, MAX(int_position) AS last_position
+                FROM mx_menu
+                WHERE int_parent IS NOT NULL
+                GROUP BY int_parent
+            ");
+            foreach ($positionRows ?: [] as $row) {
+                $nextChildByParent[(int)$row['int_parent']] = (int)($row['last_position'] ?? 0) + 1;
+            }
+
             foreach ($parents as $row) {
                 $pid = (int)$row['id'];
-                $nextChildByParent[$pid] = $this->getLastPositionInScope($pid) + 1;
+                $nextChildByParent[$pid] = $nextChildByParent[$pid] ?? 1;
             }
 
             $int_parent_ids = array_map(static function ($r) {

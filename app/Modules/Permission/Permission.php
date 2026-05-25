@@ -68,6 +68,11 @@ class Permission extends Controller
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
             }
 
+            $perm = Perm_Auth::getPermissions();
+            if (!$perm->verifyPermission('view_permissions')) {
+                $this->permissionDenied();
+            }
+
             $result = $this->service->getUserGroups($payload['domain'], $payload['id']);
             return $this->responseSuccess(200, 'User groups loaded', ['data' => $result]);
 
@@ -85,6 +90,11 @@ class Permission extends Controller
             $errors = PermissionValidator::validateUserGroupPayload($payload);
             if ($errors) {
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
+            }
+
+            $perm = Perm_Auth::getPermissions();
+            if (!$perm->verifyPermission('assign_permissions')) {
+                $this->permissionDenied();
             }
 
             $result = $this->service->saveUserGroups($payload['id'], $payload['new_data']);
@@ -135,6 +145,11 @@ class Permission extends Controller
             $errors = PermissionValidator::validateGroupPermissionPayload($payload);
             if ($errors) {
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
+            }
+
+            $perm = Perm_Auth::getPermissions();
+            if (!$perm->verifyPermission('assign_permissions')) {
+                $this->permissionDenied();
             }
 
             $result = $this->service->saveGroupPermissions((int)$payload['id'], $payload['new_data']);
@@ -243,6 +258,11 @@ class Permission extends Controller
             $errors = PermissionValidator::validateCreatePermissionPayload($payload);
             if ($errors) {
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
+            }
+
+            $perm = Perm_Auth::getPermissions();
+            if (!$perm->verifyPermission('add_permission')) {
+                $this->permissionDenied();
             }
 
             $result = $this->service->createPermission(

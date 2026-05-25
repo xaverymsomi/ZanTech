@@ -55,6 +55,24 @@ final class ModuleGeneratorTest extends TestCase
         $this->assertFileDoesNotExist($this->workDir . DIRECTORY_SEPARATOR . 'app/Modules/Billing/Billing.php');
     }
 
+    public function testGenerateExampleModuleIncludesPermissionGuardAndStatusEndpoint(): void
+    {
+        ob_start();
+        (new ModuleGenerator())->generate('billing', true);
+        $output = ob_get_clean();
+
+        $this->assertSame("Module Billing generated successfully with example actions in app/Modules/Billing\n", $output);
+
+        $controller = file_get_contents($this->workDir . DIRECTORY_SEPARATOR . 'app/Modules/Billing/Billing.php');
+        $model = file_get_contents($this->workDir . DIRECTORY_SEPARATOR . 'app/Modules/Billing/Billing_Model.php');
+        $view = file_get_contents($this->workDir . DIRECTORY_SEPARATOR . 'app/Modules/Billing/Views/index.php');
+
+        $this->assertStringContainsString('verifyPermission(\'view_billing\')', (string) $controller);
+        $this->assertStringContainsString('function status()', (string) $controller);
+        $this->assertStringContainsString('exampleItems', (string) $model);
+        $this->assertStringContainsString('htmlspecialchars', (string) $view);
+    }
+
     private function removeDirectory(string $dir): void
     {
         if (!is_dir($dir)) {

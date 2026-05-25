@@ -15,6 +15,13 @@ final class PermissionValidatorTest extends TestCase
         $this->assertArrayHasKey('domain', $errors);
     }
 
+    public function testValidateDomainAndRowValueRejectsNonObjectPayload(): void
+    {
+        $errors = PermissionValidator::validateDomainAndRowValue(null);
+
+        $this->assertArrayHasKey('payload', $errors);
+    }
+
     public function testValidateDomainAndRowValueRejectsBadId(): void
     {
         $errors = PermissionValidator::validateDomainAndRowValue([
@@ -53,5 +60,12 @@ final class PermissionValidatorTest extends TestCase
     public function testSanitizePermissionKey(): void
     {
         $this->assertSame('view_permissions', PermissionValidator::sanitizePermissionKey('VIEW Permissions!!'));
+    }
+
+    public function testAssertSafeDomainThrowsOnUnsafeTableName(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        PermissionValidator::assertSafeDomain('mx_user;DROP');
     }
 }

@@ -11,6 +11,7 @@ use Foundation\Console\ModuleGenerator;
 use Database\Schema\DatabaseInitializer;
 use Database\Migrations\MigrationRunner;
 use Database\Database;
+use Foundation\Console\Doctor;
 use Foundation\Console\QueueWorker;
 use Foundation\Console\ModelMigrator;
 
@@ -22,7 +23,8 @@ if ($command === 'make:module') {
         echo "Usage: php zt make:module <ModuleName>\n";
         exit(1);
     }
-    (new ModuleGenerator())->generate($name);
+    $example = in_array('--example', $argv, true);
+    (new ModuleGenerator())->generate($name, $example);
 } elseif ($command === 'make:controller') {
     $name = $argv[2] ?? null;
     if (!$name) {
@@ -51,6 +53,8 @@ if ($command === 'make:module') {
     $cmd = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($phpunit);
     passthru($cmd, $exitCode);
     exit($exitCode);
+} elseif ($command === 'doctor') {
+    exit((new Doctor())->check(__DIR__));
 } elseif ($command === 'db:init') {
     $sqlPath = __DIR__ . '/src/Database/Schema/init.sql';
     $initializer = new DatabaseInitializer(new Database());
@@ -77,6 +81,7 @@ if ($command === 'make:module') {
             'src/Database/migrations/20260215_cleanup_utility_menu_children.sql',
             'src/Database/migrations/20260216_sidebar_menu_restructure.sql',
             'src/Database/migrations/20260217_mu_arms_sidebar_layout.sql',
+            'src/Database/migrations/20260525_complete_menu_permission_module_permissions.sql',
         ]
         : [ltrim($arg, '/\\')];
 
@@ -138,9 +143,10 @@ if ($command === 'make:module') {
     echo "Zantech CLI Utility\n";
     echo "--------------------\n";
     echo "Available commands:\n";
-    echo "  make:module <Name>    Scaffold a new module\n";
+    echo "  make:module <Name> [--example] Scaffold a new module\n";
     echo "  make:controller <Name> Scaffold a new module controller\n";
     echo "  cache:clear           Clear runtime cache directory\n";
+    echo "  doctor                Run lightweight environment checks\n";
     echo "  test                  Run PHPUnit tests\n";
     echo "  db:init               Initialize database with core schema\n";
     echo "  db:seed               Seed database with initial data\n";

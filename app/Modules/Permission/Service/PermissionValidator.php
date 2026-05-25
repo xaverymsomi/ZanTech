@@ -1,7 +1,7 @@
 <?php
 
 namespace Modules\Permission\Service;
-use Exception;
+use InvalidArgumentException;
 use Logging\Log;
 
 class PermissionValidator
@@ -22,8 +22,14 @@ class PermissionValidator
         return $decoded;
     }
 
-    public static function validateDomainAndRowValue(array $payload): array
+    private const MAX_CHECKED_ROWS = 1000;
+
+    public static function validateDomainAndRowValue(mixed $payload): array
     {
+        if (!is_array($payload)) {
+            return ['payload' => 'JSON object is required'];
+        }
+
         $errors = [];
 
         if (empty($payload['domain']) || !is_string($payload['domain'])) {
@@ -56,8 +62,12 @@ class PermissionValidator
         return [];
     }
 
-    public static function validateUserGroupPayload(array $payload): array
+    public static function validateUserGroupPayload(mixed $payload): array
     {
+        if (!is_array($payload)) {
+            return ['payload' => 'JSON object is required'];
+        }
+
         $errors = [];
         if (empty($payload['id']) || !is_string($payload['id'])) {
             $errors['id'] = 'user row_value is required';
@@ -70,8 +80,12 @@ class PermissionValidator
         return $errors;
     }
 
-    public static function validateGroupPermissionPayload(array $payload): array
+    public static function validateGroupPermissionPayload(mixed $payload): array
     {
+        if (!is_array($payload)) {
+            return ['payload' => 'JSON object is required'];
+        }
+
         $errors = [];
         if (!isset($payload['id']) || !is_numeric($payload['id']) || (int)$payload['id'] <= 0) {
             $errors['id'] = 'group id must be integer > 0';
@@ -84,9 +98,13 @@ class PermissionValidator
         return $errors;
     }
 
-    public static function validateUserPermissionPayload(array $payload): array
+    public static function validateUserPermissionPayload(mixed $payload): array
     {
         $errors = self::validateDomainAndRowValue($payload);
+        if (!is_array($payload)) {
+            return $errors;
+        }
+
         if (!isset($payload['new_data']) || !is_array($payload['new_data'])) {
             $errors['new_data'] = 'new_data must be an array';
         } else {
@@ -95,8 +113,12 @@ class PermissionValidator
         return $errors;
     }
 
-    public static function validateCreateGroupPayload(array $payload): array
+    public static function validateCreateGroupPayload(mixed $payload): array
     {
+        if (!is_array($payload)) {
+            return ['payload' => 'JSON object is required'];
+        }
+
         $errors = [];
         if (empty($payload['name']) || !is_string($payload['name'])) {
             $errors['name'] = 'name is required';
@@ -106,8 +128,12 @@ class PermissionValidator
         return $errors;
     }
 
-    public static function validateCreatePermissionPayload(array $payload): array
+    public static function validateCreatePermissionPayload(mixed $payload): array
     {
+        if (!is_array($payload)) {
+            return ['payload' => 'JSON object is required'];
+        }
+
         $errors = [];
         if (empty($payload['display_name']) || !is_string($payload['display_name'])) {
             $errors['display_name'] = 'display_name is required';
@@ -121,8 +147,12 @@ class PermissionValidator
         return $errors;
     }
 
-    public static function validateCreateSectionPayload(array $payload): array
+    public static function validateCreateSectionPayload(mixed $payload): array
     {
+        if (!is_array($payload)) {
+            return ['payload' => 'JSON object is required'];
+        }
+
         $errors = [];
         if (empty($payload['txt_name']) || !is_string($payload['txt_name'])) {
             $errors['txt_name'] = 'txt_name is required';
@@ -134,6 +164,10 @@ class PermissionValidator
 
     private static function validateCheckedRows(array $rows): array
     {
+        if (count($rows) > self::MAX_CHECKED_ROWS) {
+            return ['new_data' => 'too many rows submitted'];
+        }
+
         foreach ($rows as $i => $row) {
             if (!is_array($row) || count($row) < 2) {
                 return ['new_data' => "invalid row at index {$i}"];
@@ -181,6 +215,7 @@ class PermissionValidator
         // Prevent table injection (domain used to locate a table)
         if (!preg_match('/^[A-Za-z0-9_]+$/', $domain)) {
             Log::sysLog('[PERMISSION][' . $domain . '] invalid domain');
+            throw new InvalidArgumentException('Invalid domain');
         }
     }
 }

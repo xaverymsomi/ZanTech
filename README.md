@@ -156,8 +156,10 @@ php zt.php <command>
 | Command | Purpose |
 |---------|---------|
 | `make:module <Name>` | Scaffold a new module |
+| `make:module <Name> --example` | Scaffold a permission-aware example module with a JSON status endpoint |
 | `make:controller <Name>` | Scaffold a module controller and index view |
 | `cache:clear` | Clear runtime cache from `storage/cache` |
+| `doctor` | Run lightweight environment checks without connecting to the database |
 | `test` | Run PHPUnit tests |
 | `db:init` | Run `src/Database/Schema/init.sql` |
 | `db:seed` | Run `src/Database/Schema/seed.sql` |
