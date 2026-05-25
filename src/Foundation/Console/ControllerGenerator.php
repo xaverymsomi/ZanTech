@@ -7,7 +7,7 @@ final class ControllerGenerator
     public function generate(string $name): void
     {
         $name = ucfirst($name);
-        $baseDir = "Modules/{$name}";
+        $baseDir = "app/Modules/{$name}";
 
         if (!is_dir($baseDir)) {
             mkdir($baseDir, 0755, true);

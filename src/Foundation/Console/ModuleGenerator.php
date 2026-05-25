@@ -7,7 +7,7 @@ final class ModuleGenerator
     public function generate(string $name): void
     {
         $name = ucfirst($name);
-        $baseDir = "Modules/{$name}";
+        $baseDir = "app/Modules/{$name}";
 
         if (is_dir($baseDir)) {
             echo "Error: Module {$name} already exists.\n";

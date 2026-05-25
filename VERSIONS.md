@@ -1,7 +1,7 @@
 # ZanTech — version matrix
 
 This file is the **detailed** companion to the summary in [README.md](README.md).  
-**CDN URLs** are recorded in [cdn-lock.json](cdn-lock.json). When you change `views/header.php`, update `cdn-lock.json` in the same commit.
+**CDN URLs** are recorded in [cdn-lock.json](cdn-lock.json). When you change `resources/views/header.php`, update `cdn-lock.json` in the same commit.
 
 ---
 
@@ -9,13 +9,13 @@ This file is the **detailed** companion to the summary in [README.md](README.md)
 
 | Item | Value | Where |
 |------|--------|--------|
-| ZanTech (kernel / shell) | **2.4.1** | `constants/sys_pref.php` (`ZT_APP_VERSION`) |
+| ZanTech (kernel / shell) | **2.4.1** | `bootstrap/sys_pref.php` (`ZT_APP_VERSION`) |
 | PHP (required) | **^8.2** | `composer.json` → `require.php` |
-| Database (migrations) | **Microsoft SQL Server** (T-SQL) | `Database/migrations/*.sql` |
+| Database (migrations) | **Microsoft SQL Server** (T-SQL) | `src/Database/migrations/*.sql` |
 
 ---
 
-## Frontend — CDN (`views/header.php`)
+## Frontend — CDN (`resources/views/header.php`)
 
 All of the following are loaded globally for the main HTML shell (unless a view omits the standard header).
 
@@ -37,7 +37,7 @@ All of the following are loaded globally for the main HTML shell (unless a view 
 
 | Resource | Notes |
 |----------|--------|
-| [Google Fonts — Outfit](https://fonts.google.com/specimen/Outfit) | Weights 300–700; URL in `views/header.php` |
+| [Google Fonts — Outfit](https://fonts.google.com/specimen/Outfit) | Weights 300–700; URL in `resources/views/header.php` |
 
 ### First-party assets (not on CDN)
 
@@ -69,5 +69,5 @@ To lock PHP dependencies for reproducible installs, use a committed **`composer.
 
 ## Changelog vs this file
 
-- Bump **`constants/sys_pref.php`** `ZT_APP_VERSION` when you ship a notable framework release.
-- Bump **`cdn-lock.json`** (and this file’s tables) whenever **`views/header.php`** CDN URLs or versions change.
+- Bump **`bootstrap/sys_pref.php`** `ZT_APP_VERSION` when you ship a notable framework release.
+- Bump **`cdn-lock.json`** (and this file’s tables) whenever **`resources/views/header.php`** CDN URLs or versions change.

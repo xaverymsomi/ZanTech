@@ -69,9 +69,9 @@ class ViewRenderer
                 return;
             }
 
-            $header = $this->appPath('views/header.php');
-            $body = $this->appPath('views/body.php');
-            $footer = $this->appPath('views/footer.php');
+            $header = $this->appPath('resources/views/header.php');
+            $body = $this->appPath('resources/views/body.php');
+            $footer = $this->appPath('resources/views/footer.php');
 
             $this->assertFileExists($header, 'Missing header.php');
             $this->assertFileExists($body, 'Missing body.php');
@@ -124,9 +124,9 @@ class ViewRenderer
 
     private function renderFullLayout(string $viewPath): void
     {
-        $header = $this->appPath('views/header.php');
-        $body = $this->appPath('views/body.php');
-        $footer = $this->appPath('views/footer.php');
+        $header = $this->appPath('resources/views/header.php');
+        $body = $this->appPath('resources/views/body.php');
+        $footer = $this->appPath('resources/views/footer.php');
 
         Log::debug("RENDER_FULL_LAYOUT: {$viewPath}");
 
@@ -167,8 +167,8 @@ class ViewRenderer
         $this->enterRenderGuard('renderLoginLayout');
 
         try {
-            $header = $this->appPath('views/header.php');
-            $footer = $this->appPath('views/footer.php');
+            $header = $this->appPath('resources/views/header.php');
+            $footer = $this->appPath('resources/views/footer.php');
 
             if (is_file($header)) {
                 $ui = \View\Component::class;
@@ -241,19 +241,19 @@ class ViewRenderer
     private function resolveTemplatePath(string $module, string $view): string
     {
         // Try project standard (Uppercase)
-        $path = "Modules/{$module}/Views/{$view}.php";
+        $path = "app/Modules/{$module}/Views/{$view}.php";
         $full = $this->appPath($path);
         Log::debug("CHECKING_PATH: {$full}");
         if (is_file($full)) return $full;
 
         // Try lowercase fallback
-        $path = "modules/{$module}/views/{$view}.php";
+        $path = "app/modules/{$module}/views/{$view}.php";
         $full = $this->appPath($path);
         Log::debug("CHECKING_PATH_FALLBACK: {$full}");
         if (is_file($full)) return $full;
 
         // Default to project standard (will trigger assertFileExists if missing)
-        $final = $this->appPath("Modules/{$module}/Views/{$view}.php");
+        $final = $this->appPath("app/Modules/{$module}/Views/{$view}.php");
         Log::debug("FALLING_BACK_TO_DEFAULT: {$final}");
         return $final;
     }

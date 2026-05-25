@@ -19,7 +19,7 @@ if (!defined('ZT_BASE_PATH')) {
     define('ZT_BASE_PATH', dirname(__DIR__));
 }
 
-$profiler = ZT_BASE_PATH . DIRECTORY_SEPARATOR . 'Foundation' . DIRECTORY_SEPARATOR . 'Profiler.php';
+$profiler = ZT_BASE_PATH . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Foundation' . DIRECTORY_SEPARATOR . 'Profiler.php';
 if (is_file($profiler)) {
     require_once $profiler;
     \Foundation\Profiler::start();
@@ -27,7 +27,7 @@ if (is_file($profiler)) {
 
 // 2. Delegate to the Foundation Loader
 // The loader handles namespace detection (web/api), security, and kernel booting.
-$loader = ZT_BASE_PATH . DIRECTORY_SEPARATOR . 'Foundation' . DIRECTORY_SEPARATOR . 'AppLoader.php';
+$loader = ZT_BASE_PATH . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'Foundation' . DIRECTORY_SEPARATOR . 'AppLoader.php';
 
 if (!is_file($loader) || !is_readable($loader)) {
     http_response_code(500);

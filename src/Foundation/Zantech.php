@@ -44,7 +44,7 @@ final class Zantech
     public function __construct()
     {
         $this->request = Request::capture();
-        $this->modulesPath = rtrim(ZT_APP_ROOT, '/\\') . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR;
+        $this->modulesPath = rtrim(ZT_APP_ROOT, '/\\') . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Modules' . DIRECTORY_SEPARATOR;
         $this->publicPath  = rtrim(ZT_BASE_PATH, '/\\') . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR;
 
         $this->rateLimitEnabled = Config::get('ZT_RATE_LIMIT', false);

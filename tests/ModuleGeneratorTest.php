@@ -30,13 +30,13 @@ final class ModuleGeneratorTest extends TestCase
         (new ModuleGenerator())->generate('billing');
         $output = ob_get_clean();
 
-        $this->assertSame("Module Billing generated successfully in Modules/Billing\n", $output);
-        $this->assertFileExists($this->workDir . DIRECTORY_SEPARATOR . 'Modules/Billing/Billing.php');
-        $this->assertFileExists($this->workDir . DIRECTORY_SEPARATOR . 'Modules/Billing/Billing_Model.php');
-        $this->assertFileExists($this->workDir . DIRECTORY_SEPARATOR . 'Modules/Billing/Views/index.php');
+        $this->assertSame("Module Billing generated successfully in app/Modules/Billing\n", $output);
+        $this->assertFileExists($this->workDir . DIRECTORY_SEPARATOR . 'app/Modules/Billing/Billing.php');
+        $this->assertFileExists($this->workDir . DIRECTORY_SEPARATOR . 'app/Modules/Billing/Billing_Model.php');
+        $this->assertFileExists($this->workDir . DIRECTORY_SEPARATOR . 'app/Modules/Billing/Views/index.php');
 
-        $controller = file_get_contents($this->workDir . DIRECTORY_SEPARATOR . 'Modules/Billing/Billing.php');
-        $model = file_get_contents($this->workDir . DIRECTORY_SEPARATOR . 'Modules/Billing/Billing_Model.php');
+        $controller = file_get_contents($this->workDir . DIRECTORY_SEPARATOR . 'app/Modules/Billing/Billing.php');
+        $model = file_get_contents($this->workDir . DIRECTORY_SEPARATOR . 'app/Modules/Billing/Billing_Model.php');
 
         $this->assertStringContainsString('use Http\\Controller;', (string) $controller);
         $this->assertStringNotContainsString('use Library\\Controller;', (string) $controller);
@@ -45,14 +45,14 @@ final class ModuleGeneratorTest extends TestCase
 
     public function testGenerateDoesNotOverwriteExistingModule(): void
     {
-        mkdir($this->workDir . DIRECTORY_SEPARATOR . 'Modules/Billing', 0777, true);
+        mkdir($this->workDir . DIRECTORY_SEPARATOR . 'app/Modules/Billing', 0777, true);
 
         ob_start();
         (new ModuleGenerator())->generate('billing');
         $output = ob_get_clean();
 
         $this->assertSame("Error: Module Billing already exists.\n", $output);
-        $this->assertFileDoesNotExist($this->workDir . DIRECTORY_SEPARATOR . 'Modules/Billing/Billing.php');
+        $this->assertFileDoesNotExist($this->workDir . DIRECTORY_SEPARATOR . 'app/Modules/Billing/Billing.php');
     }
 
     private function removeDirectory(string $dir): void

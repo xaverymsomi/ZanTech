@@ -69,6 +69,6 @@ try {
 
 /**
  * NOTE: 
- * All system-wide constants are now defined in constants/sys_pref.php.
+ * All system-wide constants are now defined in bootstrap/sys_pref.php.
  * This file (config.php) should remain focused on environment loading.
  */

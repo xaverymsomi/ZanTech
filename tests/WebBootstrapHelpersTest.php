@@ -4,7 +4,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../Foundation/WebBootstrapHelpers.php';
+require_once __DIR__ . '/../src/Foundation/WebBootstrapHelpers.php';
 
 final class WebBootstrapHelpersTest extends TestCase
 {

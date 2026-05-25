@@ -15,11 +15,11 @@ final class ViewRendererTest extends TestCase
         $this->appRoot = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'zantech-view-renderer-test';
         $this->removeDir($this->appRoot);
 
-        mkdir($this->appRoot . '/modules/Demo/views', 0777, true);
-        mkdir($this->appRoot . '/views', 0777, true);
+        mkdir($this->appRoot . '/app/modules/Demo/views', 0777, true);
+        mkdir($this->appRoot . '/resources/views', 0777, true);
 
-        file_put_contents($this->appRoot . '/modules/Demo/views/index.php', 'Hello <?= $this->e($this->title) ?>');
-        file_put_contents($this->appRoot . '/views/plain.php', 'Plain <?= $this->e($this->title) ?>');
+        file_put_contents($this->appRoot . '/app/modules/Demo/views/index.php', 'Hello <?= $this->e($this->title) ?>');
+        file_put_contents($this->appRoot . '/resources/views/plain.php', 'Plain <?= $this->e($this->title) ?>');
     }
 
     protected function tearDown(): void
@@ -48,7 +48,7 @@ final class ViewRendererTest extends TestCase
         $view->title = 'Template';
 
         ob_start();
-        $view->renderFull('views/plain.php');
+        $view->renderFull('resources/views/plain.php');
         $output = (string)ob_get_clean();
 
         $this->assertSame('Plain Template', $output);

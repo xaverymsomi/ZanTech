@@ -1,8 +1,8 @@
 <?php
 require 'vendor/autoload.php';
-require 'configuration/config.php';
-require 'Database/Database.php';
-require 'Database/DB.php';
+require __DIR__ . '/../bootstrap/config.php';
+require __DIR__ . '/../src/Database/Database.php';
+require __DIR__ . '/../src/Database/DB.php';
 
 $db = \Database\DB::connection();
 try {

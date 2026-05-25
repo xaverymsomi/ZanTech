@@ -31,7 +31,7 @@ if (!function_exists('ztBootstrapAbort')) {
     }
 }
 
-// Timezone is set in configuration/config.php.
+// Timezone is set in bootstrap/config.php.
 
 // Output buffering (optional but ok)
 if (!ob_get_level()) {

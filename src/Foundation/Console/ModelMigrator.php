@@ -10,8 +10,8 @@ class ModelMigrator
     {
         echo "Starting Automated Schema Generation...\n";
 
-        $basePath = dirname(__DIR__, 2);
-        $modulesDir = $basePath . DIRECTORY_SEPARATOR . 'Modules';
+        $basePath = dirname(__DIR__, 3);
+        $modulesDir = $basePath . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'Modules';
         
         if (!is_dir($modulesDir)) {
             echo "Modules directory not found at {$modulesDir}!\n";
@@ -67,7 +67,7 @@ class ModelMigrator
         foreach ($iterator as $file) {
             if ($file->isFile() && str_ends_with($file->getFilename(), '_Model.php')) {
                 // Determine class namespace dynamically from path
-                $relativePath = str_replace($basePath . DIRECTORY_SEPARATOR, '', $file->getPathname());
+                $relativePath = str_replace($basePath . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR, '', $file->getPathname());
                 $relativePath = str_replace('.php', '', $relativePath);
                 $class = str_replace(DIRECTORY_SEPARATOR, '\\', $relativePath);
                 $models[] = $class;

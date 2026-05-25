@@ -111,12 +111,12 @@ if (!defined('ZT_ROUTE_LOGOUT')) {
 
 if (!defined('ZT_BLOCKED_ROUTES')) {
     define('ZT_BLOCKED_ROUTES', [
-        'bootstrap',
         'foundation',
+        'src',
+        'app',
+        'resources',
         'vendor',
-        'configuration',
-        'helpers',
-        'constants',
+        'bootstrap',
     ]);
 }
 

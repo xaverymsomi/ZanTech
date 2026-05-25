@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4c4974224395688e3b17f65be4004a73",
+    "content-hash": "74d0937dc47cecc8e3adb447e6e52799",
     "packages": [
         {
             "name": "aferrandini/phpqrcode",

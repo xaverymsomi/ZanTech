@@ -9,17 +9,17 @@ ZanTech is a high-fidelity, modular, URL-driven web application framework built 
 The repository structure cleanly decouples configuration, framework foundation classes, database layers, and business logic:
 
 ```
-├── Authentication/       # Session, Captcha, RBAC, and Dual Control approvals
-├── Config/               # Config key repositories with env fallback
-├── Database/             # Schema, migrations, DB drivers, and Base ORM Model
-├── Exceptions/           # Native framework exception mapping & error UI handlers
-├── Foundation/           # App loader, web/console kernels, routing, and middlewares
-├── Http/                 # HTTP Request, Response, and Base Controller
-├── Modules/              # Modular application business features (Dashboard, User, Permission...)
-├── Services/             # Cross-cutting validators, adapters, log sanitizers
-├── View/                 # HTML UI layouts, shared header/footer, and view engines
-├── constants/            # Framework versions and global system preferences
-├── helpers/              # Standard global helper libraries
+├── src/Authentication/       # Session, Captcha, RBAC, and Dual Control approvals
+├── src/Config/               # Config key repositories with env fallback
+├── src/Database/             # Schema, migrations, DB drivers, and Base ORM Model
+├── src/Exceptions/           # Native framework exception mapping & error UI handlers
+├── src/Foundation/           # App loader, web/console kernels, routing, and middlewares
+├── src/Http/                 # HTTP Request, Response, and Base Controller
+├── app/Modules/              # Modular application business features (Dashboard, User, Permission...)
+├── src/Services/             # Cross-cutting validators, adapters, log sanitizers
+├── src/View/                 # HTML UI layouts, shared header/footer, and view engines
+├── bootstrap/            # Framework versions and global system preferences
+├── src/helpers/              # Standard global helper libraries
 ├── public/               # Web Document Root (front-controller entry, assets)
 ├── storage/              # File cache, session stores, and reports
 ├── zt / zt.php           # Console CLI commands
@@ -31,10 +31,10 @@ The repository structure cleanly decouples configuration, framework foundation c
 
 Every HTTP request enters the web root and is processed linearly:
 
-1. **Entry**: Web server forwards request URIs through [public/index.php](file:///e:/personal/zanTech/public/index.php) to [Foundation/AppLoader.php](file:///e:/personal/zanTech/Foundation/AppLoader.php).
+1. **Entry**: Web server forwards request URIs through [public/index.php](file:///e:/personal/zanTech/public/index.php) to [src/Foundation/AppLoader.php](file:///e:/personal/zanTech/src/Foundation/AppLoader.php).
 2. **Bootstrapping**: `AppLoader` configures global exception tracking, executes Composer autoloading, loads configuration arrays, and detects target namespaces (`web`, `api`, or `cronjob`).
-3. **Core Initialization**: Passes control to [Foundation/web.php](file:///e:/personal/zanTech/Foundation/web.php) to initialize output buffers, enforce secure session configurations, and bind a unique Request ID.
-4. **URL Decomposition**: The router [Foundation/Routing/Router.php](file:///e:/personal/zanTech/Foundation/Routing/Router.php) maps URL paths to modules:
+3. **Core Initialization**: Passes control to [src/Foundation/web.php](file:///e:/personal/zanTech/src/Foundation/web.php) to initialize output buffers, enforce secure session configurations, and bind a unique Request ID.
+4. **URL Decomposition**: The router [src/Foundation/Routing/Router.php](file:///e:/personal/zanTech/src/Foundation/Routing/Router.php) maps URL paths to modules:
    * **Convention-based**: `/Module/Method/Param1` resolves to class `Modules\Module\Module` invoking action `Method(Param1)`.
    * **Parameterized Routes**: Custom regex mappings defined in `routes.php` translate paths into clean segment chains.
    * **Asset Protection**: Prevents broken static files from invoking heavy MVC cycles.
@@ -43,7 +43,7 @@ Every HTTP request enters the web root and is processed linearly:
 
 ## 3. Middleware Pipeline
 
-ZanTech routes all dispatch actions through a sequential pipeline of middlewares defined in [Foundation/Zantech.php](file:///e:/personal/zanTech/Foundation/Zantech.php):
+ZanTech routes all dispatch actions through a sequential pipeline of middlewares defined in [src/Foundation/Zantech.php](file:///e:/personal/zanTech/src/Foundation/Zantech.php):
 
 ```
 [ Request ] 
@@ -82,14 +82,14 @@ ZanTech routes all dispatch actions through a sequential pipeline of middlewares
 ## 4. The MVC & Core Abstractions
 
 ### 1. Controllers (`Http\Controller`)
-The [Http/Controller.php](file:///e:/personal/zanTech/Http/Controller.php) base controller implements clean lifecycle control:
+The [src/Http/Controller.php](file:///e:/personal/zanTech/src/Http/Controller.php) base controller implements clean lifecycle control:
 * **Lazy Rendering**: Views are rendered on demand, minimizing execution overhead during direct API payloads.
 * **Unified Response Wrapper**: Offers simple response standards (`responseSuccess()`, `responseError()`, and `responseJson()`).
 * **Route Guards**: Evaluates custom privileges using `requirePermission('slug')`.
 * **Generic automation (`BaseModuleController`)**: Automatically wires controller instances to their respective models, providing standard grid tables, filtering (Active/Inactive), and automatic listing pagination out of the box.
 
 ### 2. Models (`Database\Model`)
-Models in [Database/Model.php](file:///e:/personal/zanTech/Database/Model.php) provide robust SQL database interactions:
+Models in [src/Database/Model.php](file:///e:/personal/zanTech/src/Database/Model.php) provide robust SQL database interactions:
 * **Fluent Query Builder**: Secure parameters validation that enforces parameterized values preventing SQL Injections:
   ```php
   $activeStaff = $this->where('opt_mx_status_id', 1)
@@ -97,7 +97,7 @@ Models in [Database/Model.php](file:///e:/personal/zanTech/Database/Model.php) p
                       ->orderBy('id', 'DESC')
                       ->get();
   ```
-* **Universal Database Abstraction**: Integrates with [Database\Database](file:///e:/personal/zanTech/Database/Database.php) to automatically balance escaping protocols across SQL Server, MySQL, SQLite, and PostgreSQL.
+* **Universal Database Abstraction**: Integrates with [Database\Database](file:///e:/personal/zanTech/src/Database/Database.php) to automatically balance escaping protocols across SQL Server, MySQL, SQLite, and PostgreSQL.
 * **Metadata discovery**: Infers target table/view names dynamically from the child model's namespace prefix.
 * **Multi-Connection Database Routing**: Supports routing different models to different databases on the fly. By overriding the `$connection` parameter (e.g. `protected string $connection = 'billing'`) or switching connections dynamically at runtime using `$model->setConnection('billing')`, the model, active record query builders, pagination compilers, and ORM methods instantly redirect all execution routines and SQL dialects to that connection automatically.
 * **SQL Profiler & Heavy Query Tracing**: Automatically monitors execution performance on all `select()`, `save()`, and `update()` queries. Any queries taking longer than `ZT_SLOW_QUERY_THRESHOLD` (default 100ms) are logged along with their bound parameters directly into `logs/custom/db/*-slow.log` for optimization.
@@ -107,7 +107,7 @@ Models in [Database/Model.php](file:///e:/personal/zanTech/Database/Model.php) p
 ## 5. Transactional Integrity & Governance
 
 ### 1. Role-Based Access Control (RBAC)
-Authorizations in [Authentication/Perm_Auth.php](file:///e:/personal/zanTech/Authentication/Perm_Auth.php) provide precise access policies:
+Authorizations in [src/Authentication/Perm_Auth.php](file:///e:/personal/zanTech/src/Authentication/Perm_Auth.php) provide precise access policies:
 * **Multi-Group Memberships**: Access privileges are dynamically aggregated across multiple organizational groups assigned to the user.
 * **Individual overrides**: Specific capabilities can be directly assigned or revoked from a user's credential ID.
 * **Super Admin Bypass**: Accounts with Role ID `1` bypass local verification rules to ensure emergency administrative control.
@@ -182,10 +182,10 @@ Previously, direct database operations `save()`, `update()`, and `updateFiltered
 * **Refinement**: Integrated automatic string-replacement sanitizers that convert illegal parameter characters (`.`, `-`, and spaces) into safe underscores (`_`) on the fly, rendering the raw PDO parameters perfectly compliant.
 
 ### 2. Login Security Reinforcement
-* **Empty Username Lockdown**: Overhauled `Auth::login()` in [Authentication/Auth.php](file:///e:/personal/zanTech/Authentication/Auth.php) to assert that incoming username payloads are not empty, raising an immediate `AuthException` if attempts are made to authenticate empty strings or blank space characters.
+* **Empty Username Lockdown**: Overhauled `Auth::login()` in [src/Authentication/Auth.php](file:///e:/personal/zanTech/src/Authentication/Auth.php) to assert that incoming username payloads are not empty, raising an immediate `AuthException` if attempts are made to authenticate empty strings or blank space characters.
 
 ### 3. Log Sanitizer Overhaul (SMS Protection)
-* **SMS Payload Redaction**: Upgraded `MXSms::sendTemplateSMS()` in [Services/MXSms.php](file:///e:/personal/zanTech/Services/MXSms.php) to filter its log statements. All phone number recipients are masked using safe format expressions, and all token keys (such as codes, passwords, or secrets) are scrubbed using the core `RouterSecurity::redactSensitive()` engine before being stored.
+* **SMS Payload Redaction**: Upgraded `MXSms::sendTemplateSMS()` in [src/Services/MXSms.php](file:///e:/personal/zanTech/src/Services/MXSms.php) to filter its log statements. All phone number recipients are masked using safe format expressions, and all token keys (such as codes, passwords, or secrets) are scrubbed using the core `RouterSecurity::redactSensitive()` engine before being stored.
 
 ### 4. Cinematic Split-Panel Visual Hotfixes
 * **Contrast Alignment**: Hardened CSS active-state classes in [zantech-ui.css](file:///e:/personal/zanTech/public/assets/css/zantech-ui.css) (such as `.zt-permission-architect .list-group-item.active`) to enforce high-contrast readable color schemes against soft glassmorphic primary overlays.
@@ -193,4 +193,4 @@ Previously, direct database operations `save()`, `update()`, and `updateFiltered
 
 ### 5. Dead Code & Legacy Method Cleanup
 * **Method Replacement**: Systematically scanned the application to eliminate the deprecated `_permissionDenied()` legacy method. All modules (`DualActivity.php`, `SmsTemplate.php`, `Report.php`, `Miscellaneous.php`, `EmailContent.php`) were safely refactored to use the modern, reflection-based `permissionDenied()` pipeline without arguments.
-* **Base Cleanse**: Successfully removed the deprecated wrapper from the abstract [Http/Controller.php](file:///e:/personal/zanTech/Http/Controller.php) template.
+* **Base Cleanse**: Successfully removed the deprecated wrapper from the abstract [src/Http/Controller.php](file:///e:/personal/zanTech/src/Http/Controller.php) template.

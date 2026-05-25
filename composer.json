@@ -24,21 +24,21 @@
   },
   "autoload": {
     "psr-4": {
-      "Logging\\": "Logging/",
-      "Config\\": "Config/",
-      "View\\": "View/",
-      "Validation\\": "Validation/",
-      "Http\\": "Http/",
-      "Exceptions\\": "Exceptions/",
-      "Foundation\\": "Foundation/",
-      "Authentication\\": "Authentication/",
-      "Database\\": "Database/",
-      "Services\\": "Services/",
-      "Notification\\": "Notification/",
-      "Modules\\": "Modules/"
+      "Logging\\": "src/Logging/",
+      "Config\\": "src/Config/",
+      "View\\": "src/View/",
+      "Validation\\": "src/Validation/",
+      "Http\\": "src/Http/",
+      "Exceptions\\": "src/Exceptions/",
+      "Foundation\\": "src/Foundation/",
+      "Authentication\\": "src/Authentication/",
+      "Database\\": "src/Database/",
+      "Services\\": "src/Services/",
+      "Notification\\": "src/Notification/",
+      "Modules\\": "app/Modules/"
     },
     "files": [
-      "Foundation/AppLoaderFunctions.php"
+      "src/Foundation/AppLoaderFunctions.php"
     ]
   },
   "config": {

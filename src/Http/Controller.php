@@ -183,7 +183,7 @@ class Controller
 
         if (!$this->model) {
             Log::sysLog("PROFILE ERROR: Model not set");
-            $this->renderFull('views/templates/not_found');
+            $this->renderFull('resources/views/templates/not_found');
             return;
         }
 
@@ -194,7 +194,7 @@ class Controller
 
         if ($recordId < 0) {
             $this->view()->subtitle = "Record not found";
-            $this->renderFull('views/templates/not_found');
+            $this->renderFull('resources/views/templates/not_found');
             return;
         }
 
@@ -246,7 +246,7 @@ class Controller
         $this->requirePermission($permission);
 
         if (!$this->model) {
-            $this->renderFull('views/templates/not_found');
+            $this->renderFull('resources/views/templates/not_found');
             return;
         }
 
@@ -263,7 +263,7 @@ class Controller
             $this->render('profile/profile');
         } else {
             $this->view()->subtitle = "Record not found";
-            $this->renderFull('views/templates/not_found');
+            $this->renderFull('resources/views/templates/not_found');
         }
     }
 
@@ -272,7 +272,7 @@ class Controller
         $this->requirePermission($permission);
 
         if (!$this->model) {
-            $this->renderFull('views/templates/not_found');
+            $this->renderFull('resources/views/templates/not_found');
             return;
         }
 
@@ -304,7 +304,7 @@ class Controller
             $this->render('associated_records/main');
         } else {
             $this->view()->subtitle = "Record not found";
-            $this->renderFull('views/templates/not_found');
+            $this->renderFull('resources/views/templates/not_found');
         }
     }
 

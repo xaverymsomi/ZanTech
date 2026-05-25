@@ -36,7 +36,7 @@ set_exception_handler(static function (Throwable $e): void {
     ExceptionHandler::handle($e);
 });
 
-$customErrorHandler = ZT_BASE_PATH . '/helpers/ErrorHandler.php';
+$customErrorHandler = ZT_BASE_PATH . '/src/helpers/ErrorHandler.php';
 if (is_file($customErrorHandler)) {
     require_once $customErrorHandler;
     if (function_exists('mxPublicError')) {
@@ -48,9 +48,9 @@ if (is_file($customErrorHandler)) {
 }
 
 // C. Configuration, Constants & Helpers
-$configFile  = ZT_BASE_PATH . '/configuration/config.php';
-$sysPrefFile = ZT_BASE_PATH . '/constants/sys_pref.php';
-$helpersFile = ZT_BASE_PATH . '/helpers/helpers.php';
+$configFile  = ZT_BASE_PATH . '/bootstrap/config.php';
+$sysPrefFile = ZT_BASE_PATH . '/bootstrap/sys_pref.php';
+$helpersFile = ZT_BASE_PATH . '/src/helpers/helpers.php';
 
 foreach ([$configFile, $sysPrefFile, $helpersFile] as $file) {
     if (is_file($file)) {

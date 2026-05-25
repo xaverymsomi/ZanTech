@@ -4,7 +4,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../Foundation/AppLoaderFunctions.php';
+require_once __DIR__ . '/../src/Foundation/AppLoaderFunctions.php';
 
 final class AppLoaderTest extends TestCase
 {

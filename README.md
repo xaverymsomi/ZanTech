@@ -2,7 +2,7 @@
 
 ZanTech is a **PHP 8.2** modular web application framework: URL-driven routing, module-based MVC, session authentication, permission-aware UI, and a small **CLI (`zt`)** for scaffolding and database tasks. The front controller lives under **`public/`**; application code uses **Composer PSR-4** autoloading.
 
-**Framework (app shell):** `2.4.1` (see `ZT_APP_VERSION` in `constants/sys_pref.php`).
+**Framework (app shell):** `2.4.1` (see `ZT_APP_VERSION` in `bootstrap/sys_pref.php`).
 
 Repository: [github.com/xaverymsomi/ZanTech](https://github.com/xaverymsomi/ZanTech)
 
@@ -10,17 +10,17 @@ Repository: [github.com/xaverymsomi/ZanTech](https://github.com/xaverymsomi/ZanT
 
 ## Versions and stack
 
-Pinned or primary versions are the ones loaded in **`views/header.php`** (CDN) and declared in **`composer.json`**. Upgrade those files together when bumping a major dependency. **Details:** [VERSIONS.md](VERSIONS.md) · **CDN lockfile:** [cdn-lock.json](cdn-lock.json).
+Pinned or primary versions are the ones loaded in **`resources/views/header.php`** (CDN) and declared in **`composer.json`**. Upgrade those files together when bumping a major dependency. **Details:** [VERSIONS.md](VERSIONS.md) · **CDN lockfile:** [cdn-lock.json](cdn-lock.json).
 
 ### Runtime
 
 | Component | Version |
 |-----------|---------|
-| **ZanTech / kernel** | `2.4.1` (`constants/sys_pref.php`) |
+| **ZanTech / kernel** | `2.4.1` (`bootstrap/sys_pref.php`) |
 | **PHP** | `^8.2` (`composer.json`) |
-| **Database** | **SQL Server** (T-SQL migrations under `Database/migrations/`) |
+| **Database** | **SQL Server** (T-SQL migrations under `src/Database/migrations/`) |
 
-### Frontend (CDN, `views/header.php`)
+### Frontend (CDN, `resources/views/header.php`)
 
 | Library | Version |
 |---------|---------|
@@ -68,35 +68,35 @@ Bundled app script: **`public/assets/js/zantech.bundle.js`** (build or edit in-r
 
 2. **Environment**
 
-   Copy or create a **`.env`** in the project root. A sample template is available at **`.env.example`**. Configuration is bootstrapped in `configuration/config.php` (uses `vlucas/phpdotenv`). Database and app settings are typically read via `zt_env()` and related helpers after `.env` is loaded.
+   Copy or create a **`.env`** in the project root. A sample template is available at **`.env.example`**. Configuration is bootstrapped in `bootstrap/config.php` (uses `vlucas/phpdotenv`). Database and app settings are typically read via `zt_env()` and related helpers after `.env` is loaded.
 
 3. **Database**
 
    ```bash
-   php zt db:init      # core schema from Database/Schema/init.sql
-   php zt db:seed      # optional seed from Database/Schema/seed.sql
-   php zt db:migrate   # runs SQL files from Database/migrations/ (default RBAC/sidebar batch)
+   php zt db:init      # core schema from src/Database/Schema/init.sql
+   php zt db:seed      # optional seed from src/Database/Schema/seed.sql
+   php zt db:migrate   # runs SQL files from src/Database/migrations/ (default RBAC/sidebar batch)
    php zt migrate      # runs pending migrations and records them in zt_migrations
    ```
 
-   Migration scripts live in **`Database/migrations/`**.
+   Migration scripts live in **`src/Database/migrations/`**.
    Individual file:
 
    ```bash
-   php zt db:migrate Database/migrations/20260212_create_mx_menu_table.sql
+   php zt db:migrate src/Database/migrations/20260212_create_mx_menu_table.sql
    ```
 
 4. **Web server**
 
-   Point the document root at **`public/`** so that `public/index.php` is the entry point. Requests are forwarded through **`Foundation/AppLoader.php`**, which picks the runtime namespace (e.g. **web**) and loads **`Foundation/web.php`**.
+   Point the document root at **`public/`** so that `public/index.php` is the entry point. Requests are forwarded through **`src/Foundation/AppLoader.php`**, which picks the runtime namespace (e.g. **web**) and loads **`src/Foundation/web.php`**.
 
 ---
 
 ## How requests flow
 
-1. **`public/index.php`** defines `ZT_BASE_PATH` and loads **`Foundation/AppLoader.php`**.
-2. **AppLoader** normalizes the URI, applies basic security checks, and loads the correct kernel (e.g. **`Foundation/web.php`**).
-3. **`Foundation/web.php`** initializes session, logging context, and runs **`Foundation\Zantech`**.
+1. **`public/index.php`** defines `ZT_BASE_PATH` and loads **`src/Foundation/AppLoader.php`**.
+2. **AppLoader** normalizes the URI, applies basic security checks, and loads the correct kernel (e.g. **`src/Foundation/web.php`**).
+3. **`src/Foundation/web.php`** initializes session, logging context, and runs **`Foundation\Zantech`**.
 4. **`Foundation\Zantech`** resolves the URL into **module** and **action** segments, maps slugs such as `get_all_menus` to **`getAllMenus`**, loads **`Modules\{Module}\{Module}`**, and invokes the controller method.
 
 So a URL like `/Menu/index` maps to the **`Menu`** module’s **`index`** method on **`Modules\Menu\Menu`**.
@@ -105,13 +105,13 @@ So a URL like `/Menu/index` maps to the **`Menu`** module’s **`index`** method
 
 ## Modules (MVC)
 
-Each feature area is a **module** under **`Modules/{ModuleName}/`** (PascalCase class name, e.g. `Menu` → `Modules/Menu/Menu.php`).
+Each feature area is a **module** under **`app/Modules/{ModuleName}/`** (PascalCase class name, e.g. `Menu` → `app/Modules/Menu/Menu.php`).
 
 | Piece | Role |
 |--------|------|
 | **Controller** | Extends `Http\Controller`. Handles permissions, calls the model, sets `$this->view()->...` data, then `render()`, `renderJson()`, or response helpers such as `responseJson()`, `responseSuccess()`, and `responseError()`. |
 | **Model** | Extends `Database\Model`. Encapsulates tables, queries, dropdowns, and helpers (`getRecord`, `update` / `updateRecord`, etc.). |
-| **Views** | PHP templates under **`Modules/{Module}/Views/`** (e.g. `home.php`, `edit.php`). The view layer composes HTML or JSON payloads for Angular/legacy clients. |
+| **Views** | PHP templates under **`app/Modules/{Module}/Views/`** (e.g. `home.php`, `edit.php`). The view layer composes HTML or JSON payloads for Angular/legacy clients. |
 
 Optional scaffolding:
 
@@ -131,7 +131,7 @@ php zt make:module YourModule
 
 ## HTTP responses
 
-- **HTML pages** use `Controller::render()` and the shared layout under **`views/`** (e.g. `body.php`, `header.php`).
+- **HTML pages** use `Controller::render()` and the shared layout under **`resources/views/`** (e.g. `body.php`, `header.php`).
 - **JSON APIs** use `responseJson()`, `responseSuccess()`, and `responseError()` on `Http\Controller`, which return structured payloads (including `ok`, `code`, `message`, and `title`) for both modern clients and legacy Angular response handlers.
 
 ---
@@ -151,8 +151,8 @@ php zt.php <command>
 | `make:controller <Name>` | Scaffold a module controller and index view |
 | `cache:clear` | Clear runtime cache from `storage/cache` |
 | `test` | Run PHPUnit tests |
-| `db:init` | Run `Database/Schema/init.sql` |
-| `db:seed` | Run `Database/Schema/seed.sql` |
+| `db:init` | Run `src/Database/Schema/init.sql` |
+| `db:seed` | Run `src/Database/Schema/seed.sql` |
 | `db:migrate [path]` | Run one SQL file, or the default migration batch |
 | `migrate` | Run pending SQL migrations and record them in `zt_migrations` |
 | `migrate:status` | Show applied and pending tracked migrations |
@@ -164,22 +164,22 @@ php zt.php <command>
 | Path | Purpose |
 |------|---------|
 | `public/` | Web root (`index.php`, assets, `.htaccess` / `web.config`) |
-| `Foundation/` | Bootstrapping, web kernel, console scaffolding, middleware, and routing |
-| `Config/` | Dotted-key configuration repository with env and optional DB fallback |
+| `src/Foundation/` | Bootstrapping, web kernel, console scaffolding, middleware, and routing |
+| `src/Config/` | Dotted-key configuration repository with env and optional DB fallback |
 | `Library/` | Retired namespace; no PSR-4 autoload mapping remains. |
-| `Http/` | Request, response, and controller abstractions |
-| `View/` | View rendering and table helper utilities |
-| `Validation/` | Input validation |
-| `Foundation/Routing/` | Router and route security |
-| `Modules/` | Application modules (controllers, models, views) |
-| `Database/` | Database access, base model, `Schema/` (init, seed), and `migrations/` (incremental SQL) |
-| `Authentication/` | Auth, session, captcha, dual control, permissions |
-| `Services/` | Cross-cutting application services such as hashing, validation, notification adapters, log sanitizing, and RBAC helpers |
-| `Exceptions/` | Centralized exception handling |
-| `configuration/` | `config.php` and environment-driven bootstrap |
-| `constants/` | System preferences and constants |
-| `views/` | Global layouts and shared templates |
-| `helpers/` | Shared PHP helpers |
+| `src/Http/` | Request, response, and controller abstractions |
+| `src/View/` | View rendering and table helper utilities |
+| `src/Validation/` | Input validation |
+| `src/Foundation/Routing/` | Router and route security |
+| `app/Modules/` | Application modules (controllers, models, views) |
+| `src/Database/` | Database access, base model, `Schema/` (init, seed), and `migrations/` (incremental SQL) |
+| `src/Authentication/` | Auth, session, captcha, dual control, permissions |
+| `src/Services/` | Cross-cutting application services such as hashing, validation, notification adapters, log sanitizing, and RBAC helpers |
+| `src/Exceptions/` | Centralized exception handling |
+| `bootstrap/` | `config.php`, `sys_pref.php`, and environment-driven bootstrap |
+| `bootstrap/` | `config.php`, `sys_pref.php`, and environment-driven bootstrap |
+| `resources/views/` | Global layouts and shared templates |
+| `src/helpers/` | Shared PHP helpers |
 | `zt` / `zt.php` | Console entry for maintenance tasks |
 
 ---
