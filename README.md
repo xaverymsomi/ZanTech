@@ -8,6 +8,14 @@ Repository: [github.com/xaverymsomi/ZanTech](https://github.com/xaverymsomi/ZanT
 
 ---
 
+## Documentation
+
+Full framework documentation lives in [docs/README.md](docs/README.md). A safe environment template is available at [.env.example](.env.example).
+
+Start there for installation, project structure, request lifecycle, routing, modules, controllers, API response contracts, database usage, configuration, authentication, RBAC, views, CLI commands, testing, deployment, troubleshooting, contributing, and maintenance guidance.
+
+---
+
 ## Versions and stack
 
 Pinned or primary versions are the ones loaded in **`resources/views/header.php`** (CDN) and declared in **`composer.json`**. Upgrade those files together when bumping a major dependency. **Details:** [VERSIONS.md](VERSIONS.md) · **CDN lockfile:** [cdn-lock.json](cdn-lock.json).
@@ -166,7 +174,6 @@ php zt.php <command>
 | `public/` | Web root (`index.php`, assets, `.htaccess` / `web.config`) |
 | `src/Foundation/` | Bootstrapping, web kernel, console scaffolding, middleware, and routing |
 | `src/Config/` | Dotted-key configuration repository with env and optional DB fallback |
-| `Library/` | Retired namespace; no PSR-4 autoload mapping remains. |
 | `src/Http/` | Request, response, and controller abstractions |
 | `src/View/` | View rendering and table helper utilities |
 | `src/Validation/` | Input validation |
@@ -176,7 +183,6 @@ php zt.php <command>
 | `src/Authentication/` | Auth, session, captcha, dual control, permissions |
 | `src/Services/` | Cross-cutting application services such as hashing, validation, notification adapters, log sanitizing, and RBAC helpers |
 | `src/Exceptions/` | Centralized exception handling |
-| `bootstrap/` | `config.php`, `sys_pref.php`, and environment-driven bootstrap |
 | `bootstrap/` | `config.php`, `sys_pref.php`, and environment-driven bootstrap |
 | `resources/views/` | Global layouts and shared templates |
 | `src/helpers/` | Shared PHP helpers |

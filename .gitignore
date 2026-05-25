@@ -8,4 +8,5 @@ storage/*
 *.log
 .env
 .env.*
+!.env.example
 Modules/Report/Libs/tmp/
