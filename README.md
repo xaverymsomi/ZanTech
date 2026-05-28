@@ -99,6 +99,7 @@ Common commands:
 | `migrate:status` | Show migration status |
 | `migrate:auto` | Generate tables from model schema arrays |
 | `queue:work` | Start the background queue worker |
+| `cron:run [--max-jobs=N]` | Run cron-safe lifecycle tasks once |
 
 ## Project Layout
 

@@ -7,6 +7,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/bootstrap/config.php';
 
 use Foundation\Console\ControllerGenerator;
+use Foundation\Console\CronRunner;
 use Foundation\Console\ModuleGenerator;
 use Database\Schema\DatabaseInitializer;
 use Database\Migrations\MigrationRunner;
@@ -135,7 +136,34 @@ if ($command === 'make:module') {
         echo "\n";
     }
 } elseif ($command === 'queue:work') {
-    (new QueueWorker())->work();
+    $maxJobs = 0;
+    $sleepSeconds = 3;
+    $stopWhenEmpty = in_array('--stop-when-empty', $argv, true);
+
+    foreach ($argv as $arg) {
+        if (str_starts_with($arg, '--max-jobs=')) {
+            $maxJobs = max(0, (int)substr($arg, 11));
+        }
+        if (str_starts_with($arg, '--sleep=')) {
+            $sleepSeconds = max(0, (int)substr($arg, 8));
+        }
+    }
+
+    if (in_array('--once', $argv, true)) {
+        $maxJobs = 1;
+        $stopWhenEmpty = true;
+    }
+
+    (new QueueWorker())->work($maxJobs, $sleepSeconds, $stopWhenEmpty);
+} elseif ($command === 'cron:run') {
+    $maxJobs = 25;
+    foreach ($argv as $arg) {
+        if (str_starts_with($arg, '--max-jobs=')) {
+            $maxJobs = max(0, (int)substr($arg, 11));
+        }
+    }
+
+    exit((new CronRunner())->run(__DIR__, $maxJobs));
 } elseif ($command === 'migrate:auto') {
     $dryRun = in_array('--dry-run', $argv, true);
     (new ModelMigrator())->migrate($dryRun);
@@ -155,5 +183,6 @@ if ($command === 'make:module') {
     echo "  migrate               Run pending migrations and record them\n";
     echo "  migrate:status        Show applied/pending migrations\n";
     echo "  migrate:auto          Auto-generate tables from Model \$schema arrays\n";
-    echo "  queue:work            Start the background job queue worker\n";
+    echo "  queue:work [--once] [--max-jobs=N] [--sleep=N] Start the background job queue worker\n";
+    echo "  cron:run [--max-jobs=N] Run cron-safe lifecycle tasks once\n";
 }

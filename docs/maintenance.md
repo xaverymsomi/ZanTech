@@ -53,3 +53,9 @@ php oryn test
 
 Composer may report existing dependency warnings. Treat new validation failures as blockers.
 
+## Cron Checks
+
+- Use `php oryn cron:run --max-jobs=25` for scheduler entries.
+- Use `php oryn queue:work --once` to verify a single queued job lifecycle.
+- Confirm `storage/cron/` is writable before enabling system cron.
+

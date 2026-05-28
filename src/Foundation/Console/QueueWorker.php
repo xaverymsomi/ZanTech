@@ -5,82 +5,142 @@ namespace Foundation\Console;
 use Database\DB;
 use Database\Database;
 use Logging\Log;
-use Exception;
+use Throwable;
 
 class QueueWorker
 {
-    public function work(): void
+    private const DEFAULT_SLEEP_SECONDS = 3;
+
+    public function work(int $maxJobs = 0, int $sleepSeconds = self::DEFAULT_SLEEP_SECONDS, bool $stopWhenEmpty = false): int
     {
         echo "Starting Oryn Queue Worker...\n";
-        echo "Polling mx_job_queue every 3 seconds...\n";
+        echo $maxJobs > 0
+            ? "Processing up to {$maxJobs} job(s).\n"
+            : "Polling mx_job_queue every {$sleepSeconds} seconds.\n";
 
         $db = DB::connection();
+        $processed = 0;
 
         while (true) {
-            $driver = $db->getDriverType();
-            
-            if (in_array($driver, ['sqlsrv', 'odbc', 'dblib'])) {
-                $sql = "SELECT TOP 1 id, job_type, payload FROM mx_job_queue WHERE status = 'pending' ORDER BY id ASC";
-            } else {
-                $sql = "SELECT id, job_type, payload FROM mx_job_queue WHERE status = 'pending' ORDER BY id ASC LIMIT 1";
+            $didWork = $this->runOnce($db);
+            if ($didWork) {
+                $processed++;
             }
 
-            $job = $db->select($sql);
-
-            if (!empty($job) && isset($job[0])) {
-                $this->processJob($db, $job[0]);
+            if ($maxJobs > 0 && $processed >= $maxJobs) {
+                break;
             }
 
-            // Sleep to prevent CPU thrashing
-            sleep(3);
+            if (!$didWork && $stopWhenEmpty) {
+                break;
+            }
+
+            if (!$didWork && $sleepSeconds > 0) {
+                sleep($sleepSeconds);
+            }
         }
+
+        return $processed;
+    }
+
+    public function runOnce(?Database $db = null): bool
+    {
+        $db ??= DB::connection();
+        $job = $this->nextPendingJob($db);
+        if ($job === null) {
+            return false;
+        }
+
+        if (!$this->claimJob($db, (int)$job['id'])) {
+            return false;
+        }
+
+        $this->processJob($db, $job);
+        return true;
+    }
+
+    private function nextPendingJob(Database $db): ?array
+    {
+        $driver = $db->getDriverType();
+
+        if (in_array($driver, ['sqlsrv', 'odbc', 'dblib'], true)) {
+            $sql = "SELECT TOP 1 id, job_type, payload, attempts
+                    FROM mx_job_queue
+                    WHERE status = 'pending'
+                    ORDER BY id ASC";
+        } else {
+            $sql = "SELECT id, job_type, payload, attempts
+                    FROM mx_job_queue
+                    WHERE status = 'pending'
+                    ORDER BY id ASC
+                    LIMIT 1";
+        }
+
+        $rows = $db->select($sql);
+        return $rows[0] ?? null;
+    }
+
+    private function claimJob(Database $db, int $id): bool
+    {
+        $stmt = $db->prepare("
+            UPDATE mx_job_queue
+            SET status = :status,
+                locked_at = :locked_at,
+                attempts = attempts + 1
+            WHERE id = :id
+              AND status = 'pending'
+        ");
+
+        $stmt->execute([
+            ':status' => 'processing',
+            ':locked_at' => date('Y-m-d H:i:s'),
+            ':id' => $id,
+        ]);
+
+        return $stmt->rowCount() === 1;
     }
 
     private function processJob(Database $db, array $job): void
     {
-        $id = $job['id'];
-        echo "[" . date('Y-m-d H:i:s') . "] Processing Job #{$id} ({$job['job_type']})...\n";
-
-        // Lock the job to prevent duplicate processing by other worker instances
-        $db->update('mx_job_queue', [
-            'status'    => 'processing',
-            'locked_at' => date('Y-m-d H:i:s'),
-            'attempts'  => 1
-        ], $id);
+        $id = (int)$job['id'];
+        echo "[" . date('Y-m-d H:i:s') . "] Processing Job #{$id} ({$job['job_type']}).\n";
 
         try {
-            $payload = json_decode($job['payload'], true);
-
-            // Dispatch to appropriate handlers
-            if ($job['job_type'] === 'sms') {
-                if (class_exists('\\Services\\MXSms') && method_exists('\\Services\\MXSms', 'sendTemplateSMS')) {
-                    // Example mapping, exact implementation depends on payload structure
-                    // \Services\MXSms::sendTemplateSMS($payload['phone'], $payload['token'], $payload['data']);
-                }
-                // Simulate processing time
-                sleep(1);
-            } elseif ($job['job_type'] === 'email') {
-                // Simulate processing time
-                sleep(1);
+            $payload = json_decode((string)$job['payload'], true);
+            if (!is_array($payload)) {
+                throw new \RuntimeException('Invalid job payload JSON.');
             }
 
-            // Finalize job
+            $this->dispatch($job['job_type'], $payload);
+
             $db->update('mx_job_queue', [
                 'status'       => 'completed',
-                'completed_at' => date('Y-m-d H:i:s')
+                'completed_at' => date('Y-m-d H:i:s'),
+                'error_message' => null,
             ], $id);
 
-            echo "[" . date('Y-m-d H:i:s') . "] Job #{$id} completed successfully.\n";
-
-        } catch (Exception $e) {
-            // Register failure state
+            echo "[" . date('Y-m-d H:i:s') . "] Job #{$id} completed.\n";
+        } catch (Throwable $e) {
             $db->update('mx_job_queue', [
                 'status'        => 'failed',
-                'error_message' => substr($e->getMessage(), 0, 4000)
+                'error_message' => substr($e->getMessage(), 0, 4000),
             ], $id);
 
-            echo "[" . date('Y-m-d H:i:s') . "] Job #{$id} failed: " . $e->getMessage() . "\n";
+            echo "[" . date('Y-m-d H:i:s') . "] Job #{$id} failed: {$e->getMessage()}\n";
             Log::sysErr("Job Queue Failed - ID: {$id} - " . $e->getMessage());
         }
+    }
+
+    private function dispatch(string $type, array $payload): void
+    {
+        if ($type === 'sms') {
+            return;
+        }
+
+        if ($type === 'email') {
+            return;
+        }
+
+        throw new \RuntimeException("Unknown job type: {$type}");
     }
 }

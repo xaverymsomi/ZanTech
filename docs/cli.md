@@ -31,7 +31,8 @@ php zt.php <command>
 | `migrate` | Run tracked pending migrations and record them in `zt_migrations`. |
 | `migrate:status` | Show applied and pending tracked migrations. |
 | `migrate:auto` | Generate tables from model schema arrays where supported. |
-| `queue:work` | Start the background job queue worker. |
+| `queue:work [--once] [--max-jobs=N] [--sleep=N]` | Start the background job queue worker. |
+| `cron:run [--max-jobs=N]` | Run cron-safe lifecycle tasks once with a filesystem lock. |
 
 ## Module Scaffolding
 
@@ -93,3 +94,32 @@ php oryn test
 ```
 
 The command prefers `vendor/bin/phpunit` and falls back to a global `phpunit` command.
+
+## Cron And Queue
+
+Use `cron:run` from the system scheduler:
+
+```bash
+* * * * * /usr/bin/php /path/to/project/oryn cron:run --max-jobs=25
+```
+
+The cron lifecycle:
+
+- CLI-only execution.
+- Creates a request ID with a `CRON-` prefix.
+- Acquires `storage/cron/oryn-cron.lock` to prevent overlapping runs.
+- Processes pending queue jobs once, then exits.
+- Returns exit code `0` on success and `1` on failure.
+
+For a long-running worker:
+
+```bash
+php oryn queue:work --sleep=3
+```
+
+For a deploy-safe one-shot worker:
+
+```bash
+php oryn queue:work --once
+php oryn queue:work --max-jobs=10 --stop-when-empty
+```
