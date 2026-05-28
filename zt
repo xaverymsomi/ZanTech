@@ -7,7 +7,6 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/bootstrap/config.php';
 
 use Foundation\Console\ControllerGenerator;
-use Foundation\Console\CronRunner;
 use Foundation\Console\ModuleGenerator;
 use Database\Schema\DatabaseInitializer;
 use Database\Migrations\MigrationRunner;
@@ -26,14 +25,16 @@ if ($command === 'make:module') {
     }
     $example = in_array('--example', $argv, true);
     (new ModuleGenerator())->generate($name, $example);
-} elseif ($command === 'make:controller') {
+}
+elseif ($command === 'make:controller') {
     $name = $argv[2] ?? null;
     if (!$name) {
         echo "Usage: php oryn make:controller <ModuleName>\n";
         exit(1);
     }
     (new ControllerGenerator())->generate($name);
-} elseif ($command === 'cache:clear') {
+}
+elseif ($command === 'cache:clear') {
     $cacheDir = __DIR__ . '/storage/cache';
     if (!is_dir($cacheDir)) {
         echo "No cache directory found at {$cacheDir}.\n";
@@ -46,7 +47,8 @@ if ($command === 'make:module') {
         }
     }
     echo "Cache cleared: {$cacheDir}\n";
-} elseif ($command === 'test') {
+}
+elseif ($command === 'test') {
     $phpunit = __DIR__ . '/vendor/bin/phpunit';
     if (!is_file($phpunit)) {
         $phpunit = 'phpunit';
@@ -54,23 +56,27 @@ if ($command === 'make:module') {
     $cmd = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($phpunit);
     passthru($cmd, $exitCode);
     exit($exitCode);
-} elseif ($command === 'doctor') {
+}
+elseif ($command === 'doctor') {
     exit((new Doctor())->check(__DIR__));
-} elseif ($command === 'db:init') {
+}
+elseif ($command === 'db:init') {
     $sqlPath = __DIR__ . '/src/Database/Schema/init.sql';
     $initializer = new DatabaseInitializer(new Database());
     $result = $initializer->initialize($sqlPath);
 
     echo $result['message'] . "\n";
     if ($result['status'] === 'error') exit(1);
-} elseif ($command === 'db:seed') {
+}
+elseif ($command === 'db:seed') {
     $sqlPath = __DIR__ . '/src/Database/Schema/seed.sql';
     $initializer = new DatabaseInitializer(new Database());
     $result = $initializer->initialize($sqlPath);
 
     echo $result['message'] . "\n";
     if ($result['status'] === 'error') exit(1);
-} elseif ($command === 'db:migrate') {
+}
+elseif ($command === 'db:migrate') {
     // With no second arg: run RBAC-related migrations in order (section → menu).
     // With arg: run that single SQL file relative to project root.
     $arg = $argv[2] ?? null;
@@ -113,7 +119,8 @@ if ($command === 'make:module') {
     if ($exitCode !== 0) {
         exit($exitCode);
     }
-} elseif ($command === 'migrate') {
+}
+elseif ($command === 'migrate') {
     $runner = new MigrationRunner(new Database());
     $results = $runner->run(__DIR__ . '/src/Database/migrations');
     $exitCode = 0;
@@ -126,7 +133,8 @@ if ($command === 'make:module') {
     }
 
     exit($exitCode);
-} elseif ($command === 'migrate:status') {
+}
+elseif ($command === 'migrate:status') {
     $runner = new MigrationRunner(new Database());
     foreach ($runner->status(__DIR__ . '/src/Database/migrations') as $row) {
         echo '[' . strtoupper($row['status']) . '] ' . $row['name'];
@@ -135,39 +143,15 @@ if ($command === 'make:module') {
         }
         echo "\n";
     }
-} elseif ($command === 'queue:work') {
-    $maxJobs = 0;
-    $sleepSeconds = 3;
-    $stopWhenEmpty = in_array('--stop-when-empty', $argv, true);
-
-    foreach ($argv as $arg) {
-        if (str_starts_with($arg, '--max-jobs=')) {
-            $maxJobs = max(0, (int)substr($arg, 11));
-        }
-        if (str_starts_with($arg, '--sleep=')) {
-            $sleepSeconds = max(0, (int)substr($arg, 8));
-        }
-    }
-
-    if (in_array('--once', $argv, true)) {
-        $maxJobs = 1;
-        $stopWhenEmpty = true;
-    }
-
-    (new QueueWorker())->work($maxJobs, $sleepSeconds, $stopWhenEmpty);
-} elseif ($command === 'cron:run') {
-    $maxJobs = 25;
-    foreach ($argv as $arg) {
-        if (str_starts_with($arg, '--max-jobs=')) {
-            $maxJobs = max(0, (int)substr($arg, 11));
-        }
-    }
-
-    exit((new CronRunner())->run(__DIR__, $maxJobs));
-} elseif ($command === 'migrate:auto') {
+}
+elseif ($command === 'queue:work') {
+    (new QueueWorker())->work();
+}
+elseif ($command === 'migrate:auto') {
     $dryRun = in_array('--dry-run', $argv, true);
     (new ModelMigrator())->migrate($dryRun);
-} else {
+}
+else {
     echo "Oryn CLI Utility\n";
     echo "--------------------\n";
     echo "Use `php oryn <command>` or legacy `php zt <command>`.\n";
@@ -183,6 +167,5 @@ if ($command === 'make:module') {
     echo "  migrate               Run pending migrations and record them\n";
     echo "  migrate:status        Show applied/pending migrations\n";
     echo "  migrate:auto          Auto-generate tables from Model \$schema arrays\n";
-    echo "  queue:work [--once] [--max-jobs=N] [--sleep=N] Start the background job queue worker\n";
-    echo "  cron:run [--max-jobs=N] Run cron-safe lifecycle tasks once\n";
+    echo "  queue:work            Start the background job queue worker\n";
 }
