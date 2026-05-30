@@ -271,19 +271,6 @@ final class Login_Model extends Model
     }
 
     /* ============================================================
-     * UPDATE LOGIN STATE
-     * ============================================================ */
-
-    private function updateUserState(string $table, int $state, int|string $user_id): void
-    {
-        $db = new Database();
-        $tableQ = $db->quoteTable($table);
-
-        $stmt = $db->prepare("UPDATE {$tableQ} SET int_active = :state WHERE id = :id");
-        $stmt->execute([':state' => $state, ':id' => $user_id]);
-    }
-
-    /* ============================================================
      * PASSWORD RESET (REQUEST)
      * ============================================================ */
 
