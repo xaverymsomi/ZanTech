@@ -1,7 +1,7 @@
 <?php
 
 use Logging\Log;
-use Exceptions\ZantechException;
+use Exceptions\OrynException;
 use Exceptions\ExceptionHandler;
 
 function mxPublicError(int $errno, string $errstr, string $errfile, int $errline): bool
@@ -39,7 +39,7 @@ function mxPublicError(int $errno, string $errstr, string $errfile, int $errline
     } catch (Throwable) {}
 
     // Convert PHP error → Exception
-    throw new ZantechException(
+    throw new OrynException(
         $errstr,
         'A system error occurred.',
         500,
@@ -69,7 +69,7 @@ function mxFatalErrorHandler(): void
         ]);
     } catch (Throwable) {}
 
-    $ex = new ZantechException(
+    $ex = new OrynException(
         (string)($error['message'] ?? 'Fatal error'),
         'A fatal system error occurred.',
         500,

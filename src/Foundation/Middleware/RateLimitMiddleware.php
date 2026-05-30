@@ -4,7 +4,7 @@ namespace Foundation\Middleware;
 
 use Authentication\Auth;
 use Closure;
-use Exceptions\ZantechException;
+use Exceptions\OrynException;
 use Foundation\Routing\RouteContext;
 use Logging\Log;
 
@@ -35,7 +35,7 @@ final class RateLimitMiddleware implements Middleware
         $count = (int)$_SESSION['ZT_RATE'][$key][$bucket];
         if ($count > $this->maxPerMinute) {
             Log::sysLog("RATE-LIMIT TRIGGERED key={$key} count={$count}");
-            throw new ZantechException(
+            throw new OrynException(
                 "Rate limit exceeded key={$key} bucket={$bucket} count={$count}",
                 'Too many requests. Please slow down and try again.',
                 429,

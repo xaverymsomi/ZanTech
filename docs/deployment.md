@@ -100,10 +100,10 @@ Example:
 
 ```apache
 <VirtualHost *:80>
-    ServerName zantech.local
-    DocumentRoot /var/www/zantech/public
+    ServerName oryn.local
+    DocumentRoot /var/www/oryn/public
 
-    <Directory /var/www/zantech/public>
+    <Directory /var/www/oryn/public>
         AllowOverride All
         Require all granted
     </Directory>
@@ -121,8 +121,8 @@ Example:
 ```nginx
 server {
     listen 80;
-    server_name zantech.local;
-    root /var/www/zantech/public;
+    server_name oryn.local;
+    root /var/www/oryn/public;
     index index.php;
 
     location / {

@@ -2,7 +2,7 @@
 
 
 
-use Exceptions\ZantechException;
+use Exceptions\OrynException;
 use PHPUnit\Framework\TestCase;
 use View\ViewRenderer;
 
@@ -12,7 +12,7 @@ final class ViewRendererTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->appRoot = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'zantech-view-renderer-test';
+        $this->appRoot = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oryn-view-renderer-test';
         $this->removeDir($this->appRoot);
 
         mkdir($this->appRoot . '/app/modules/Demo/views', 0777, true);
@@ -56,7 +56,7 @@ final class ViewRendererTest extends TestCase
 
     public function testMissingViewThrowsFrameworkException(): void
     {
-        $this->expectException(ZantechException::class);
+        $this->expectException(OrynException::class);
 
         (new ViewRenderer($this->appRoot))->render('Demo', 'missing', true);
     }

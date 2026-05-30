@@ -4,7 +4,7 @@ namespace Exceptions;
 
 use Throwable;
 
-final class RedirectException extends ZantechException
+final class RedirectException extends OrynException
 {
     public function __construct(string $to, int $statusCode = 302, array $context = [], ?Throwable $previous = null)
     {

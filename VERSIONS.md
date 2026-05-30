@@ -43,8 +43,8 @@ All of the following are loaded globally for the main HTML shell (unless a view 
 
 | Path | Notes |
 |------|--------|
-| `public/assets/css/zantech-ui.css` | App design system |
-| `public/assets/js/zantech.bundle.js` | Bundled Angular controllers / app logic (`?v=` cache-bust in header) |
+| `public/assets/css/oryn-ui.css` | App design system |
+| `public/assets/js/oryn.bundle.js` | Bundled Angular controllers / app logic (`?v=` cache-bust in header) |
 
 ---
 

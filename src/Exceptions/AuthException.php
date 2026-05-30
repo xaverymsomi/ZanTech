@@ -2,7 +2,7 @@
 
 namespace Exceptions;
 
-class AuthException extends ZantechException
+class AuthException extends OrynException
 {
     public function __construct(string $message = 'Unauthorized')
     {

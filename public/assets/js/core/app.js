@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    // 1. Sub-Module Definitions (Must come before zantechApp)
+    // 1. Sub-Module Definitions (Must come before orynApp)
     angular.module('create.modal', ['ui.bootstrap', 'toaster', 'angular.filter', 'ngFileUpload']);
     angular.module('dashboard.modal', ['ui.bootstrap', 'toaster']);
     angular.module('permission.modal', ['ui.bootstrap', 'toaster', 'angular.filter']);
@@ -9,7 +9,7 @@
     angular.module('report.modal', ['ui.bootstrap', 'toaster']);
 
     // 2. Main Application Module
-    angular.module('zantechApp', [
+    angular.module('orynApp', [
         'toaster',
         'ngAnimate',
         'ngSanitize',

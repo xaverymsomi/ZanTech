@@ -65,8 +65,8 @@ public/assets/
 
 Core frontend files include:
 
-- `public/assets/css/zantech-ui.css`
-- `public/assets/js/zantech.bundle.js`
+- `public/assets/css/oryn-ui.css`
+- `public/assets/js/oryn.bundle.js`
 - `public/assets/js/core/app.js`
 - `public/assets/js/core/api.client.js`
 - `public/assets/js/controllers/`

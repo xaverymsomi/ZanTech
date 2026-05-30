@@ -22,7 +22,7 @@ src/helpers/helpers.php
 src/Foundation/web.php
   |
   v
-Foundation\Zantech
+Foundation\\Oryn
   |
   v
 Middleware pipeline
@@ -54,7 +54,7 @@ The web server should route all application requests to this file.
 
 ## Web Kernel
 
-`src/Foundation/web.php` starts output buffering, initializes secure sessions for web requests, assigns a request ID, and runs the legacy-compatible `Foundation\Zantech` kernel class.
+`src/Foundation/web.php` starts output buffering, initializes secure sessions for web requests, assigns a request ID, and runs the legacy-compatible `Foundation\\Oryn` kernel class.
 
 ## Cron Lifecycle
 
@@ -68,7 +68,7 @@ The cron runner is CLI-only, assigns a `CRON-` request ID, takes a non-blocking 
 
 ## Application Dispatcher
 
-`Foundation\Zantech` captures the request, creates a route context, runs middleware, resolves the controller, and calls the matching action.
+`Foundation\\Oryn` captures the request, creates a route context, runs middleware, resolves the controller, and calls the matching action.
 
 For example:
 

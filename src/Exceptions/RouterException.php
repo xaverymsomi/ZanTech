@@ -2,7 +2,7 @@
 
 namespace Exceptions;
 
-class RouterException extends ZantechException
+class RouterException extends OrynException
 {
     public function __construct(string $internalMessage, string $publicMessage = 'A routing error occurred.', int $statusCode = 500, array $context = [])
     {

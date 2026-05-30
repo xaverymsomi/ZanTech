@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('zantechApp')
+    angular.module('orynApp')
         .factory('ApiClient', [
             '$http', '$q', 'toaster',
             function ($http, $q, toaster) {

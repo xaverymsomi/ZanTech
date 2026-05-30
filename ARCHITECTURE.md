@@ -145,7 +145,7 @@ php oryn migrate:status          # Shows applied vs pending migrations in the ti
 ## 7. Frontend Integration & Premium UI Standards
 
 Oryn coordinates modern responsive interfaces by pairing modular PHP template blocks with AngularJS application stacks:
-* **Responsive Styling**: Enforced by **Bootstrap 5.3.3** utilizing curated primary components, fluid spacing layouts, and glassmorphic inputs defined in [zantech-ui.css](file:///e:/personal/zanTech/public/assets/css/zantech-ui.css).
+* **Responsive Styling**: Enforced by **Bootstrap 5.3.3** utilizing curated primary components, fluid spacing layouts, and glassmorphic inputs defined in [oryn-ui.css](file:///e:/personal/zanTech/public/assets/css/oryn-ui.css).
 * **Single-Page Mechanics**: Embedded AngularJS applications (v1.8.2) interact with server REST routes to update table structures dynamically without refreshing layouts.
 * **Controller-to-Frontend Binding**: Backend attributes are safely serialized into HTML container tags, which the AngularJS app maps upon bootstrapping to maintain seamless dynamic states.
 
@@ -189,7 +189,7 @@ Previously, direct database operations `save()`, `update()`, and `updateFiltered
 * **SMS Payload Redaction**: Upgraded `MXSms::sendTemplateSMS()` in [src/Services/MXSms.php](file:///e:/personal/zanTech/src/Services/MXSms.php) to filter its log statements. All phone number recipients are masked using safe format expressions, and all token keys (such as codes, passwords, or secrets) are scrubbed using the core `RouterSecurity::redactSensitive()` engine before being stored.
 
 ### 4. Cinematic Split-Panel Visual Hotfixes
-* **Contrast Alignment**: Hardened CSS active-state classes in [zantech-ui.css](file:///e:/personal/zanTech/public/assets/css/zantech-ui.css) (such as `.zt-permission-architect .list-group-item.active`) to enforce high-contrast readable color schemes against soft glassmorphic primary overlays.
+* **Contrast Alignment**: Hardened CSS active-state classes in [oryn-ui.css](file:///e:/personal/zanTech/public/assets/css/oryn-ui.css) (such as `.zt-permission-architect .list-group-item.active`) to enforce high-contrast readable color schemes against soft glassmorphic primary overlays.
 * **Edge-to-Edge Banners**: Modified margin rules (`margin-left: -3rem`, `margin-right: -3rem`) inside `.zt-dashboard-header` to pull background headers perfectly flush with the screen, eliminating white gaps and layout inconsistencies.
 
 ### 5. Dead Code & Legacy Method Cleanup

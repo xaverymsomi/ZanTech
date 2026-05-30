@@ -10,7 +10,7 @@ use Foundation\Routing\RouteContext;
 use Http\Request;
 use PHPUnit\Framework\TestCase;
 use Exceptions\AuthException;
-use Exceptions\ZantechException;
+use Exceptions\OrynException;
 
 final class MiddlewarePipelineTest extends TestCase
 {
@@ -92,7 +92,7 @@ final class MiddlewarePipelineTest extends TestCase
 
         $this->assertSame('ok', $middleware->handle($route, fn (): string => 'ok'));
 
-        $this->expectException(ZantechException::class);
+        $this->expectException(OrynException::class);
         $middleware->handle($route, fn (): string => 'blocked');
     }
 }

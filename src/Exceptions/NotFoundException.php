@@ -2,7 +2,7 @@
 
 namespace Exceptions;
 
-class NotFoundException extends ZantechException
+class NotFoundException extends OrynException
 {
     public function __construct(string $message = 'Resource not found')
     {

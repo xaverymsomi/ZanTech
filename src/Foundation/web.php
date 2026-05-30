@@ -2,7 +2,7 @@
 
 use Authentication\Session;
 use Exceptions\ExceptionHandler;
-use Foundation\Zantech;
+use Foundation\Oryn;
 use Modules\Error\Error;
 use Logging\Log;
 
@@ -72,7 +72,7 @@ if (session_status() === PHP_SESSION_ACTIVE) {
  * Here we only ensure any boot/runtime Throwable is handled gracefully.
  */
 try {
-    (new Zantech())->init();
+    (new Oryn())->init();
 } catch (Throwable $e) {
     ExceptionHandler::handle($e);
 }

@@ -12,7 +12,7 @@ final class MigrationRunnerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'zantech-migrations-test';
+        $this->dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'Oryn-migrations-test';
         $this->removeDir($this->dir);
         mkdir($this->dir, 0777, true);
     }

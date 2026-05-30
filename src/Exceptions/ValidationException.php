@@ -2,7 +2,7 @@
 
 namespace Exceptions;
 
-class ValidationException extends ZantechException
+class ValidationException extends OrynException
 {
     public function __construct(array $errors)
     {

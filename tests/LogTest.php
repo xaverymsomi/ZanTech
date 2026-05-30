@@ -11,7 +11,7 @@ final class LogTest extends TestCase
 
         Log::exception($exception, 'TEST_EXCEPTION');
 
-        $logDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'zantech-test-logs' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'sys';
+        $logDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'Oryn-test-logs' . DIRECTORY_SEPARATOR . 'logs' . DIRECTORY_SEPARATOR . 'sys';
         $files = glob($logDir . DIRECTORY_SEPARATOR . '*.log');
         $this->assertNotEmpty($files, 'Expected at least one sys log file to exist.');
 

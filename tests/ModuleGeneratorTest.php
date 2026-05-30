@@ -13,7 +13,7 @@ final class ModuleGeneratorTest extends TestCase
     protected function setUp(): void
     {
         $this->originalCwd = getcwd() ?: __DIR__;
-        $this->workDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'zantech-module-generator-' . bin2hex(random_bytes(6));
+        $this->workDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'Oryn-module-generator-' . bin2hex(random_bytes(6));
         mkdir($this->workDir, 0777, true);
         chdir($this->workDir);
     }

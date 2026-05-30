@@ -13,9 +13,9 @@ if (!defined('ZT_BASE_PATH')) {
     define('ZT_BASE_PATH', realpath(__DIR__ . '/..'));
 }
 if (!defined('ZT_LOG_ROOT')) {
-    define('ZT_LOG_ROOT', sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'zantech-test-logs');
+    define('ZT_LOG_ROOT', sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oryn-test-logs');
 }
-$sessionPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'zantech-test-sessions';
+$sessionPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oryn-test-sessions';
 if (!is_dir($sessionPath)) {
     mkdir($sessionPath, 0777, true);
 }

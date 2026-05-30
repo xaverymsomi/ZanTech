@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('zantechApp')
+    angular.module('orynApp')
         .service('FormLoader', ['$http', '$q', '$compile', '$timeout', function ($http, $q, $compile, $timeout) {
 
             this.load = function (url) {

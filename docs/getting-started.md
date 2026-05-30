@@ -36,7 +36,7 @@ URL1=http://localhost
 APP_DIR=
 DB_TYPE=sqlsrv
 DB_HOST=localhost
-DB_NAME=zantech
+DB_NAME=oryn
 DB_USER=sa
 DB_PASS=secret
 ```

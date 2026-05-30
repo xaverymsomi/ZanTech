@@ -11,7 +11,7 @@ use Database\Database;
 use Foundation\Middleware\AuthThrottlingMiddleware;
 use Http\Request;
 use DateTime;
-use Exceptions\ZantechException;
+use Exceptions\OrynException;
 use Database\Model;
 use Logging\Log;
 use Services\Hash;
@@ -213,7 +213,7 @@ final class Login_Model extends Model
         // ✅ whitelist domain tables
         $allowedDomains = ['mx_user', 'mx_agent', 'mx_staff'];
         if (!in_array($user['txt_domain'], $allowedDomains, true)) {
-            throw new ZantechException("Invalid domain table {$user['txt_domain']}", "Account configuration error", 500);
+            throw new OrynException("Invalid domain table {$user['txt_domain']}", "Account configuration error", 500);
         }
 
         $domainQ = method_exists($db, 'quoteTable') ? $db->quoteTable($user['txt_domain']) : $user['txt_domain'];

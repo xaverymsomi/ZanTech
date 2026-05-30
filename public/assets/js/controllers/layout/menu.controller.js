@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('zantechApp')
+        .module('orynApp')
         .controller('menuController', ['$scope', '$rootScope', '$compile', '$window', '$http', 'toaster', function ($scope, $rootScope, $compile, $window, $http, toaster) {
             
             // Listen for changes from Menu Builder

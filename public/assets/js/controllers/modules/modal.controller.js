@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('zantechApp')
+    angular.module('orynApp')
         .controller('ModalProfileCtrl', [
             '$scope', '$uibModalInstance', '$http', '$compile', '$interval', '$filter', '$sce', 'toaster', 'ApiClient',
             function ($scope, $uibModalInstance, $http, $compile, $interval, $filter, $sce, toaster, ApiClient) {

@@ -26,7 +26,7 @@ use Modules\Login\Login;
 use Throwable;
 use Logging\Log;
 
-final class Zantech
+final class Oryn
 {
     private array $segments = [];
     private string $rawUrl = '';

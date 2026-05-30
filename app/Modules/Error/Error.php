@@ -6,7 +6,7 @@ use Http\Controller;
 
 /**
  * ============================================================================
- *  ZANTECH - Error Controller
+ *  ORYN - Error Controller
  * ============================================================================
  *  ✔ Displays framework/system/module errors
  *  ✔ Uses Bootstrap Icons (bi-*)

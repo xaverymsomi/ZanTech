@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('zantechApp')
+    angular.module('orynApp')
         .controller('reportCtrl', [
             '$scope', '$http', '$interval', '$compile', '$filter', 'ApiClient',
             function ($scope, $http, $interval, $compile, $filter, ApiClient) {

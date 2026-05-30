@@ -2,7 +2,7 @@
 
 namespace Exceptions;
 
-class ForbiddenException extends ZantechException
+class ForbiddenException extends OrynException
 {
     public function __construct(string $message = 'Forbidden')
     {

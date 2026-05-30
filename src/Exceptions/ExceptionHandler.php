@@ -21,7 +21,7 @@ final class ExceptionHandler
         ForbiddenException::class  => 'warning',
         NotFoundException::class   => 'info',
         RouterException::class     => 'danger',
-        ZantechException::class    => 'danger',
+        OrynException::class       => 'danger',
         DatabaseException::class   => 'danger',
     ];
 
@@ -35,13 +35,13 @@ final class ExceptionHandler
     {
         $requestId = isset($_SERVER['ZT_REQUEST_ID']) ? (string)$_SERVER['ZT_REQUEST_ID'] : null;
 
-        if (!$e instanceof ZantechException) {
+        if (!$e instanceof OrynException) {
             $fullMessage = $e->getMessage();
             if ($prev = $e->getPrevious()) {
                 $fullMessage .= " (Original: " . $prev->getMessage() . ")";
             }
 
-            $e = new ZantechException(
+            $e = new OrynException(
                 $fullMessage,
                 'An unexpected error occurred.',
                 500,
@@ -89,7 +89,7 @@ final class ExceptionHandler
         return strtolower((string)($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '')) === 'xmlhttprequest';
     }
 
-    private static function jsonResponse(ZantechException $e, ?string $requestId): Response
+    private static function jsonResponse(OrynException $e, ?string $requestId): Response
     {
         $ctx = $e->getContext();
         $redirect = isset($ctx['redirect']) ? self::sanitizeRedirectTarget((string)$ctx['redirect']) : null;
@@ -104,7 +104,7 @@ final class ExceptionHandler
         ], $e->getStatusCode());
     }
 
-    private static function htmlResponse(ZantechException $e, string $severity, string $icon): Response
+    private static function htmlResponse(OrynException $e, string $severity, string $icon): Response
     {
         $ctx = $e->getContext();
 
@@ -189,7 +189,7 @@ final class ExceptionHandler
         return Response::redirect($location, $statusCode);
     }
 
-    private static function resolveSeverity(ZantechException $e): string
+    private static function resolveSeverity(OrynException $e): string
     {
         foreach (self::EXCEPTION_SEVERITY as $class => $severity) {
             if ($e instanceof $class) {

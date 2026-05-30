@@ -7,7 +7,7 @@ namespace View;
 use AllowDynamicProperties;
 use Authentication\Auth;
 use Authentication\Session;
-use Exceptions\ZantechException;
+use Exceptions\OrynException;
 use Logging\Log;
 
 #[AllowDynamicProperties]
@@ -196,7 +196,7 @@ class ViewRenderer
         if (!is_file($file)) {
             Log::sysErr("VIEW ERROR: {$reason}");
 
-            throw new ZantechException(
+            throw new OrynException(
                 $reason,
                 'A system view could not be loaded.',
                 500,
@@ -210,7 +210,7 @@ class ViewRenderer
         self::$renderDepth++;
 
         if (self::$renderDepth > self::MAX_RENDER_DEPTH) {
-            throw new ZantechException(
+            throw new OrynException(
                 "View recursion detected in {$context}",
                 'A rendering error occurred.',
                 500,

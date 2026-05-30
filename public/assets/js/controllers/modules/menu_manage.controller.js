@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('zantechApp')
+    angular.module('orynApp')
         .controller('menuManageCtrl', [
             '$scope', '$rootScope', '$window', '$http', '$timeout', '$compile', '$uibModal', 'toaster',
             function ($scope, $rootScope, $window, $http, $timeout, $compile, $uibModal, toaster) {

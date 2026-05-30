@@ -169,12 +169,12 @@
   ],
   "app_bundles": [
     {
-      "name": "zantech-ui",
-      "path": "public/assets/css/zantech-ui.css"
+      "name": "oryn-ui",
+      "path": "public/assets/css/oryn-ui.css"
     },
     {
-      "name": "zantech-bundle",
-      "path": "public/assets/js/zantech.bundle.js",
+      "name": "oryn-bundle",
+      "path": "public/assets/js/oryn.bundle.js",
       "note": "Cache-bust query in header: ?v=time()"
     }
   ]

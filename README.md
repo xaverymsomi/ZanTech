@@ -6,7 +6,7 @@ The preferred CLI entry is **`oryn`**. The older **`zt`** and **`zt.php`** entri
 
 **Framework shell:** `2.4.1` (see `ZT_APP_VERSION` in `bootstrap/sys_pref.php`).
 
-Repository: [github.com/xaverymsomi/ZanTech](https://github.com/xaverymsomi/ZanTech)
+Repository: [github.com/xaverymsomi/ZanTech](https://github.com/xaverymsomi/ZanTech) (repository rename to `oryn` in progress)
 
 ## Documentation
 
@@ -116,7 +116,7 @@ Common commands:
 
 ## Notes
 
-Some internal class names and constants still use the historical `Zantech` / `ZT_` naming for compatibility. New user-facing docs and CLI branding use **Oryn**.
+Internal constants prefixed `ZT_` are kept for backward compatibility with existing `.env` files.
 
 ## License
 

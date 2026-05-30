@@ -61,7 +61,7 @@ class User extends BaseModuleController
     public function save()
     {
         // This method is now protected by Dual Control (Maker-Checker).
-        // If a user attempts to save, the Zantech kernel will intercept it,
+        // If a user attempts to save, the Oryn kernel will intercept it,
         // create an approval request, and only execute this code after approval.
 
         $posted_data = $this->request()->all();

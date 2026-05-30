@@ -5,7 +5,7 @@ namespace Foundation\Middleware;
 use Closure;
 use Database\Database;
 use Foundation\Routing\RouteContext;
-use Exceptions\ZantechException;
+use Exceptions\OrynException;
 use Logging\Log;
 
 /**
@@ -57,7 +57,7 @@ class AuthThrottlingMiddleware implements Middleware
             $blockedUntil = $result[0]['blocked_until'];
             Log::sysLog("AUTH-THROTTLE: Blocked request from IP: {$ip}, User: {$username} until {$blockedUntil}");
             
-            throw new ZantechException(
+            throw new OrynException(
                 "Too many failed attempts. Access is restricted until {$blockedUntil}.",
                 "Security Block Active",
                 429

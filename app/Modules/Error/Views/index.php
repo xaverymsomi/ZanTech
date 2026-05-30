@@ -1,7 +1,7 @@
 <?php
 /**
  * ============================================================================
- *  ZANTECH ERROR VIEW (Bootstrap-enhanced)
+ *  ORYN ERROR VIEW (Bootstrap-enhanced)
  * ============================================================================
  *  - Uses Bootstrap + Bootstrap Icons
  *  - Icon + color explain the error visually
