@@ -23,7 +23,7 @@ ELSE
 BEGIN
     PRINT 'bit_is_superadmin already exists on mx_login_credential — skipped';
 END
-GO
+
 
 -- -----------------------------------------------------------------------------
 -- 2. Add direct permission link to mx_menu
@@ -45,7 +45,7 @@ ELSE
 BEGIN
     PRINT 'opt_mx_permission_id already exists on mx_menu — skipped';
 END
-GO
+
 
 -- Add FK constraint if not already present
 IF NOT EXISTS (
@@ -66,7 +66,7 @@ ELSE
 BEGIN
     PRINT 'FK_mx_menu_permission already exists — skipped';
 END
-GO
+
 
 -- =============================================================================
 -- MANUAL STEP (run after migration):
@@ -81,4 +81,4 @@ GO
 --   ) WHERE txt_name = 'Menu';
 -- =============================================================================
 PRINT 'RBAC v2 migration complete.';
-GO
+

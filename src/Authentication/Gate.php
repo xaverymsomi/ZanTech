@@ -208,21 +208,13 @@ final class Gate
         try {
             $db = DB::connection();
 
-            $superAdmin = false;
-            try {
-                // 1. Check super admin flag
-                $stmt = $db->prepare(
-                    "SELECT bit_is_superadmin FROM mx_login_credential WHERE id = :id"
-                );
-                $stmt->execute([':id' => $credentialId]);
-                $row        = $stmt->fetch(PDO::FETCH_ASSOC);
-                $superAdmin = (bool)(int)($row['bit_is_superadmin'] ?? 0);
-            } catch (\Throwable $e) {
-                // Graceful fallback if migration hasn't been run yet
-                Log::sysLog('GATE_SUPERADMIN_FALLBACK: run database/migrations/rbac_v2.sql');
-                // Legacy fallback: users in group 1 (Developer) act as super admins
-                $superAdmin = (\Authentication\Auth::groupId() === 1);
-            }
+            // 1. Check super admin flag
+            $stmt = $db->prepare(
+                "SELECT bit_is_superadmin FROM mx_login_credential WHERE id = :id"
+            );
+            $stmt->execute([':id' => $credentialId]);
+            $row        = $stmt->fetch(PDO::FETCH_ASSOC);
+            $superAdmin = (bool)(int)($row['bit_is_superadmin'] ?? 0);
 
             // Super admins skip permission loading entirely
             if ($superAdmin) {
