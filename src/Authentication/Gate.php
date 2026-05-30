@@ -220,6 +220,8 @@ final class Gate
             } catch (\Throwable $e) {
                 // Graceful fallback if migration hasn't been run yet
                 Log::sysLog('GATE_SUPERADMIN_FALLBACK: run database/migrations/rbac_v2.sql');
+                // Legacy fallback: users in group 1 (Developer) act as super admins
+                $superAdmin = (\Authentication\Auth::groupId() === 1);
             }
 
             // Super admins skip permission loading entirely
