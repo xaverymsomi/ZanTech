@@ -284,15 +284,29 @@ class Menu extends Controller
                 return $this->responseError("User not authenticated", 401);
             }
 
-            // 1. Fetch all menus with their linked permission slug in one query
-            $allMenus = $this->model->db->select(
-                "SELECT m.id, m.txt_name, m.txt_icon, m.int_parent, m.int_position,
-                        m.txt_link, m.txt_title, m.txt_row_value, m.txt_sidebar_group,
-                        p.txt_name AS txt_permission_slug
-                 FROM mx_menu m
-                 LEFT JOIN mx_permission p ON p.id = m.opt_mx_permission_id
-                 ORDER BY m.int_parent ASC, m.int_position ASC, m.id ASC"
-            );
+            // 1. Fetch all menus with their linked permission slug in one query.
+            //    Falls back to a plain query if rbac_v2.sql migration hasn't been run yet.
+            try {
+                $allMenus = $this->model->db->select(
+                    "SELECT m.id, m.txt_name, m.txt_icon, m.int_parent, m.int_position,
+                            m.txt_link, m.txt_title, m.txt_row_value, m.txt_sidebar_group,
+                            p.txt_name AS txt_permission_slug
+                     FROM mx_menu m
+                     LEFT JOIN mx_permission p ON p.id = m.opt_mx_permission_id
+                     ORDER BY m.int_parent ASC, m.int_position ASC, m.id ASC"
+                );
+            } catch (\Throwable $migrationErr) {
+                // Migration not yet applied — opt_mx_permission_id column missing.
+                // Show all menus to authenticated users (NULL slug = visible to all).
+                Log::sysLog('GATE_MENU_FALLBACK: run database/migrations/rbac_v2.sql to enable per-menu permissions');
+                $allMenus = $this->model->db->select(
+                    "SELECT id, txt_name, txt_icon, int_parent, int_position,
+                            txt_link, txt_title, txt_row_value, txt_sidebar_group,
+                            NULL AS txt_permission_slug
+                     FROM mx_menu
+                     ORDER BY int_parent ASC, int_position ASC, id ASC"
+                );
+            }
 
             // 2. Organise into parents and children, filtering by permission
             $parents  = [];

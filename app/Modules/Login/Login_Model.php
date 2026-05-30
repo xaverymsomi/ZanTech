@@ -80,12 +80,13 @@ final class Login_Model extends Model
 
         // ✅ NEW: set canonical auth session used by Auth::isLogged()
         Auth::login([
-            'id'             => $result[1]['id'],
-            'credential_id'  => $result[1]['id'],
-            'txt_username'   => $result[1]['txt_username'] ?? $email,
-            'txt_name'       => $result[1]['txt_name'] ?? '',
-            'txt_domain'     => $result[1]['txt_domain'] ?? '',
-            'opt_mx_group_id'=> $result[0]['opt_mx_group_id'] ?? 0,
+            'id'                => $result[1]['id'],
+            'credential_id'     => $result[1]['id'],
+            'txt_username'      => $result[1]['txt_username'] ?? $email,
+            'txt_name'          => $result[1]['txt_name'] ?? '',
+            'txt_domain'        => $result[1]['txt_domain'] ?? '',
+            'opt_mx_group_id'   => $result[0]['opt_mx_group_id'] ?? 0,
+            'bit_is_superadmin' => $result[1]['bit_is_superadmin'] ?? 0,
         ]);
 
         // 5) SESSION KEYS
