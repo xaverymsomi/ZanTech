@@ -2,7 +2,7 @@
 
 namespace Modules\Permission;
 
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 use Exception;
 use Http\Controller;
 use Database\Database;
@@ -24,10 +24,7 @@ class Permission extends Controller
     public function index()
     {
         try {
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('view_permissions')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('view_permissions');
 
             $this->view()->permission_details = $this->model->loadData();
             $this->render('index');
@@ -41,10 +38,7 @@ class Permission extends Controller
     public function create()
     {
         try {
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('add_permission')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('add_permission');
 
             $this->view()->class = get_class($this->model);
             $this->view()->title = 'New ' . $this->model->getTitle();
@@ -68,10 +62,7 @@ class Permission extends Controller
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
             }
 
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('view_permissions')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('view_permissions');
 
             $result = $this->service->getUserGroups($payload['domain'], $payload['id']);
             return $this->responseSuccess(200, 'User groups loaded', ['data' => $result]);
@@ -92,16 +83,16 @@ class Permission extends Controller
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
             }
 
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('assign_permissions')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('assign_permissions');
 
             $result = $this->service->saveUserGroups($payload['id'], $payload['new_data']);
             
             if (($result['status'] ?? 200) >= 400) {
                 return $this->responseError($result['title'] ?? 'Error', $result['status'] ?? 500);
             }
+
+            // Flush the gate cache for all affected users so changes take effect immediately
+            Gate::flush();
 
             return $this->responseSuccess(200, $result['title'] ?? 'User groups saved');
 
@@ -123,10 +114,7 @@ class Permission extends Controller
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
             }
 
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('view_group_permissions')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('view_group_permissions');
 
             $result = $this->service->getGroupPermissions((int)$groupId);
             return $this->responseSuccess(200, 'Group permissions loaded', ['data' => $result]);
@@ -147,16 +135,16 @@ class Permission extends Controller
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
             }
 
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('assign_permissions')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('assign_permissions');
 
             $result = $this->service->saveGroupPermissions((int)$payload['id'], $payload['new_data']);
             
             if (($result['status'] ?? 200) >= 400) {
                 return $this->responseError($result['title'] ?? 'Error', $result['status'] ?? 500);
             }
+
+            // Flush the gate cache so updated group permissions are reflected immediately
+            Gate::flush();
 
             return $this->responseSuccess(200, $result['title'] ?? 'Group permissions updated');
 
@@ -176,10 +164,7 @@ class Permission extends Controller
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
             }
 
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('view_user_permissions')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('view_user_permissions');
 
             $result = $this->service->getUserPermissions($payload['domain'], $payload['id']);
             return $this->responseSuccess(200, 'User permissions loaded', ['data' => $result]);
@@ -200,10 +185,7 @@ class Permission extends Controller
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
             }
 
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('assign_user_permissions')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('assign_user_permissions');
 
             $result = $this->service->saveUserPermissions(
                 $payload['domain'],
@@ -214,6 +196,9 @@ class Permission extends Controller
             if (($result['status'] ?? 200) >= 400) {
                 return $this->responseError($result['title'] ?? 'Error', $result['status'] ?? 500);
             }
+
+            // Flush the gate cache so updated user permissions take effect immediately
+            Gate::flush();
 
             return $this->responseSuccess(200, $result['title'] ?? 'User permissions updated');
 
@@ -232,10 +217,7 @@ class Permission extends Controller
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
             }
 
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('add_group')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('add_group');
 
             $result = $this->service->createGroup($payload['name'], (int)($_SESSION['user_id'] ?? 0));
             
@@ -260,10 +242,7 @@ class Permission extends Controller
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
             }
 
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('add_permission')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('add_permission');
 
             $result = $this->service->createPermission(
                 $payload['display_name'],
@@ -292,10 +271,7 @@ class Permission extends Controller
                 return $this->responseError('Validation error', 422, ['errors' => $errors]);
             }
 
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('add_section')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('add_section');
 
             $result = $this->service->createSection($payload['txt_name']);
             
@@ -315,10 +291,7 @@ class Permission extends Controller
     public function loadData()
     {
         try {
-            $perm = Perm_Auth::getPermissions();
-            if (!$perm->verifyPermission('view_permissions')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('view_permissions');
 
             $data = $this->model->loadData();
             return $this->responseSuccess(200, 'Permission data loaded', ['data' => $data]);

@@ -3,7 +3,7 @@
 namespace Modules\User;
 
 use Foundation\BaseModuleController;
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 use Authentication\Session;
 use Exception;
 use Logging\Log;

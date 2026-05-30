@@ -45,7 +45,7 @@ final class ModuleGenerator
 
 namespace Modules\\{$name};
 
-use Authentication\\Perm_Auth;
+use Authentication\\Gate;
 use Http\\Controller;
 
 class {$name} extends Controller
@@ -60,10 +60,7 @@ class {$name} extends Controller
 
     public function index(): void
     {
-        \$perm = Perm_Auth::getPermissions();
-        if (!\$perm->verifyPermission('{$permission}')) {
-            \$this->permissionDenied();
-        }
+        \$this->requirePermission('{$permission}');
 
         \$this->view()->title = '{$name}';
         \$this->view()->items = \$this->model->exampleItems();

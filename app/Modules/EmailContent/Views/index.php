@@ -1,11 +1,10 @@
 <div id="page-content" class="px-4 py-4">
     <?php
-    use Authentication\Perm_Auth;
+    use Authentication\Gate;
     use Authentication\Session;
     use View\DataView;
 
     $returned = Session::get('returned') ?? 0;
-    $perm = Perm_Auth::getPermissions();
 
     // Modern Header Section
     echo '<div class="d-flex align-items-center justify-content-between mb-4">';
@@ -25,7 +24,7 @@
     $actions = [];
     if (sizeof($this->actions)) {
         foreach ($this->actions as $action) {
-            if ($perm->verifyPermission(strtolower($action['action']))) {
+            if (Gate::allows(strtolower($action['action']))) {
                 $actions[] = $action;
             }
         }

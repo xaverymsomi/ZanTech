@@ -2,7 +2,7 @@
 
 namespace Http;
 
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 use Http\Request;
 use Logging\Log;
 use Modules\Error\Error;
@@ -154,9 +154,7 @@ class Controller
 
     protected function requirePermission(string $permissionKey): void
     {
-        $permissions = Perm_Auth::getPermissions();
-
-        if (!$permissions->verifyPermission($permissionKey)) {
+        if (!Gate::allows($permissionKey)) {
             $this->permissionDenied();
         }
     }

@@ -3,7 +3,7 @@
 namespace Modules\Menu;
 
 use Authentication\Auth;
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 use Exception;
 use Http\Controller;
 use Logging\Log;
@@ -21,11 +21,7 @@ class Menu extends Controller
     public function index()
     {
         try {
-            $permission = Perm_Auth::getPermissions();
-            if (!$permission->verifyPermission('view_menu')) {
-                $this->permissionDenied();
-            }
-
+            $this->requirePermission('view_menu');
             $this->view()->title = "All " . $this->model->getTitle() . "s";
             $this->view()->dropdowns = $this->model->getFormDropdowns();
             $this->render('home');
@@ -42,11 +38,7 @@ class Menu extends Controller
     public function getAllMenus()
     {
         try {
-            $permission = Perm_Auth::getPermissions();
-            if (!$permission->verifyPermission('view_menu')) {
-                $this->permissionDenied();
-            }
-
+            $this->requirePermission('view_menu');
             $menus = $this->model->getMenus();
             $dropdowns = $this->model->getFormDropdowns();
             return $this->responseSuccess(200, 'Menus loaded', [
@@ -66,10 +58,7 @@ class Menu extends Controller
     public function saveMenu()
     {
         try {
-            $permission = Perm_Auth::getPermissions();
-            if (!$permission->verifyPermission('add_menu')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('add_menu');
 
             $posted = json_decode(file_get_contents("php://input"), true);
             if (!is_array($posted)) {
@@ -167,11 +156,8 @@ class Menu extends Controller
     public function edit($id)
     {
         try {
+            $this->requirePermission('edit_menu');
             $id = (string)$id;
-            $permission = Perm_Auth::getPermissions();
-            if (!$permission->verifyPermission('edit_menu')) {
-                $this->permissionDenied();
-            }
 
             $recordId = $this->model->getRecordIdByRowValue($this->model->getTable(), $id);
             if ($recordId < 0) {
@@ -206,10 +192,7 @@ class Menu extends Controller
     public function postEdit()
     {
         try {
-            $permission = Perm_Auth::getPermissions();
-            if (!$permission->verifyPermission('edit_menu')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('edit_menu');
 
             $raw = file_get_contents('php://input');
             $posted = json_decode((string)$raw, true);
@@ -301,38 +284,35 @@ class Menu extends Controller
                 return $this->responseError("User not authenticated", 401);
             }
 
-            // 1. Fetch all menus in one query
+            // 1. Fetch all menus with their linked permission slug in one query
             $allMenus = $this->model->db->select(
-                "SELECT id, txt_name, txt_icon, int_parent, int_position, txt_link, txt_title, txt_row_value, txt_sidebar_group
-                 FROM mx_menu
-                 ORDER BY int_parent ASC, int_position ASC, id ASC"
+                "SELECT m.id, m.txt_name, m.txt_icon, m.int_parent, m.int_position,
+                        m.txt_link, m.txt_title, m.txt_row_value, m.txt_sidebar_group,
+                        p.txt_name AS txt_permission_slug
+                 FROM mx_menu m
+                 LEFT JOIN mx_permission p ON p.id = m.opt_mx_permission_id
+                 ORDER BY m.int_parent ASC, m.int_position ASC, m.id ASC"
             );
 
-            $perm = Perm_Auth::getPermissions();
-            $sections = method_exists($perm, 'getPermittedSections')
-                ? $perm->getPermittedSections($userId)
-                : [];
-
-            $allowedNames = [];
-            foreach ($sections as $s) {
-                if (!empty($s['section_name'])) $allowedNames[] = $s['section_name'];
-            }
-
-            // 2. Organize into parents and children
-            $parents = [];
+            // 2. Organise into parents and children, filtering by permission
+            $parents  = [];
             $children = [];
 
             foreach ($allMenus as $menu) {
                 $parentId = $menu['int_parent'] ?? null;
-                $isRoot = ($parentId === null || $parentId === '' || $parentId === false);
+                $isRoot   = ($parentId === null || $parentId === '' || $parentId === false);
+                $slug     = $menu['txt_permission_slug'] ?? null;
+
+                // Permission check: null slug = visible to all; otherwise Gate checks it
+                $allowed = ($slug === null) || Gate::allows((string)$slug);
+
                 if ($isRoot) {
-                    // Only keep main menu if user has permission for that section
-                    if (in_array($menu['txt_name'], $allowedNames, true)) {
+                    if ($allowed) {
                         $parents[$menu['id']] = $menu;
                     }
                 } else {
                     $pid = (int) $parentId;
-                    if ($pid > 0) {
+                    if ($pid > 0 && $allowed) {
                         $children[$pid][] = $menu;
                     }
                 }
@@ -344,21 +324,14 @@ class Menu extends Controller
 
             $final = [];
             foreach ($parents as $parentId => $menu) {
-                $pid = (int) $parentId;
-                $sub = $children[$pid] ?? [];
-
-                // 3. Verify submenu permissions if applicable
-                if (method_exists($perm, 'verifySubMenuPermissions')) {
-                    $sub = $perm->verifySubMenuPermissions($sub, $userId);
-                }
+                $pid  = (int) $parentId;
+                $sub  = $children[$pid] ?? [];
 
                 $items = array_map(function ($item) {
                     $link = trim((string)($item['txt_link'] ?? '#'));
                     $link = ($link === '' ? '#' : $link);
-
                     return [
                         'name'  => trans($item['txt_name']),
-                        /* Path only (leading slash); client uses window.app_url which already includes APP_DIR */
                         'link'  => ($link === '#' ? '#' : self::menuLinkForClient($link)),
                         'title' => $item['txt_title'],
                         'icon'  => $item['txt_icon'],
@@ -369,14 +342,14 @@ class Menu extends Controller
                 $link = ($link === '' ? '#' : $link);
 
                 $final[] = [
-                    'id'            => $menu['txt_row_value'],
-                    'name'          => trans($menu['txt_name']),
-                    'link'          => ($link === '#' ? '#' : self::menuLinkForClient($link)),
-                    'title'         => $menu['txt_title'],
-                    'icon'          => $menu['txt_icon'],
-                    'sidebarGroup'  => trim((string) ($menu['txt_sidebar_group'] ?? '')),
-                    'int_position'  => (int) ($menu['int_position'] ?? 0),
-                    'submenus'      => $items,
+                    'id'           => $menu['txt_row_value'],
+                    'name'         => trans($menu['txt_name']),
+                    'link'         => ($link === '#' ? '#' : self::menuLinkForClient($link)),
+                    'title'        => $menu['txt_title'],
+                    'icon'         => $menu['txt_icon'],
+                    'sidebarGroup' => trim((string) ($menu['txt_sidebar_group'] ?? '')),
+                    'int_position' => (int) ($menu['int_position'] ?? 0),
+                    'submenus'     => $items,
                 ];
             }
 
@@ -433,10 +406,7 @@ class Menu extends Controller
     public function deleteMenu()
     {
         try {
-            $permission = Perm_Auth::getPermissions();
-            if (!$permission->verifyPermission('delete_menu')) {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('delete_menu');
 
             $raw = file_get_contents('php://input');
             $posted = json_decode((string)$raw, true);

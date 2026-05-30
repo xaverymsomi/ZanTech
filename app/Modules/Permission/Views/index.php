@@ -36,8 +36,7 @@
 <div id="page-content" class="px-4 py-4 zt-animate-fade-in">
     <!-- Controller Data Transfer -->
     <div id="data_content"
-         data-permission-detail="<?php use Authentication\Perm_Auth;
-         echo htmlspecialchars(json_encode($this->permission_details, JSON_NUMERIC_CHECK), ENT_COMPAT, 'UTF-8') ?>"
+         data-permission-detail="<?php echo htmlspecialchars(json_encode($this->permission_details, JSON_NUMERIC_CHECK), ENT_COMPAT, 'UTF-8') ?>"
          ></div>
 
     <div ng-controller="permissionCtrl" ng-init="getData();" class="zt-permission-architect">

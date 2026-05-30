@@ -5,7 +5,7 @@ namespace Modules\SmsTemplate;
 use Exception;
 use Http\Controller;
 use Database\Database;
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 
 class SmsTemplate extends Controller
 {
@@ -20,78 +20,58 @@ class SmsTemplate extends Controller
 
     public function index()
     {
-        $user_id = filter_var($_SESSION['id'], FILTER_SANITIZE_SPECIAL_CHARS);
-        $permission = Perm_Auth::getPermissions();
-        if ($permission->verifyPermission('view_sms_templates')) {
-            $data = $this->model->getAllRecords($this->model->getTable());
+        $this->requirePermission('view_sms_templates');
+        $data = $this->model->getAllRecords($this->model->getTable());
 
-            $this->view()->title = "All " . $this->model->getTitle();
-            $this->view()->buttons = $this->model->getControls();
-            $this->view()->class = getClassName(get_class($this->model));
-            $this->view()->table = $this->model->getTable();
-            $this->view()->allRecords = $data[0];
-            $this->view()->headings = $this->model->getClassFields($this->model->getTable())['properties'];
-            $this->view()->hidden = $this->model->getHiddenFields();
-            $this->view()->actions = $this->model->getActions();
-            $this->view()->table = $this->model->getTable();
-            $this->view()->resultData = $data[1];
-            $this->view()->postData = $data[2];
-            $this->render('index');
-        } else {
-            $this->permissionDenied();
-        }
+        $this->view()->title = "All " . $this->model->getTitle();
+        $this->view()->buttons = $this->model->getControls();
+        $this->view()->class = getClassName(get_class($this->model));
+        $this->view()->table = $this->model->getTable();
+        $this->view()->allRecords = $data[0];
+        $this->view()->headings = $this->model->getClassFields($this->model->getTable())['properties'];
+        $this->view()->hidden = $this->model->getHiddenFields();
+        $this->view()->actions = $this->model->getActions();
+        $this->view()->table = $this->model->getTable();
+        $this->view()->resultData = $data[1];
+        $this->view()->postData = $data[2];
+        $this->render('index');
     }
 
     public function profile($id)
     {
+        $this->requirePermission('view_sms_templates');
         $record_id = filter_var($id, FILTER_SANITIZE_SPECIAL_CHARS);
-        $user_id = filter_var($_SESSION['id'], FILTER_SANITIZE_SPECIAL_CHARS);
-        $permission = Perm_Auth::getPermissions();
-        if ($permission->verifyPermission('view_sms_templates')) {
-            $returned_id = $this->model->getRecordIdByRowValue($this->model->getTable(), $record_id);
-            $data = $this->model->getProfileData($returned_id, $this->model->getTable());
-            $this->view()->title = 'SMS Template Profile';
-            $this->view()->data = $data;
-            $this->view()->tabs = $this->model->getTabs();
-            $this->view()->hidden_columns = $this->model->getProfileHiddenColumns();
-            $this->view()->buttons = $this->model->getProfileButtons();
-            $this->view()->primary_color = filter_input(INPUT_COOKIE, 'primary', FILTER_SANITIZE_SPECIAL_CHARS, ["options" => ["default" => "#000000"]]);
-            $this->view()->secondary_color = filter_input(INPUT_COOKIE, 'secondary', FILTER_SANITIZE_SPECIAL_CHARS, ["options" => ["default" => "#FF0000"]]);
-            $this->render('profile');
-        } else {
-            $this->permissionDenied();
-        }
+        $returned_id = $this->model->getRecordIdByRowValue($this->model->getTable(), $record_id);
+        $data = $this->model->getProfileData($returned_id, $this->model->getTable());
+        $this->view()->title = 'SMS Template Profile';
+        $this->view()->data = $data;
+        $this->view()->tabs = $this->model->getTabs();
+        $this->view()->hidden_columns = $this->model->getProfileHiddenColumns();
+        $this->view()->buttons = $this->model->getProfileButtons();
+        $this->view()->primary_color = filter_input(INPUT_COOKIE, 'primary', FILTER_SANITIZE_SPECIAL_CHARS, ["options" => ["default" => "#000000"]]);
+        $this->view()->secondary_color = filter_input(INPUT_COOKIE, 'secondary', FILTER_SANITIZE_SPECIAL_CHARS, ["options" => ["default" => "#FF0000"]]);
+        $this->render('profile');
     }
 
     public function edit($id)
     {
-        $user_id = filter_var($_SESSION['id'], FILTER_SANITIZE_SPECIAL_CHARS);
+        $this->requirePermission('edit_sms_template');
         $posted_id = filter_var($id, FILTER_SANITIZE_SPECIAL_CHARS);
-        $permission = Perm_Auth::getPermissions();
-        if ($permission->verifyPermission('edit_sms_template')) {
-            $sms_id = $this->model->getRecordIdByRowValue($this->model->getTable(), $posted_id);
-            $data = $this->model->getRecord($sms_id, $this->model->getTable());
-            $this->view()->title = 'Update ' . $this->model->getTitle();
-            $this->view()->data = $data;
-            $this->view()->dropdowns = $this->model->getFormDropdowns($data['opt_mx_source_id']);
-            $this->render('edit');
-        } else {
-            $this->permissionDenied();
-        }
+        $sms_id = $this->model->getRecordIdByRowValue($this->model->getTable(), $posted_id);
+        $data = $this->model->getRecord($sms_id, $this->model->getTable());
+        $this->view()->title = 'Update ' . $this->model->getTitle();
+        $this->view()->data = $data;
+        $this->view()->dropdowns = $this->model->getFormDropdowns($data['opt_mx_source_id']);
+        $this->render('edit');
     }
 
     public function edit_sms_setup()
     {
-        $user_id = filter_var($_SESSION['id'], FILTER_SANITIZE_SPECIAL_CHARS);
-        $permission = Perm_Auth::getPermissions();
-        if ($permission->verifyPermission('edit_sms_setup')) {
-            $this->view()->title = 'Update ' . $this->model->getTitle();
-            $this->view()->data = $this->model->getSMSSetting();
-            $this->view()->dropdowns = [];
-            $this->render('edit_sms_setup');
-        } else {
-            $this->permissionDenied();
-        }
+        $this->requirePermission('edit_sms_setup');
+        $this->view()->title = 'Update ' . $this->model->getTitle();
+        $this->view()->data = $this->model->getSMSSetting();
+        $this->view()->dropdowns = [];
+        $this->render('edit_sms_setup');
     }
 
     public function post_edit_sms_setup()
@@ -129,17 +109,12 @@ class SmsTemplate extends Controller
 
     public function create()
     {
-        $user_id = filter_var($_SESSION['id'], FILTER_SANITIZE_SPECIAL_CHARS);
-        $permission = Perm_Auth::getPermissions();
-        if ($permission->verifyPermission('add_sms_template')) { //checking permission
-            $this->view()->class = get_class($this->model);
-            $this->view()->title = 'New SMS Template';
-            $this->view()->dropdowns = $this->model->getFormDropdowns(0); // Get only unused reasons
-            $this->view()->data = ['has_extra' => 0];
-            $this->render('create');
-        } else {
-            $this->permissionDenied();
-        }
+        $this->requirePermission('add_sms_template');
+        $this->view()->class = get_class($this->model);
+        $this->view()->title = 'New SMS Template';
+        $this->view()->dropdowns = $this->model->getFormDropdowns(0);
+        $this->view()->data = ['has_extra' => 0];
+        $this->render('create');
     }
 
     public function save()

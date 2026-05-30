@@ -1,7 +1,7 @@
 <?php
 namespace Modules\DualActivity;
 
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 use Exception;
 use Http\Controller;
 
@@ -20,53 +20,42 @@ class DualActivity extends Controller {
     }
 
     public function index() {
-        $permission = Perm_Auth::getPermissions();
-        if ($permission->verifyPermission('view_dual_activity')) {
-            $this->view->title = $this->model->getTitle();
-            $data = $this->model->getAllRecords($this->model->getTable());
-//            print_r($data);
-            $this->view->buttons = $this->model->getControls();
-            $this->view->class = getClassName(get_class($this->model));
-            $this->view->allRecords = $data[0];
-            $this->view->headings = $this->model->getClassFields($this->model->getTable())['properties'];
-            $this->view->hidden = $this->model->getHiddenFields();
-            $this->view->actions = $this->model->getActions();
-            $this->view->table = $this->model->getTable();
-            $this->view->resultData = $data[1];
-            $this->view->postData = $data[2];
-            $this->render('index');
-        } else {
-            $this->permissionDenied();
-        }
+        $this->requirePermission('view_dual_activity');
+        $this->view->title = $this->model->getTitle();
+        $data = $this->model->getAllRecords($this->model->getTable());
+        $this->view->buttons = $this->model->getControls();
+        $this->view->class = getClassName(get_class($this->model));
+        $this->view->allRecords = $data[0];
+        $this->view->headings = $this->model->getClassFields($this->model->getTable())['properties'];
+        $this->view->hidden = $this->model->getHiddenFields();
+        $this->view->actions = $this->model->getActions();
+        $this->view->table = $this->model->getTable();
+        $this->view->resultData = $data[1];
+        $this->view->postData = $data[2];
+        $this->render('index');
     }
 
     public function edit($id) {
-        $user_id = filter_var($_SESSION['id'], FILTER_SANITIZE_SPECIAL_CHARS);
+        $this->requirePermission('edit_dual_activity');
         $posted_id = filter_var($id, FILTER_SANITIZE_SPECIAL_CHARS);
-        $permission = Perm_Auth::getPermissions();
-        if ($permission->verifyPermission('edit_dual_activity')) { //checking permission 
-            $returned_id = $this->model->getRecordIdByRowValue($this->model->getTable(), $posted_id);
-            if ($returned_id > -1) {
-                $data = $this->model->getRecord($returned_id, $this->model->getTable());
-                $view_data = [
-                    'id' => $posted_id,
-                    'int_require_dual_activity' => $data['int_require_dual_activity'],
-                    'has_extra' => 0
-                ];
-                $this->view->title = 'Change Dual Control Setting';
-                $this->view->model = $data['txt_model'];
-                $this->view->actionname = $data['txt_action_name'];
-                $this->view->data = $view_data;
-                $this->view->dropdowns = $this->model->getFormDropdowns();
-                $this->view->councils_groups = $this->model->getCouncilsGroups($returned_id);
-
-                $this->render('edit');
-            } else {
-                $this->view->subtitle = "User Editing Error";
-                $this->view->renderFull('views/templates/not_found');
-            }
+        $returned_id = $this->model->getRecordIdByRowValue($this->model->getTable(), $posted_id);
+        if ($returned_id > -1) {
+            $data = $this->model->getRecord($returned_id, $this->model->getTable());
+            $view_data = [
+                'id' => $posted_id,
+                'int_require_dual_activity' => $data['int_require_dual_activity'],
+                'has_extra' => 0
+            ];
+            $this->view->title = 'Change Dual Control Setting';
+            $this->view->model = $data['txt_model'];
+            $this->view->actionname = $data['txt_action_name'];
+            $this->view->data = $view_data;
+            $this->view->dropdowns = $this->model->getFormDropdowns();
+            $this->view->councils_groups = $this->model->getCouncilsGroups($returned_id);
+            $this->render('edit');
         } else {
-            $this->permissionDenied();
+            $this->view->subtitle = "User Editing Error";
+            $this->view->renderFull('views/templates/not_found');
         }
     }
 

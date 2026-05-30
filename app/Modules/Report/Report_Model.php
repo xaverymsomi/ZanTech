@@ -3,7 +3,7 @@
 namespace Modules\Report;
 
 use Database\Model;
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 
 /**
  * Report_Model
@@ -56,19 +56,18 @@ class Report_Model extends Model
     public function getReportTypes(): array
     {
         $permitted_section = [];
-        $permission = Perm_Auth::getPermissions();
         $data = [
-            ['report_type' => 'General_Report', 'permission' => 'print_general_report', 'report_title' => 'General', 'report_id' => 1, 'report_header' => 'general.html'],
-            ['report_type' => 'Applicant_Report', 'permission' => 'generate_applicant_report', 'report_title' => 'Applicants', 'report_id' => 2, 'report_header' => 'applicant.html'],
-            ['report_type' => 'Permit_Report', 'permission' => 'generate_permission_report', 'report_title' => 'Permit', 'report_id' => 11, 'report_header' => 'permit.html'],
-            ['report_type' => 'Application_Report', 'permission' => 'generate_application_report', 'report_title' => 'Applications', 'report_id' => 3, 'report_header' => 'application.html'],
-            ['report_type' => 'Invoice_Report', 'permission' => 'generate_invoice_report', 'report_title' => 'Invoice', 'report_id' => 4, 'report_header' => 'invoice.html'],
-            ['report_type' => 'Receipt_Report', 'permission' => 'generate_receipt_report', 'report_title' => 'Receipt', 'report_id' => 8, 'report_header' => 'receipt.html'],
-            ['report_type' => 'Finance_Report', 'permission' => 'generate_finance_report', 'report_title' => 'Finances', 'report_id' => 10, 'report_header' => 'finance.html']
+            ['report_type' => 'General_Report',     'permission' => 'print_general_report',       'report_title' => 'General',      'report_id' => 1,  'report_header' => 'general.html'],
+            ['report_type' => 'Applicant_Report',   'permission' => 'generate_applicant_report',  'report_title' => 'Applicants',   'report_id' => 2,  'report_header' => 'applicant.html'],
+            ['report_type' => 'Permit_Report',      'permission' => 'generate_permission_report', 'report_title' => 'Permit',       'report_id' => 11, 'report_header' => 'permit.html'],
+            ['report_type' => 'Application_Report', 'permission' => 'generate_application_report','report_title' => 'Applications', 'report_id' => 3,  'report_header' => 'application.html'],
+            ['report_type' => 'Invoice_Report',     'permission' => 'generate_invoice_report',    'report_title' => 'Invoice',      'report_id' => 4,  'report_header' => 'invoice.html'],
+            ['report_type' => 'Receipt_Report',     'permission' => 'generate_receipt_report',    'report_title' => 'Receipt',      'report_id' => 8,  'report_header' => 'receipt.html'],
+            ['report_type' => 'Finance_Report',     'permission' => 'generate_finance_report',    'report_title' => 'Finances',     'report_id' => 10, 'report_header' => 'finance.html'],
         ];
 
-        foreach ($data as $key => $value) {
-            if ($permission->verifyPermission($value['permission'])) {
+        foreach ($data as $value) {
+            if (Gate::allows($value['permission'])) {
                 $permitted_section[] = $value;
             }
         }

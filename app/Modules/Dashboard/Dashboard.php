@@ -3,7 +3,7 @@
 namespace Modules\Dashboard;
 
 use Authentication\Auth;
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 use Http\Controller;
 use Exception;
 use Logging\Log;
@@ -63,19 +63,15 @@ class Dashboard extends Controller
     public function createNewTransaction()
     {
         try {
-            $permission = Perm_Auth::getPermissions();
-            if ($permission->verifyPermission('create_transaction')) {
-                $this->view()->title = 'Create New Business';
-                $this->view()->controller = 'Dashboard';
-                $this->view()->action = 'postCreateTransaction';
-                $this->view()->icon = 'transaction';
-                $this->view()->data = ['has_extra' => 0];
-                $this->view()->dropdowns = $this->model->getFormDropdowns();
-                $this->view()->disabled = [];
-                $this->render('create_transaction');
-            } else {
-                $this->permissionDenied();
-            }
+            $this->requirePermission('create_transaction');
+            $this->view()->title = 'Create New Business';
+            $this->view()->controller = 'Dashboard';
+            $this->view()->action = 'postCreateTransaction';
+            $this->view()->icon = 'transaction';
+            $this->view()->data = ['has_extra' => 0];
+            $this->view()->dropdowns = $this->model->getFormDropdowns();
+            $this->view()->disabled = [];
+            $this->render('create_transaction');
         } catch (Exception $e) {
             Log::exception($e, 'DASHBOARD_CREATE_TRANSACTION_ERROR', ['action' => 'createNewTransaction']);
             $this->render('templates/error');

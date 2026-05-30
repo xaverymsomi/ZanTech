@@ -26,7 +26,7 @@ final class Auth
             'txt_name'        => (string) ($user['txt_name'] ?? ''),
             'txt_domain'      => (string) ($user['txt_domain'] ?? ''),
             'opt_mx_group_id' => (int) ($user['opt_mx_group_id'] ?? 0),
-            'role'            => (int) ($user['role'] ?? $user['opt_mx_group_id'] ?? 0),
+            'bit_is_superadmin' => (bool) ($user['bit_is_superadmin'] ?? false),
         ];
 
         Session::set(self::KEY_USER, $cleanUser);
@@ -95,6 +95,15 @@ final class Auth
     public static function domain(): ?string
     {
         return self::user()['txt_domain'] ?? null;
+    }
+
+    /**
+     * Returns true if the current session user is a super admin.
+     * This reads directly from the session payload (set at login from bit_is_superadmin column).
+     */
+    public static function isSuperAdmin(): bool
+    {
+        return (bool)(self::user()['bit_is_superadmin'] ?? false);
     }
 
     private static function forceLogout(): void

@@ -4,7 +4,7 @@ namespace Modules\EmailContent;
 
 use Exception;
 use Http\Controller;
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 
 class EmailContent extends Controller
 {
@@ -20,76 +20,56 @@ class EmailContent extends Controller
 
     public function index()
     {
-        $user_id = filter_var($_SESSION['id'], FILTER_SANITIZE_SPECIAL_CHARS);
-        $perm = Perm_Auth::getPermissions();
-        if ($perm->verifyPermission('view_email_contents')) {
-            $data = $this->model->getAllRecords($this->model->getTable());
-            $this->view()->title = "All " . $this->model->getTitle();
-            $this->view()->buttons = $this->model->getControls();
-            $this->view()->class = getClassName(get_class($this->model));
-            $this->view()->table = $this->model->getTable();
-            $this->view()->allRecords = $data[0];
-            $this->view()->headings = $this->model->getClassFields($this->model->getTable())['properties'];
-            $this->view()->hidden = $this->model->getHiddenFields();
-            $this->view()->actions = $this->model->getActions();
-            $this->view()->resultData = $data[1];
-            $this->view()->postData = $data[2];
-            $this->render('index');
-        } else {
-            $this->permissionDenied();
-        }
+        $this->requirePermission('view_email_contents');
+        $data = $this->model->getAllRecords($this->model->getTable());
+        $this->view()->title      = "All " . $this->model->getTitle();
+        $this->view()->buttons    = $this->model->getControls();
+        $this->view()->class      = getClassName(get_class($this->model));
+        $this->view()->table      = $this->model->getTable();
+        $this->view()->allRecords = $data[0];
+        $this->view()->headings   = $this->model->getClassFields($this->model->getTable())['properties'];
+        $this->view()->hidden     = $this->model->getHiddenFields();
+        $this->view()->actions    = $this->model->getActions();
+        $this->view()->resultData = $data[1];
+        $this->view()->postData   = $data[2];
+        $this->render('index');
     }
 
     public function profile($id)
     {
-        $record_id = filter_var($id, FILTER_SANITIZE_SPECIAL_CHARS);
-        $user_id = filter_var($_SESSION['id'], FILTER_SANITIZE_SPECIAL_CHARS);
-        $permission = Perm_Auth::getPermissions();
-        if ($permission->verifyPermission('view_email_content')) {
-            $returned_id = $this->model->getRecordIdByRowValue($this->model->getTable(), $record_id);
-            $data = $this->model->getProfileData($returned_id, $this->model->getTable());
-            $this->view()->title = 'Email Content Profile';
-            $this->view()->data = $data;
-            $this->view()->tabs = $this->model->getTabs();
-            $this->view()->hidden_columns = $this->model->getProfileHiddenColumns();
-            $this->view()->buttons = [];
-            $this->view()->primary_color = filter_input(INPUT_COOKIE, 'primary', FILTER_SANITIZE_SPECIAL_CHARS, ["options" => ["default" => "#000000"]]);
-            $this->view()->secondary_color = filter_input(INPUT_COOKIE, 'secondary', FILTER_SANITIZE_SPECIAL_CHARS, ["options" => ["default" => "#FF0000"]]);
-            $this->render('profile');
-        } else {
-            $this->permissionDenied();
-        }
+        $this->requirePermission('view_email_content');
+        $record_id   = filter_var($id, FILTER_SANITIZE_SPECIAL_CHARS);
+        $returned_id = $this->model->getRecordIdByRowValue($this->model->getTable(), $record_id);
+        $data = $this->model->getProfileData($returned_id, $this->model->getTable());
+        $this->view()->title          = 'Email Content Profile';
+        $this->view()->data           = $data;
+        $this->view()->tabs           = $this->model->getTabs();
+        $this->view()->hidden_columns = $this->model->getProfileHiddenColumns();
+        $this->view()->buttons        = [];
+        $this->view()->primary_color   = filter_input(INPUT_COOKIE, 'primary', FILTER_SANITIZE_SPECIAL_CHARS, ["options" => ["default" => "#000000"]]);
+        $this->view()->secondary_color = filter_input(INPUT_COOKIE, 'secondary', FILTER_SANITIZE_SPECIAL_CHARS, ["options" => ["default" => "#FF0000"]]);
+        $this->render('profile');
     }
 
     public function edit($id)
     {
-        $user_id = filter_var($_SESSION['id'], FILTER_SANITIZE_SPECIAL_CHARS);
+        $this->requirePermission('edit_email_content');
         $posted_id = filter_var($id, FILTER_SANITIZE_SPECIAL_CHARS);
-        $permission = Perm_Auth::getPermissions();
-        if ($permission->verifyPermission('edit_email_content')) {
-            $email_id = $this->model->getRecordIdByRowValue($this->model->getTable(), $posted_id);
-            $data = $this->model->getRecord($email_id, $this->model->getTable());
-            $this->view()->title = 'Update ' . $this->model->getTitle();
-            $this->view()->data = $data;
-            $this->view()->dropdowns = $this->model->getFormDropdowns($data['opt_mx_source_id']);
-            $this->render('edit');
-        } else {
-            $this->permissionDenied();
-        }
+        $email_id  = $this->model->getRecordIdByRowValue($this->model->getTable(), $posted_id);
+        $data      = $this->model->getRecord($email_id, $this->model->getTable());
+        $this->view()->title     = 'Update ' . $this->model->getTitle();
+        $this->view()->data      = $data;
+        $this->view()->dropdowns = $this->model->getFormDropdowns($data['opt_mx_source_id']);
+        $this->render('edit');
     }
 
     public function edit_email_setup()
     {
-        $user_id = filter_var($_SESSION['id'], FILTER_SANITIZE_SPECIAL_CHARS);
-        $permission = Perm_Auth::getPermissions();
-        if ($permission->verifyPermission('edit_email_setup')) {
-            $this->view()->title = 'Update ' . $this->model->getTitle();
-            $this->view()->data = $this->model->getMailSetting();
-            $this->view()->dropdowns = [];
-            $this->render('edit_email_setup');
-        } else {
-            $this->permissionDenied();
-        }
+        $this->requirePermission('edit_email_setup');
+        $this->view()->title     = 'Update ' . $this->model->getTitle();
+        $this->view()->data      = $this->model->getMailSetting();
+        $this->view()->dropdowns = [];
+        $this->render('edit_email_setup');
     }
 
     public function post_edit_email_setup()
@@ -135,17 +115,12 @@ class EmailContent extends Controller
 
     public function create()
     {
-        $user_id = filter_var($_SESSION['id'], FILTER_SANITIZE_SPECIAL_CHARS);
-        $perm = Perm_Auth::getPermissions();
-        if ($perm->verifyPermission('add_email_content')) { //checking permission
-            $this->view()->class = getClassName(get_class($this->model));
-            $this->view()->title = 'New ' . $this->model->getTitle();
-            $this->view()->dropdowns = $this->model->getFormDropdowns(0); // Get only unused reasons
-            $this->view()->data = ['has_extra' => 0];
-            $this->render('create');
-        } else {
-            $this->permissionDenied();
-        }
+        $this->requirePermission('add_email_content');
+        $this->view()->class     = getClassName(get_class($this->model));
+        $this->view()->title     = 'New ' . $this->model->getTitle();
+        $this->view()->dropdowns = $this->model->getFormDropdowns(0);
+        $this->view()->data      = ['has_extra' => 0];
+        $this->render('create');
     }
 
     public function save()

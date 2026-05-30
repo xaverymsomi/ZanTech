@@ -4,7 +4,7 @@ namespace Foundation;
 
 use Http\Controller;
 use Authentication\Auth;
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 use Logging\Log;
 use ReflectionClass;
 

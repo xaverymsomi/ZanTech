@@ -3,7 +3,7 @@
 namespace Modules\UserGroup;
 
 use Foundation\BaseModuleController;
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 use Exception;
 use Logging\Log;
 

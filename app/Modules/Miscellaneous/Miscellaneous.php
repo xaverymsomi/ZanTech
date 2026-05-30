@@ -3,7 +3,7 @@ namespace Modules\Miscellaneous;
 
 use Exception;
 use Http\Controller;
-use Authentication\Perm_Auth;
+use Authentication\Gate;
 
 /**
  * Description of Miscellaneous
@@ -19,15 +19,10 @@ class Miscellaneous extends Controller {
     }
 
     public function index() {
-        $perm = Perm_Auth::getPermissions();
-        if ($perm->verifyPermission('view_configurations')) {
-//            $this->view->data = $this->model->getConfigurationData(filter_var($_SESSION['council'], FILTER_SANITIZE_NUMBER_INT));
-            $this->view()->data = $this->model->getConfigurationData();
-            $this->view()->dropdowns = $this->model->getMiscellaneousDropdowns();
-            $this->render('index');
-        } else {
-            $this->permissionDenied();
-        }
+        $this->requirePermission('view_configurations');
+        $this->view()->data = $this->model->getConfigurationData();
+        $this->view()->dropdowns = $this->model->getMiscellaneousDropdowns();
+        $this->render('index');
     }
 
     public function save()
