@@ -12,9 +12,19 @@ final class Profiler
         self::$startTime = microtime(true);
     }
 
+    private static function isEnabled(): bool
+    {
+        if (!defined('APP_DEBUG') || APP_DEBUG !== true) {
+            return false;
+        }
+
+        $env = $_ENV['ENV'] ?? $_ENV['APP_ENV'] ?? (defined('APP_ENV') ? APP_ENV : 'production');
+        return in_array(strtolower($env), ['development', 'local', 'dev'], true);
+    }
+
     public static function recordQuery(string $sql, array $params, float $durationMs): void
     {
-        if (defined('APP_DEBUG') && APP_DEBUG === true) {
+        if (self::isEnabled()) {
             self::$queries[] = [
                 'sql' => $sql,
                 'params' => $params,
@@ -36,7 +46,7 @@ final class Profiler
 
     public static function renderToolbar(): string
     {
-        if (!defined('APP_DEBUG') || APP_DEBUG !== true) {
+        if (!self::isEnabled()) {
             return '';
         }
 
